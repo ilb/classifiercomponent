@@ -1,0 +1,46 @@
+import fs from 'fs';
+import FormData from 'form-data';
+import fetch from 'isomorphic-fetch';
+import { timeoutPromise } from '../../../../src/utils.mjs';
+
+export default class ClassifierGate {
+  /**
+   * @param {string} classifierUrl
+   * @param {int} classifierTimeout
+   */
+  constructor({ classifierUrl, classifierTimeout }) {
+    this.classifierUrl = classifierUrl;
+    this.classifierTimeout = classifierTimeout;
+  }
+
+  /**
+   *
+   * @param {Page[]} pages
+   * @param {string} previousClass
+   * @returns {Promise<unknown[]>}
+   */
+  async classify(pages, previousClass) {
+    const formData = new FormData();
+    const queryParams = previousClass ? new URLSearchParams({ previousClass }).toString() : '';
+
+    pages.forEach((page) => {
+      const pageBuffer = fs.readFileSync(page.uri);
+      formData.append('file', pageBuffer);
+    });
+    const res = await timeoutPromise(fetch(`${this.classifierUrl}/classify?${queryParams}`, {
+        method: 'POST',
+        headers: {
+          ...formData.getHeaders()
+        },
+        body: formData
+      }), new Error('Classifier Timed Out! Page: ' + JSON.stringify(pages)), this.classifierTimeout
+    );
+
+    if (res.ok) {
+      const classifications = await res.json();
+      return Object.values(classifications);
+    } else {
+      throw Error(`Error occured while classifying the page: ${await res.text()}`);
+    }
+  }
+}
