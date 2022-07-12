@@ -26,7 +26,6 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
         <>
           <SemanticMenu.Item
             disabled={classifier.readonly}
-            style={{ height: 45 }}
             name="classifier"
             className="classifier-tab"
             active={selected === 'classifier'}
@@ -41,7 +40,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
               />
             </div>
           </SemanticMenu.Item>
-          <Divider style={{ margin: 8 }} />
+          <Divider style={{ margin: 0 }} />
         </>
       )}
       {docBlocks.map((block) => {

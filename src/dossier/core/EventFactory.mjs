@@ -1,8 +1,8 @@
-import SignatureVerificationHandler from '../handlers/SignatureVerificationHandler.mjs';
+// import SignatureVerificationHandler from '../handlers/SignatureVerificationHandler.mjs';
 
 export default class EventFactory {
   #handlers = [
-    SignatureVerificationHandler,
+    // SignatureVerificationHandler,
   ]
 
   constructor(scope) {

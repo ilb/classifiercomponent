@@ -1,0 +1,12 @@
+.ui.grid>.column:not(.row).dossier__wrap {
+  padding: 0;
+}
+
+.ui.horizontal.segments.dossier__uploads {
+  margin: 0;
+}
+
+.dossier__wrap .item.classifier-tab {
+  padding: 20px;
+  height: auto;
+}

@@ -10,11 +10,9 @@ export default class Document {
    * @param {Dossier} dossier
    * @param {object} documentData
    * @param {MessageBus} messageBus
-   * @param {Storage} storage
    */
-  constructor(dossier, documentData, { messageBus, storage }) {
+  constructor(dossier, documentData, { messageBus }) {
     this.messageBus = messageBus;
-    this.storage = storage;
 
     this.#_id = documentData.id;
     this.#_uuid = documentData.uuid;

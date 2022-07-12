@@ -1,6 +1,8 @@
 import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../utils/fetcher';
 
+const basePath = process.env.API_PATH || '/api';
+
 export const classifyDocument = async (uuid, files, availableClasses) => {
   const formData = new FormData();
   files.forEach((f) => {
@@ -9,7 +11,7 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
 
   availableClasses.map((availableClass) => formData.append(`availableClasses`, availableClass));
 
-  const result = await fetch(`/loanbroker/api/classifications/${uuid}`, {
+  const result = await fetch(`${basePath}/classifications/${uuid}`, {
     method: 'PUT',
     headers: {
       accept: '*/*'
@@ -30,7 +32,7 @@ export const uploadPages = async (uuid, document, files) => {
     formData.append(`documents`, f);
   });
 
-  const result = await fetch(`/loanbroker/api/classifications/${uuid}/documents/${document}`, {
+  const result = await fetch(`${basePath}/classifications/${uuid}/documents/${document}`, {
     method: 'PUT',
     headers: {
       accept: '*/*'
@@ -59,7 +61,7 @@ export const deletePage = async (pageSrc) => {
 };
 
 export const correctDocuments = async (uuid, from, to) => {
-  const res = await fetch(`/loanbroker/api/classifications/${uuid}/documents/correction`, {
+  const res = await fetch(`${basePath}/classifications/${uuid}/documents/correction`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -81,7 +83,7 @@ export const correctDocuments = async (uuid, from, to) => {
 export const usePages = (uuid, documentName) => {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { data: pages, mutate } = useSWR(
-    documentName ? `/loanbroker/api/classifications/${uuid}/documents/${documentName}/index` : null,
+    documentName ? `${basePath}/classifications/${uuid}/documents/${documentName}/index` : null,
     fetcher,
     {
       fallbackData: []
@@ -93,7 +95,7 @@ export const usePages = (uuid, documentName) => {
     revalidatePages: () =>
       mutateGlobal(
         documentName
-          ? `/loanbroker/api/classifications/${uuid}/documents/${documentName}/index`
+          ? `${basePath}/classifications/${uuid}/documents/${documentName}/index`
           : null
       )
   };
@@ -102,7 +104,7 @@ export const usePages = (uuid, documentName) => {
 export const useDocuments = (uuid) => {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { data: documents, mutate } = useSWR(
-    `/loanbroker/api/classifications/${uuid}/documents`,
+    `${basePath}/classifications/${uuid}/documents`,
     fetcher,
     {
       fallbackData: {}
@@ -112,12 +114,12 @@ export const useDocuments = (uuid) => {
     documents,
     mutateDocuments: mutate,
     correctDocuments: (from, to) => correctDocuments(uuid, from, to),
-    revalidateDocuments: () => mutateGlobal(`/loanbroker/api/classifications/${uuid}/documents`)
+    revalidateDocuments: () => mutateGlobal(`${basePath}/classifications/${uuid}/documents`)
   };
 };
 
 export const useTasks = (uuid) => {
-  const { data: tasks } = useSWR(`/loanbroker/api/classifications/${uuid}`, fetcher, {
+  const { data: tasks } = useSWR(`${basePath}/classifications/${uuid}`, fetcher, {
     fallbackData: [],
     refreshInterval: 5000
   });

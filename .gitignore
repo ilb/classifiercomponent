@@ -98,3 +98,6 @@ typings/
 
 # JetBrains config
 .idea
+
+/build
+documents

@@ -8,11 +8,10 @@ const builder = new ClassifierSchemaBuilder({ matching });
 
 export default function App() {
   const uuid = '7533b049-88ca-489b-878a-3ac1c8616fe7';
-  const [classifierSchema] = useState(builder.build(schema, {}));
+  const [classifierSchema] = useState(builder.build(schema, { stateCode: 'CREATION' }));
 
   return (
-    <div className="ui container">
-      <h1>Hello World!</h1>
+    <div style={{ marginTop: 50 }} className="ui container">
       <Classifier
         uuid={uuid}
         name="classifier"

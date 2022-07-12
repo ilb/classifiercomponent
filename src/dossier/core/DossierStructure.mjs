@@ -1,10 +1,9 @@
 import DocumentStructure from './DocumentStructure.mjs';
 import fs from 'fs';
-import { fromEnv } from '../../../src/utils.mjs';
 
 export default class DossierStructure {
   constructor(uuid) {
-    this.structurePath = `${fromEnv('apps.loanbroker.documents')}/dossier/${uuid}/index.json`;
+    this.structurePath = `${process.env['apps.loanbroker.documents']}/dossier/${uuid}/index.json`;
 
     if (fs.existsSync(this.structurePath)) {
       this.#loadStructure();

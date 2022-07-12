@@ -40,21 +40,28 @@ const GalleryItem = React.memo(
       const isImage = () => {
         return src.type ? src.type.includes('image/') : true;
       };
-
+      console.log(src);
       const getPath = () => src.path || src; // todo как-то избавиться от такого
       return (
         <div ref={ref} style={style}>
           <Card>
             <Card.Content style={{ padding: 4 }}>
               {errors?.count && (
-                <Popup trigger={
-                  <Icon style={{ display: 'block', position: 'absolute', zIndex: 10, margin: 10 }}
-                        size="large"
-                        color="red"
-                        name="attention"/>
-                       }>
-                  <div>{errors.description ? 'Отсутствует:' : 'Отсутствует подписей: ' + errors.count}</div>
-                  {errors.description.split('\n').map(error => (<div>{error}</div>))}
+                <Popup
+                  trigger={
+                    <Icon
+                      style={{ display: 'block', position: 'absolute', zIndex: 10, margin: 10 }}
+                      size="large"
+                      color="red"
+                      name="attention"
+                    />
+                  }>
+                  <div>
+                    {errors.description ? 'Отсутствует:' : 'Отсутствует подписей: ' + errors.count}
+                  </div>
+                  {errors.description.split('\n').map((error) => (
+                    <div>{error}</div>
+                  ))}
                 </Popup>
               )}
               {!disabled && <Remove onClick={handleClick} />}

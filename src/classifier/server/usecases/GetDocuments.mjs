@@ -1,4 +1,4 @@
-import { fromEnv, getMimeType } from '../../../../src/utils.mjs';
+import mime from 'mime-types';
 
 export default class GetDocuments {
   /**
@@ -10,7 +10,7 @@ export default class GetDocuments {
 
   async process({ uuid }) {
     const dossier = await this.dossierBuilder.build(uuid);
-    const url = `${fromEnv('BASE_URL')}/api/classifications/${uuid}/documents`;
+    const url = `${process.env.BASE_URL}/api/classifications/${uuid}/documents`;
 
     return dossier.getDocuments().reduce((accumulator, document) => {
       const links = document.structure.pages.map((page, i) => {
@@ -18,7 +18,7 @@ export default class GetDocuments {
           id: `${url}/${document.code}/${i + 1}?_nocache=${document.structure.lastModified}`,
           path: `${url}/${document.code}/${i + 1}?_nocache=${document.structure.lastModified}`,
           uuid: page.uuid,
-          type: getMimeType(page.extension)
+          type: mime.lookup(page.extension)
         };
       });
 

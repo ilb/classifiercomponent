@@ -1,18 +1,18 @@
-import { createScope, processUsecaseApiInstance2 } from '../../usecases/index.mjs';
+import { processUsecaseApiInstance2 } from '../../http/handlers.mjs';
 import AddPages from './usecases/AddPages.mjs';
 import GetPage from './usecases/GetPage.mjs';
 import DeletePage from './usecases/DeletePage.mjs';
 import CorrectionDocument from './usecases/CorrectionDocuments.mjs';
 import nc from 'next-connect';
-import { onError, onNoMatch, uploadMiddleware } from '../../middlewares';
+import { onError, onNoMatch, uploadMiddleware } from '../../http/middlewares.mjs';
 import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import { convertToJpeg, splitPdf } from '../../middlewares/index.mjs';
+import { convertToJpeg, splitPdf } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
-const Classifier = () => {
+const Classifier = (createScope) => {
   const getDocumentsIndex = async (req, res) => {
     const context = { query: { ...req.params, ...req.body }, req };
     const scope = await createScope(context.req);

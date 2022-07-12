@@ -1,7 +1,7 @@
 import fs from 'fs';
 import FormData from 'form-data';
 import fetch from 'isomorphic-fetch';
-import { timeoutPromise } from '../../../../src/utils.mjs';
+import { timeoutPromise } from '../utils.mjs';
 
 export default class ClassifierGate {
   /**

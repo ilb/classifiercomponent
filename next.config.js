@@ -1,9 +1,6 @@
 // const isProd = process.env.NODE_ENV === 'production';
 
-const withPlugins = require('next-compose-plugins');
-const withTM = require('next-transpile-modules')(['react-dropzone']);
-
-module.exports = withPlugins([withTM], {
+module.exports = {
   trailingSlash: false,
   images: {
     domains: ['localhost', '127.0.0.1']
@@ -14,4 +11,4 @@ module.exports = withPlugins([withTM], {
     // your project has ESLint errors.
     ignoreDuringBuilds: true
   }
-});
+};

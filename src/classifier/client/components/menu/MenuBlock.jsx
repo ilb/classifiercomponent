@@ -9,7 +9,7 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
       {!!block?.documents?.length && (
         <>
           {block.collapsed && (
-            <Menu.Item onClick={() => setOpen(!isOpened)} style={{ cursor: 'pointer', height: 35 }}>
+            <Menu.Item onClick={() => setOpen(!isOpened)} style={{ cursor: 'pointer' }}>
               <span>
                 {isOpened && <Icon color="grey" name="chevron up" />}
                 {!isOpened && <Icon color="grey" name="chevron down" />}

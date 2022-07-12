@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path'
-import { getMimeType } from '../../../src/utils.mjs';
 import Document from '../core/Document.mjs';
 import { getExtension } from 'next/dist/server/serve-static';
 import UploadingEvent from '../events/UploadingEvent.mjs';
@@ -10,6 +9,7 @@ import RemovingEvent from '../events/RemovingEvent.mjs';
 import RemovedEvent from '../events/RemovedEvent.mjs';
 import UploadedEvent from '../events/UploadedEvent.mjs';
 import ClassifierPage from "../../classifier/server/core/ClassifierPage.mjs";
+import mime from 'mime-types';
 
 export default class PageDocument extends Document {
   /**
@@ -84,7 +84,7 @@ export default class PageDocument extends Document {
       return null;
     }
 
-    const firstPageMimeType = getMimeType(this.structure.pages[0].extension);
+    const firstPageMimeType = mime.lookup(this.structure.pages[0].extension);
     if (firstPageMimeType.includes('image/')) {
       return 'application/pdf';
     }

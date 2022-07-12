@@ -1,4 +1,4 @@
-import { getMimeType } from '../../../../src/utils.mjs';
+import mime from 'mime-types';
 
 export default class GetPage {
   constructor({ dossierBuilder }) {
@@ -14,7 +14,7 @@ export default class GetPage {
     return {
       info: page,
       document: imageBuffer,
-      contentType: getMimeType(page.extension) || 'application/pdf'
+      contentType: mime.lookup(page.extension) || 'application/pdf'
     };
   }
 }

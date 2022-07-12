@@ -85,3 +85,10 @@ export const prepareClassifies = (classifies, availableClasses) => {
 export const getFilePath = (file, dossierPath) => {
   return file.path.replace(dossierPath + '/', '');
 }
+
+export const timeoutPromise = async (promise, err, timeout) => {
+  return new Promise(function(resolve,reject) {
+    promise.then(resolve,reject);
+    setTimeout(reject.bind(null, err), timeout * 1000);
+  });
+};

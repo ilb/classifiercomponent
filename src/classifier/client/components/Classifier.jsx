@@ -97,7 +97,7 @@ const Classifier = ({
       }
     }
 
-    Object.keys(documents).length && onChange(uniformDocuments);
+    Object.keys(documents).length && onChange && onChange(uniformDocuments);
   }, [documents, form]);
 
   useEffect(async () => {
@@ -384,7 +384,6 @@ const Classifier = ({
         onDragOver={onDragOver}
         onDragCancel={onDragCancel}>
         <Grid.Column
-          style={{ padding: '7px 3px' }}
           textAlign="center"
           className="dossier__wrap"
           width={4}>
