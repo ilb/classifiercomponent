@@ -1,10 +1,10 @@
-import { processUsecaseApiInstance2 } from '../../http/handlers.mjs';
+import { defaultHandler, fileHandler } from '../../http/handlers.mjs';
 import AddPages from './usecases/AddPages.mjs';
 import GetPage from './usecases/GetPage.mjs';
 import DeletePage from './usecases/DeletePage.mjs';
-import CorrectionDocument from './usecases/CorrectionDocuments.mjs';
+import CorrectionDocument from './usecases/CorrectPages.mjs';
 import nc from 'next-connect';
-import { onError, onNoMatch, uploadMiddleware } from '../../http/middlewares.mjs';
+import { uploadMiddleware } from '../../http/middlewares.mjs';
 import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
@@ -12,92 +12,16 @@ import GetDocument from './usecases/GetDocument.mjs';
 import { convertToJpeg, splitPdf } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
-const Classifier = (createScope) => {
-  const getDocumentsIndex = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new GetDocuments(scope.cradle);
-    const { httpCode, data } = await processUsecaseApiInstance2(context, usecase);
+const ClassifierApi = (createScope, onError, onNoMatch) => {
+  const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
+  const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
+  const correctPages = async (req, res) => defaultHandler(req, res, createScope, CorrectionDocument);
+  const getDocuments = async (req, res) => defaultHandler(req, res, createScope, GetDocuments);
+  const classifyPages = async (req, res) => defaultHandler(req, res, createScope, ClassifyPages);
+  const checkClassifications = async (req, res) => defaultHandler(req, res, createScope, CheckClassifications);
 
-    res.status(httpCode).json(data);
-  };
-
-  const classify = async (req, res) => {
-    const context = { query: { ...req.params, ...req.files, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new ClassifyPages(scope.cradle);
-    const { httpCode, data, contentType } = await processUsecaseApiInstance2(context, usecase);
-
-    res.setHeader('Content-Type', contentType);
-    res.status(httpCode).send(data);
-  };
-
-  const uploadPages = async (req, res) => {
-    const context = { query: { ...req.params, ...req.files }, req };
-    const scope = await createScope(context.req);
-    const usecase = new AddPages(scope.cradle);
-    const { httpCode, data, contentType } = await processUsecaseApiInstance2(context, usecase);
-
-    res.setHeader('Content-Type', contentType);
-    res.status(httpCode).send(data);
-  };
-
-  const correctDocument = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new CorrectionDocument(scope.cradle);
-    const { httpCode, data, contentType } = await processUsecaseApiInstance2(context, usecase);
-    res.setHeader('Content-Type', contentType);
-    res.status(httpCode).send(data);
-  };
-
-  const getDocumentPage = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new GetPage(scope.cradle);
-    const { data } = await processUsecaseApiInstance2(context, usecase);
-
-    res.setHeader('Content-Type', data.contentType);
-    res.setHeader('Content-Length', Buffer.byteLength(data.document));
-    const attachmentName = encodeURIComponent(data.info.name);
-    const contentDisposition = `${
-      res.contentDisposition || 'attachment'
-    }; filename*=UTF-8''${attachmentName}`;
-    res.setHeader('Content-Disposition', contentDisposition);
-    res.send(data.document);
-  };
-
-  const deleteDocumentPage = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new DeletePage(scope.cradle);
-    const { httpCode, data, contentType } = await processUsecaseApiInstance2(context, usecase);
-    res.setHeader('Content-Type', contentType);
-    res.status(httpCode).send(data);
-  };
-
-  const getDocument = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new GetDocument(scope.cradle);
-    const { data } = await processUsecaseApiInstance2(context, usecase);
-    const { file, mimeType, extension, filename } = data;
-
-    res.setHeader('Content-Length', file.length);
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename=${filename}.${extension}`);
-    res.write(file, 'binary');
-    res.end();
-  };
-
-  const checkClassifications = async (req, res) => {
-    const context = { query: { ...req.params, ...req.body }, req };
-    const scope = await createScope(context.req);
-    const usecase = new CheckClassifications(scope.cradle);
-    const { httpCode, data, contentType } = await processUsecaseApiInstance2(context, usecase);
-    res.setHeader('Content-Type', contentType);
-    res.status(httpCode).send(data);
-  };
+  const getPage = async (req, res) => fileHandler(req, res, createScope, GetPage);
+  const getDocument = async (req, res) => fileHandler(req, res, createScope, GetDocument);
 
   return nc().use(
     '/api/classifications',
@@ -106,15 +30,15 @@ const Classifier = (createScope) => {
       .use(splitPdf)
       .use(convertToJpeg)
       .use(bodyParser.json())
-      .put('/:uuid', classify)
       .get('/:uuid', checkClassifications)
-      .get('/:uuid/documents', getDocumentsIndex)
-      .post('/:uuid/documents/correction', correctDocument)
+      .put('/:uuid', classifyPages)
+      .get('/:uuid/documents', getDocuments)
+      .post('/:uuid/documents/correction', correctPages)
       .get('/:uuid/documents/:name', getDocument)
-      .put('/:uuid/documents/:name', uploadPages)
-      .get('/:uuid/documents/:name/:number', getDocumentPage)
-      .delete('/:uuid/documents/:name/:pageUuid', deleteDocumentPage)
+      .put('/:uuid/documents/:name', addPages)
+      .get('/:uuid/documents/:name/:number', getPage)
+      .delete('/:uuid/documents/:name/:pageUuid', deletePage)
   );
 };
 
-export default Classifier;
+export default ClassifierApi;
