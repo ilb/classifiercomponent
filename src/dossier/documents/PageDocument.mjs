@@ -12,18 +12,19 @@ import {
   UploadedEvent,
   UploadingEvent
 } from '../index.js';
+import MessageBus from '../core/MessageBus.mjs';
+import DocumentMerger from '../../services/DocumentMerger.mjs';
 
 export default class PageDocument extends Document {
   /**
    * @param {Dossier} dossier
    * @param {object} docData
-   * @param {any} scope
    */
-  constructor(dossier, docData, scope) {
-    super(dossier, docData, scope);
-    this.dossierPath = scope.dossierPath;
-    this.documentsPath = scope.documentsPath;
-    this.documentMerger = scope.documentMerger;
+  constructor(dossier, docData) {
+    super(dossier, docData);
+    this.documentsPath = process.env['apps.loanbroker.documents'];
+    this.dossierPath = this.dossierPath + '/dossier';
+    this.documentMerger = new DocumentMerger(this.dossierPath);
   }
 
   /**
@@ -74,7 +75,7 @@ export default class PageDocument extends Document {
    * @returns {string}
    */
   getDocumentName() {
-    return this.code + '-' + this.dossier.uuid;
+    return this.type + '-' + this.dossier.uuid;
   }
 
   /**
@@ -129,10 +130,10 @@ export default class PageDocument extends Document {
    * @param {int|null} numberTo
    */
   async addPage(page, numberTo= null) {
-    await this.messageBus.emit(new UploadingEvent({ document: this, pages: [page] }));
+    await MessageBus.emit(new UploadingEvent({ document: this, pages: [page] }));
     await this.#processAddPage(page, numberTo);
     this.structure.save();
-    await this.messageBus.emit(new UploadedEvent({ document: this, pages: [page] }));
+    await MessageBus.emit(new UploadedEvent({ document: this, pages: [page] }));
   }
 
   /**
@@ -142,10 +143,10 @@ export default class PageDocument extends Document {
    * @returns {Promise<void>}
    */
   async addPages(pages) {
-    await this.messageBus.emit(new UploadingEvent({ document: this, pages }));
+    await MessageBus.emit(new UploadingEvent({ document: this, pages }));
     pages.map(async page => await this.#processAddPage(page))
     this.structure.save();
-    await this.messageBus.emit(new UploadedEvent({ document: this, pages }));
+    await MessageBus.emit(new UploadedEvent({ document: this, pages }));
   }
 
   /**
@@ -156,10 +157,10 @@ export default class PageDocument extends Document {
    * @returns {Promise<void>}
    */
   async movePage(numberFrom, numberTo) {
-    await this.messageBus.emit(new InsideMovingEvent({ document: this, numberFrom, numberTo }));
+    await MessageBus.emit(new InsideMovingEvent({ document: this, numberFrom, numberTo }));
     await this.#processMovePage(numberFrom, numberTo);
     this.structure.save();
-    await this.messageBus.emit(new InsideMovedEvent({ document: this, numberFrom, numberTo }));
+    await MessageBus.emit(new InsideMovedEvent({ document: this, numberFrom, numberTo }));
   }
 
   /**
@@ -187,10 +188,10 @@ export default class PageDocument extends Document {
    * @param {string} pageUuid
    */
   async deletePage(pageUuid) {
-    await this.messageBus.emit(new RemovingEvent({ document: this, pageUuid }));
+    await MessageBus.emit(new RemovingEvent({ document: this, pageUuid }));
     await this.#processDeletePage(pageUuid)
     this.structure.save();
-    await this.messageBus.emit(new RemovedEvent({ document: this, pageUuid }));
+    await MessageBus.emit(new RemovedEvent({ document: this, pageUuid }));
   }
 
   /**

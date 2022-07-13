@@ -7,13 +7,13 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
   let isNotImage = false;
   let isRequired = !document.readonly && document.required;
   const { documents } = useDocuments(uuid);
-  const tabDocuments = documents[document.code];
+  const tabDocuments = documents[document.type];
   const countPages = tabDocuments?.length;
   if (countPages && !tabDocuments[0].type.includes('image/')) {
     isNotImage = true;
   }
   const { setNodeRef } = useDroppable({
-    id: document.code,
+    id: document.type,
     data: { tab: true },
     disabled: document.readonly || disabled || isNotImage
   });
@@ -24,11 +24,11 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
   return (
     <>
       {!hidden && (
-        <div key={document.code} ref={setNodeRef}>
+        <div key={document.type} ref={setNodeRef}>
           <Menu.Item
             disabled={disabled}
             className={className}
-            name={document.code}
+            name={document.type}
             active={selected}
             onClick={onDocumentSelect}>
             <span>

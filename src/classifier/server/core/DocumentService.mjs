@@ -1,16 +1,10 @@
-import { OutsideMovedEvent, OutsideMovingEvent } from '../../../dossier/index.js';
+import { MessageBus, OutsideMovedEvent, OutsideMovingEvent } from '../../../dossier/index.js';
 
 export default class DocumentService {
   /**
-   * @param classifierSchema
-   * @param {string} dossierPath
-   * @param {MessageBus} messageBus
    * @param {DossierBuilder} dossierBuilder
    */
-  constructor({ classifierSchema, dossierPath, messageBus, dossierBuilder }) {
-    this.docSchema = classifierSchema.documents
-    this.dossierPath = dossierPath;
-    this.messageBus = messageBus;
+  constructor({ dossierBuilder }) {
     this.dossierBuilder = dossierBuilder;
   }
   /**
@@ -23,7 +17,7 @@ export default class DocumentService {
    * @return {Promise<void>}
    */
   async movePage(documentFrom, pageNumberFrom, documentTo, pageNumberTo = null) {
-    await this.messageBus.emit(new OutsideMovingEvent({ documentFrom, documentTo, pageNumberFrom }));
+    await MessageBus.emit(new OutsideMovingEvent({ documentFrom, documentTo, pageNumberFrom }));
 
     const page = documentFrom.extractPage(pageNumberFrom);
     await documentTo.addPage(page, pageNumberTo);
@@ -31,17 +25,7 @@ export default class DocumentService {
     documentFrom.structure.save();
     documentTo.structure.save();
 
-    await this.messageBus.emit(new OutsideMovedEvent({ documentFrom, documentTo, page }));
-  }
-
-  /**
-   * Возвращает тип документа (бд) по его названию в классификаторе
-   *
-   * @param {string} code
-   * @return {string}
-   */
-  getTypeByName(code) {
-    return this.docSchema.find(doc => doc.code === code).type;
+    await MessageBus.emit(new OutsideMovedEvent({ documentFrom, documentTo, page }));
   }
 
   /**
@@ -51,16 +35,15 @@ export default class DocumentService {
    * @return {string[]}
    */
   async getTypes(uuid) {
+    const types = [];
     const dossier = await this.dossierBuilder.build(uuid);
-    const documents = dossier.structure.documents;
-    const codes = [];
 
-    for (const code in documents) {
-      if (documents[code].pages.length) {
-        codes.push(code);
+    for (const type in dossier.structure.documents) {
+      if (dossier.structure.documents[type].pages.length) {
+        types.push(type);
       }
     }
 
-    return this.docSchema.filter(doc => codes.includes(doc.code)).map(doc => doc.type);
+    return types;
   }
 }

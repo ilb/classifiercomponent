@@ -7,13 +7,13 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
   useEffect(() => {
     setDocBlocks(
       blocks.map((block) => {
-        const blockDocs = documents.filter((document) => document.block === block.code);
+        const blockDocs = documents.filter((document) => document.block === block.type);
 
         return {
           documents: blockDocs,
           collapsed: block.collapsed,
           name: block.name,
-          code: block.code,
+          type: block.type,
           open: block.open
         };
       })
@@ -47,7 +47,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
         return (
           <MenuBlock
             uuid={uuid}
-            key={block.code}
+            key={block.type}
             hiddenTabs={hiddenTabs}
             selected={selected}
             onDocumentSelect={onDocumentSelect}

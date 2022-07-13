@@ -16,8 +16,8 @@ export default class DossierStructure {
     this.#loadStructure();
   }
 
-  save(code, documentStructure) {
-    this.documents[code] = documentStructure;
+  save(type, documentStructure) {
+    this.documents[type] = documentStructure;
 
     fs.writeFileSync(this.structurePath, JSON.stringify({
       uuid: this.uuid,
@@ -26,8 +26,8 @@ export default class DossierStructure {
     }, null, 2))
   }
 
-  getDocumentStructure(code) {
-    return new DocumentStructure(this.documents[code], this, code)
+  getDocumentStructure(type) {
+    return new DocumentStructure(this.documents[type], this, type)
   }
 
   exists() {

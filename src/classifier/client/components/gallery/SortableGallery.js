@@ -17,7 +17,7 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
 
   useEffect(() => {
     setState({ ...state, previewOpen: false });
-  }, [tab.code]);
+  }, [tab.type]);
 
   const rotateImage = async (event, { angle }) => {
     let newAngle = state.rotation + angle;

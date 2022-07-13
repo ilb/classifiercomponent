@@ -4,19 +4,19 @@ export default class BaseBuilder {
     this.matching = matching
   }
 
-  init(types, context) {
+  init(schema, context) {
     this.context = context;
-    this.initializeTypes(types);
+    this.initializeSchema(schema);
     this.initializeProcessors(context);
   }
 
   /**
-   * Инициализация типов документов
+   * Инициализация схемы документов
    *
-   * @param types
+   * @param schema
    */
-  initializeTypes(types) {
-    this.types = types;
+  initializeSchema(schema) {
+    this.schema = schema;
   }
 
   /**
@@ -25,22 +25,22 @@ export default class BaseBuilder {
    * @param context
    */
   initializeProcessors(context) {
-    this.processors.classifier = this.getProcessor(this.types.classifier, context);
+    this.processors.classifier = this.getProcessor(this.schema.classifier, context);
 
-    for (const type of this.types.documents) {
-      this.processors[type.code] = this.getProcessor(type, context);
+    for (const documentSchema of this.schema.documents) {
+      this.processors[documentSchema.type] = this.getProcessor(documentSchema, context);
     }
   }
 
   /**
    * Возвращает процессор для переданного документа
    *
-   * @param type
+   * @param documentSchema
    * @param context
    * @returns {*|DefaultProcessor}
    */
-  getProcessor(type, context) {
-    return new this.matching[type.processor](type, context);
+  getProcessor(documentSchema, context) {
+    return new this.matching[documentSchema.processor](documentSchema, context);
   }
 
   /**

@@ -9,7 +9,6 @@ export default class DossierBuilder {
   constructor(scope) {
     this.documentRepository = scope.documentRepository;
     this.dossierSchema = scope.dossierSchema;
-    this.scope = scope;
   }
 
   /**
@@ -36,7 +35,6 @@ export default class DossierBuilder {
   #buildDocuments(dossier, documents, context) {
     return this.dossierSchema.map(document => {
       const docData = {
-        code: document.code,
         type: document.type,
       }
 
@@ -50,7 +48,7 @@ export default class DossierBuilder {
 
       const documentClass = this.getDocumentType(context);
 
-      return new documentClass(dossier, docData, this.scope);
+      return new documentClass(dossier, docData);
     });
   }
 

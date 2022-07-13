@@ -2,10 +2,12 @@
  * Для создания обработчика события нужно отнаследоваться от этого класса
  * и определить методы events(), filter() и process().
  */
+import MessageBus from './MessageBus.mjs';
+
 export default class Handler {
   constructor(scope) {
     for (const event of this.events()) {
-      scope.messageBus.on(event, this.execute(scope))
+      MessageBus.on(event, this.execute(scope))
     }
   }
 

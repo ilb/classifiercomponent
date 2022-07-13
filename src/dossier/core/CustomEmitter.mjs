@@ -1,5 +1,5 @@
 export default class CustomEmitter {
-  handlers = [];
+  static handlers = [];
 
   /**
    * Вызов обработчиков события
@@ -7,7 +7,7 @@ export default class CustomEmitter {
    * @param event
    * @returns {Promise}
    */
-  async emit(event) {
+  static async emit(event) {
     const eventName = event.constructor.name;
 
     if (this.handlers[eventName] && this.handlers[eventName].length) {
@@ -21,7 +21,7 @@ export default class CustomEmitter {
    * @param event
    * @param handler
    */
-  on(event, handler) {
+  static on(event, handler) {
     if (!this.handlers[event.name]) {
       this.handlers[event.name] = [];
     }

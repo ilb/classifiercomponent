@@ -1,6 +1,6 @@
 export default class DocumentStructure {
-  constructor(structure, dossierStructure, code) {
-    this.code = code;
+  constructor(structure, dossierStructure, type) {
+    this.type = type;
     this.dossierStructure = dossierStructure
 
     if (structure) {
@@ -11,7 +11,7 @@ export default class DocumentStructure {
   }
 
   save() {
-    this.dossierStructure.save(this.code, {
+    this.dossierStructure.save(this.type, {
       pages: this.pages,
       lastModified: (new Date()).toISOString(),
     });
@@ -23,7 +23,7 @@ export default class DocumentStructure {
 
   refresh() {
     this.dossierStructure.refresh();
-    const structure = this.dossierStructure.getDocumentStructure(this.code)
+    const structure = this.dossierStructure.getDocumentStructure(this.type)
     this.#setStructure(structure);
   }
 

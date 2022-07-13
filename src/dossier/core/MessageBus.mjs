@@ -1,24 +1,19 @@
-export default class MessageBus {
-  /**
-   * @param {CustomEmitter} eventsEmitter
-   */
-  constructor({ eventsEmitter }) {
-    this.eventsEmitter = eventsEmitter;
-  }
+import EventsEmitter from './CustomEmitter.mjs';
 
+export default class MessageBus {
   /**
    * @param event
    * @returns {Promise<void>}
    */
-  async emit(event) {
-    return await this.eventsEmitter.emit(event);
+  static async emit(event) {
+    return await EventsEmitter.emit(event);
   }
 
   /**
    * @param event
    * @param handler
    */
-  on(event, handler) {
-    this.eventsEmitter.on(event, handler);
+  static on(event, handler) {
+    EventsEmitter.on(event, handler);
   }
 }

@@ -1,8 +1,8 @@
 import BaseBuilder from './BaseBuilder.mjs';
 
 export default class ClassifierSchemaBuilder extends BaseBuilder {
-  build(types, context) {
-    this.init(types, context);
+  build(schema, context) {
+    this.init(schema, context);
 
     const classifier = this.getClassifierProperties(context.access);
     const blocks = this.getBlocksProperties();
@@ -24,32 +24,31 @@ export default class ClassifierSchemaBuilder extends BaseBuilder {
   }
 
   getBlocksProperties() {
-    return this.types.blocks.map((block) => ({
+    return this.schema.blocks.map((block) => ({
       name: block.name || '',
-      code: block.code,
+      type: block.type,
       collapsed: block.collapsed || false,
       open: block?.open?.includes(this.context.stateCode) || false
     }));
   }
 
   getTabsProperties(access) {
-    return this.types.documents
-      .filter((type) => this.processors[type.code].isDisplay())
-      .map((type) => ({
-        name: type.name,
-        code: type.code,
-        type: type.type,
-        accept: type.accept,
-        block: type.block,
-        tooltip: type.tooltip || null,
-        required: this.processors[type.code].isRequired(),
-        readonly: access === 'read' ? true : this.processors[type.code].isReadonly()
+    return this.schema.documents
+      .filter((documentSchema) => this.processors[documentSchema.type].isDisplay())
+      .map((documentSchema) => ({
+        name: documentSchema.name,
+        type: documentSchema.type,
+        accept: documentSchema.accept,
+        block: documentSchema.block,
+        tooltip: documentSchema.tooltip || null,
+        required: this.processors[documentSchema.type].isRequired(),
+        readonly: access === 'read' ? true : this.processors[documentSchema.type].isReadonly()
       }));
   }
 
   getMeta(tabs) {
     return {
-      required: tabs.filter(tab => tab.required && !tab.readonly).map(tab => tab.code)
+      required: tabs.filter(tab => tab.required && !tab.readonly).map(tab => tab.type)
     };
   }
 }

@@ -1,11 +1,9 @@
 export default class GetDocument {
   /**
    * @param {DossierBuilder} dossierBuilder
-   * @param {DocumentMerger} documentMerger
    */
-  constructor({ dossierBuilder, documentMerger }) {
+  constructor({ dossierBuilder }) {
     this.dossierBuilder = dossierBuilder;
-    this.documentMerger = documentMerger;
   }
 
   async process({ uuid, name }) {

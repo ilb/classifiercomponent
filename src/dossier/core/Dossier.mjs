@@ -10,11 +10,11 @@ export default class Dossier {
   /**
    * Получение документа досье по коду
    *
-   * @param {string} code
+   * @param {string} type
    * @returns {Document|PageDocument|null}
    */
-  getDocument(code) {
-    return this.documents.find(document => document.code === code);
+  getDocument(type) {
+    return this.documents.find(document => document.type === type);
   }
 
   /**

@@ -21,10 +21,10 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
             return (
               <MenuTab
                 uuid={uuid}
-                disabled={hiddenTabs.includes(document.code)}
-                key={document.code}
+                disabled={hiddenTabs.includes(document.type)}
+                key={document.type}
                 document={document}
-                selected={document.code === selected}
+                selected={document.type === selected}
                 onDocumentSelect={onDocumentSelect}
                 hidden={!isOpened && block.collapsed}
               />

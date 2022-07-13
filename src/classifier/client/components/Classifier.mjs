@@ -52,9 +52,9 @@ const Classifier = ({
   }, [schema]);
 
   const selectedDocument =
-    selectedTab.code !== 'classifier'
-      ? documents[selectedTab.code]
-        ? documents[selectedTab.code]
+    selectedTab.type !== 'classifier'
+      ? documents[selectedTab.type]
+        ? documents[selectedTab.type]
         : []
       : [];
   const processTasks = tasks.filter(
@@ -79,10 +79,10 @@ const Classifier = ({
         return documentsTabs[0];
       }
 
-      return { code: 'classifier' };
+      return { type: 'classifier' };
     }
 
-    return documentsTabs.find((tab) => tab.code === defaultTab);
+    return documentsTabs.find((tab) => tab.type === defaultTab);
   }
 
   /**
@@ -91,9 +91,9 @@ const Classifier = ({
   useEffect(() => {
     const uniformDocuments = {};
 
-    for (const code in documents) {
-      if (documents[code].length) {
-        uniformDocuments[code] = documents[code];
+    for (const type in documents) {
+      if (documents[type].length) {
+        uniformDocuments[type] = documents[type];
       }
     }
 
@@ -103,19 +103,19 @@ const Classifier = ({
   useEffect(async () => {
     setCountStartedTasks(processTasks.length);
     if (Object.entries(documents).length) {
-      if (!prev && !['UNKNOWN', 'classifier'].includes(selectedTab.code)) {
-        const tab = documentsTabs.find((tab) => tab.code === selectedTab.code);
-        tab.count = documents[tab.code].length;
+      if (!prev && !['UNKNOWN', 'classifier'].includes(selectedTab.type)) {
+        const tab = documentsTabs.find((tab) => tab.type === selectedTab.type);
+        tab.count = documents[tab.type].length;
         tab.count && onUpdate && onUpdate(tab, documents);
       }
 
       if (prev && onUpdate) {
-        for (const code in documents) {
-          if (prev[code].length !== documents[code].length) {
-            const tab = documentsTabs.find((tab) => tab.code === code);
-            tab.count = documents[code].length;
+        for (const type in documents) {
+          if (prev[type].length !== documents[type].length) {
+            const tab = documentsTabs.find((tab) => tab.type === type);
+            tab.count = documents[type].length;
 
-            !['UNKNOWN', 'classifier'].includes(tab.code) && onUpdate(tab, documents);
+            !['UNKNOWN', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
           }
         }
       }
@@ -125,7 +125,7 @@ const Classifier = ({
   }, [processTasks.length, Object.entries(documents).length > 0]);
 
   function updateSelectedTab() {
-    const updated = documentsTabs.find((tab) => tab.code === selectedTab.code);
+    const updated = documentsTabs.find((tab) => tab.type === selectedTab.type);
 
     selectTab(updated);
 
@@ -151,7 +151,7 @@ const Classifier = ({
   }, [classifier]);
 
   const setTwainHandler = () => {
-    return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab.code);
+    return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab.type);
   };
 
   const findContainer = (id) => {
@@ -183,13 +183,13 @@ const Classifier = ({
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
 
-    if (selectedTab.code === 'classifier') {
+    if (selectedTab.type === 'classifier') {
       !countStartedTasks && setCountStartedTasks(-1);
-      const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.code);
+      const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
       classifyDocument(uuid, acceptedFiles, availableClasses).then(revalidateDocuments);
     } else {
       setLoading(true);
-      uploadPages(uuid, selectedTab.code, acceptedFiles)
+      uploadPages(uuid, selectedTab.type, acceptedFiles)
         .then(async (result) => {
           const documents = await revalidateDocuments();
           const tab = updateSelectedTab();
@@ -220,7 +220,7 @@ const Classifier = ({
     setPageErrors({
       ...pageErrors,
       ...errors.reduce((acc, { number, count, description }) => {
-        acc[documents[selectedTab.code][number - 1].uuid] = { count, description };
+        acc[documents[selectedTab.type][number - 1].uuid] = { count, description };
 
         return acc;
       }, [])
@@ -306,7 +306,7 @@ const Classifier = ({
     setDraggableOrigin(null);
     onDrag &&
       onDrag(
-        documentsTabs.find((tab) => tab.code === dragFrom.code),
+        documentsTabs.find((tab) => tab.type === dragFrom.type),
         selectedTab,
         documents
       );
@@ -320,7 +320,7 @@ const Classifier = ({
     }
 
     if (over && over.data.current.tab) {
-      const tab = documentsTabs.find((tab) => tab.code === overId);
+      const tab = documentsTabs.find((tab) => tab.type === overId);
       selectTab(tab);
     }
 
@@ -367,10 +367,10 @@ const Classifier = ({
 
   const changeTab = (_, { name }) => {
     if (name === 'classifier') {
-      selectTab({ code: 'classifier', name: 'Автоматически' });
+      selectTab({ type: 'classifier', name: 'Автоматически' });
       return;
     }
-    const tab = documentsTabs.find((tab) => tab.code === name);
+    const tab = documentsTabs.find((tab) => tab.type === name);
     selectTab(tab);
   };
 
@@ -395,7 +395,7 @@ const Classifier = ({
             name={name}
             documents={schema.tabs}
             hiddenTabs={hiddenTabs}
-            selected={selectedTab.code}
+            selected={selectedTab.type}
             onDocumentSelect={changeTab}
           />
         </Grid.Column>
@@ -422,7 +422,7 @@ const Classifier = ({
             />
           )}
           <Dimmer.Dimmable>
-            {!!countStartedTasks && selectedTab.code === 'classifier' && (
+            {!!countStartedTasks && selectedTab.type === 'classifier' && (
               <Dimmer active inverted>
                 <Loader size="large" active>
                   {countStartedTasks === -1 && 'Документы в обработке'}

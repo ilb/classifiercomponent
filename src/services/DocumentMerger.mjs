@@ -9,7 +9,7 @@ export default class DocumentMerger {
   /**
    * @param {string} dossierPath
    */
-  constructor({ dossierPath }) {
+  constructor(dossierPath) {
     this.dossierPath = dossierPath;
   }
 
