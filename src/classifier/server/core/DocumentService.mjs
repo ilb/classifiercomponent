@@ -1,5 +1,4 @@
-import OutsideMovingEvent from '../../../dossier/events/OutsideMovingEvent.mjs';
-import OutsideMovedEvent from '../../../dossier/events/OutsideMovedEvent.mjs';
+import { OutsideMovedEvent, OutsideMovingEvent } from '../../../dossier/index.js';
 
 export default class DocumentService {
   /**

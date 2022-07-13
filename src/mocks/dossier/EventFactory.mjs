@@ -1,5 +1,3 @@
-// import SignatureVerificationHandler from '../handlers/SignatureVerificationHandler.mjs';
-
 export default class EventFactory {
   #handlers = [
     // SignatureVerificationHandler,

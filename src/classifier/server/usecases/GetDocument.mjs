@@ -1,7 +1,7 @@
 export default class GetDocument {
   /**
    * @param {DossierBuilder} dossierBuilder
-   * @param {IMagicDocumentMerger} documentMerger
+   * @param {DocumentMerger} documentMerger
    */
   constructor({ dossierBuilder, documentMerger }) {
     this.dossierBuilder = dossierBuilder;
@@ -15,8 +15,7 @@ export default class GetDocument {
     return {
       file: await document.getDocument(),
       mimeType: document.getMimeType(),
-      extension: document.getExtension(),
-      filename : document.getDocumentName()
+      filename : document.getDocumentName() + '.' + document.getExtension()
     }
   }
 }

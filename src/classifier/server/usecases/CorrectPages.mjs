@@ -1,4 +1,4 @@
-export default class CorrectionDocuments {
+export default class CorrectPages {
   /**
    *
    * @param classifierDocumentService

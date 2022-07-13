@@ -2,17 +2,17 @@ import awilix, { asClass, asValue, Lifetime } from 'awilix';
 import DocumentService from '../classifier/server/core/DocumentService.mjs';
 import ClassifierGate from '../classifier/server/gates/ClassifierGate.mjs';
 import DossierBuilder from '../dossier/core/DossierBuilder.mjs';
-import IMagicDocumentMerger from '../services/IMagicDocumentMerger.mjs';
 import DocumentRepository from '../mocks/DocumentRepository.mjs';
-import schema from '../classifier/schema/index.mjs';
+import schema from '../mocks/schema.mjs';
 import MessageBus from '../dossier/core/MessageBus.mjs';
-import matching from '../classifier/schema/matching.mjs';
-import CustomEmitter from '../dossier/emitters/CustomEmitter.mjs';
-import EventFactory from '../dossier/core/EventFactory.mjs';
+import matching from '../mocks/matching.mjs';
+import CustomEmitter from '../dossier/core/CustomEmitter.mjs';
+import EventFactory from '../mocks/dossier/EventFactory.mjs';
 import queue from '../pqueue/pqueue.mjs';
 import VerificationRepository from '../mocks/VerificationRepository.mjs';
+import DocumentMerger from '../services/DocumentMerger.mjs';
 
-export const createScope = (req) => {
+export const createScope = () => {
   const container = awilix.createContainer();
 
   container.register({
@@ -21,7 +21,7 @@ export const createScope = (req) => {
     'verificationRepository': asClass(VerificationRepository),
     'classifierGate': asClass(ClassifierGate),
     'dossierBuilder': asClass(DossierBuilder),
-    'documentMerger': asClass(IMagicDocumentMerger),
+    'documentMerger': asClass(DocumentMerger),
     'eventsEmitter': asClass(CustomEmitter).setLifetime(Lifetime.SCOPED),
     'messageBus': asClass(MessageBus),
     'classifierTimeout': asValue(30),

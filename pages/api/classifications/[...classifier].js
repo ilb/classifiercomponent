@@ -1,5 +1,6 @@
 import Classifier from '../../../src/classifier/server/index.mjs';
 import { createScope } from '../../../src/http/scope.mjs';
+import { onError, onNoMatch } from '../../../src/mocks/errors.mjs';
 
 export const config = {
   api: {
@@ -7,4 +8,4 @@ export const config = {
   }
 };
 
-export default Classifier(createScope);
+export default Classifier(createScope, onError, onNoMatch);

@@ -1,4 +1,4 @@
-import DefaultProcessor from './DefaultProcessor.mjs';
+import DefaultProcessor from '../../classifier/schema/processors/DefaultProcessor.mjs';
 
 export default class ClassifierProcessor extends DefaultProcessor {
   constructor(type, context) {

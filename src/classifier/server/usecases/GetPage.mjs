@@ -10,11 +10,11 @@ export default class GetPage {
     const document = dossier.getDocument(name);
     const page = document.getPage(number);
     const imageBuffer = document.getFile(number);
-
     return {
+      file: imageBuffer,
+      filename: page.name,
       info: page,
-      document: imageBuffer,
-      contentType: mime.lookup(page.extension) || 'application/pdf'
+      mimeType: mime.lookup(page.extension) || 'application/pdf'
     };
   }
 }

@@ -1,15 +1,17 @@
 import fs from 'fs';
 import path from 'path'
-import Document from '../core/Document.mjs';
+import Document from './Document.mjs';
 import { getExtension } from 'next/dist/server/serve-static';
-import UploadingEvent from '../events/UploadingEvent.mjs';
-import InsideMovingEvent from '../events/InsideMovingEvent.mjs';
-import InsideMovedEvent from '../events/InsideMovedEvent.mjs';
-import RemovingEvent from '../events/RemovingEvent.mjs';
-import RemovedEvent from '../events/RemovedEvent.mjs';
-import UploadedEvent from '../events/UploadedEvent.mjs';
 import ClassifierPage from "../../classifier/server/core/ClassifierPage.mjs";
 import mime from 'mime-types';
+import {
+  InsideMovedEvent,
+  InsideMovingEvent,
+  RemovedEvent,
+  RemovingEvent,
+  UploadedEvent,
+  UploadingEvent
+} from '../index.js';
 
 export default class PageDocument extends Document {
   /**
@@ -20,6 +22,7 @@ export default class PageDocument extends Document {
   constructor(dossier, docData, scope) {
     super(dossier, docData, scope);
     this.dossierPath = scope.dossierPath;
+    this.documentsPath = scope.documentsPath;
     this.documentMerger = scope.documentMerger;
   }
 
@@ -208,7 +211,7 @@ export default class PageDocument extends Document {
    */
   getDefaultPage() {
     return new ClassifierPage({
-      path: 'documents/default.jpg',
+      path: `${this.documentsPath}/default.jpg`,
       filename: 'default.jpg',
       mimetype: 'image/jpeg'
     });

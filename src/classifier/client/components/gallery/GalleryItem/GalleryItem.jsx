@@ -40,7 +40,7 @@ const GalleryItem = React.memo(
       const isImage = () => {
         return src.type ? src.type.includes('image/') : true;
       };
-      console.log(src);
+
       const getPath = () => src.path || src; // todo как-то избавиться от такого
       return (
         <div ref={ref} style={style}>

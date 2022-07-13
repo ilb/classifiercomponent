@@ -1,5 +1,5 @@
-import Handler from './Handler.mjs';
-import UploadedEvent from '../events/UploadedEvent.mjs';
+import Handler from '../../dossier/core/Handler.mjs';
+import UploadedEvent from '../../dossier/events/UploadedEvent.mjs';
 import Errors from '../../../src/util/Errors.mjs';
 import marks from '../../../src/services/signatureDetector/marks.mjs';
 

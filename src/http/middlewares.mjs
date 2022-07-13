@@ -1,37 +1,9 @@
 import fs from 'fs';
-import { notify } from '@ilb/mailer/src/errormailer';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { Poppler } from 'node-poppler';
 import im from 'imagemagick';
 import { promisify } from 'util';
-
-/**
- * Express-like middleware for handling errors.
- * @param err error object
- * @param req request
- * @param res response
- */
-export const onError = (err, req, res) => {
-  const status = err.status || 500;
-  const type = err.type || 'UNHANDLED_ERROR';
-  const description = err.description || 'Something went wrong';
-  console.error(err);
-  notify(err).catch(console.log);
-
-  if (!res.finished) {
-    res.status(status).json({ error: { type: type, description: description } });
-  }
-};
-
-/**
- * Express-like middleware for handling wrong HTTP methods.
- * @param req request
- * @param res response
- */
-export const onNoMatch = (req, res) => {
-  res.status(405).end();
-};
 
 export const uploadMiddleware = multer({
   limits: {
@@ -107,5 +79,3 @@ export const convertToJpeg = async (req, res, next) => {
   }, []);
   next();
 };
-
-// refactor ?

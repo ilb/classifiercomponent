@@ -1,5 +1,5 @@
 export default class DocumentRepository {
-  getDocumentsByDossier() {
+  async getDocumentsByUuid() {
     return [];
   }
 }

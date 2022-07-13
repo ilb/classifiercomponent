@@ -1,5 +1,3 @@
-import Document from './Document.mjs'
-import PageDocument from '../documents/PageDocument.mjs'
 import DossierStructure from './DossierStructure.mjs';
 
 export default class Dossier {

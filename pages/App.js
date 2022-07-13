@@ -1,8 +1,8 @@
-import Classifier from '../src/classifier/client/components/Classifier';
-import ClassifierSchemaBuilder from '../src/classifier/schema/builders/ClassifierSchemaBuilder.mjs';
+import { Classifier } from '../src/client';
+import { ClassifierSchemaBuilder } from '../src/client';
 import { useState } from 'react';
-import matching from '../src/classifier/schema/matching.mjs';
-import schema from '../src/classifier/schema/index.mjs';
+import matching from '../src/mocks/matching.mjs';
+import schema from '../src/mocks/schema.mjs';
 
 const builder = new ClassifierSchemaBuilder({ matching });
 
@@ -12,15 +12,7 @@ export default function App() {
 
   return (
     <div style={{ marginTop: 50 }} className="ui container">
-      <Classifier
-        uuid={uuid}
-        name="classifier"
-        // onUpdate={onDocumentsUpdate}
-        // onRemove={onDocumentsRemove}
-        // onDrag={onDrag}
-        // showError={(err) => Toast.error(err)}
-        schema={classifierSchema}
-      />
+      <Classifier uuid={uuid} name="classifier" schema={classifierSchema} />
     </div>
   );
 };

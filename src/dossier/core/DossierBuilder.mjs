@@ -1,5 +1,5 @@
 import Dossier from './Dossier.mjs';
-import Document from './Document.mjs';
+import Document from '../documents/Document.mjs';
 import PageDocument from '../documents/PageDocument.mjs';
 
 export default class DossierBuilder {
@@ -23,7 +23,7 @@ export default class DossierBuilder {
    * @returns {Promise<Dossier>}
    */
   async build(uuid, context = { documentType: 'classifier' }) {
-    const documentsData = await this.documentRepository.getDocumentsByDossier(uuid);
+    const documentsData = await this.documentRepository.getDocumentsByUuid(uuid);
     const dossierClass = DossierBuilder.#buildDossier(context);
     const dossier = new dossierClass(uuid)
     const documents = this.#buildDocuments(dossier, documentsData, context);

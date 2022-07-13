@@ -20,10 +20,7 @@ const UploadDropzone = ({
   });
 
   return (
-    <Segment.Group
-      className="dossier__uploads"
-      horizontal
-      style={{ cursor: 'pointer' }}>
+    <Segment.Group className="dossier__uploads" horizontal style={{ cursor: 'pointer' }}>
       <Segment
         textAlign="center"
         style={{ padding: 10 }}
