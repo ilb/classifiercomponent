@@ -1,8 +1,18 @@
-# Установка
+## Установка:
 ```
 npm i @ilb/classifiercomponent
 ```
 
+## Пример (классификация не работает):
+```
+git clone https://github.com/ilb/classifiercomponent.git
+npm i
+cp .env.example .env
+npm run dev
+```
+Перейти на http://127.0.0.1:3010
+
+## Использование:
 Задать переменную `DOSSIER_DOCUMENT_PATH` в .env
 
 ### Клиент:
