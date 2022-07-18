@@ -102,6 +102,7 @@ const Classifier = ({
 
   useEffect(async () => {
     setCountStartedTasks(processTasks.length);
+    const documents = await revalidateDocuments();
     if (Object.entries(documents).length) {
       if (!prev && !['unknown', 'classifier'].includes(selectedTab.type)) {
         const tab = documentsTabs.find((tab) => tab.type === selectedTab.type);
