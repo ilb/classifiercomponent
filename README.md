@@ -1,24 +1,36 @@
-# New Project
+# Установка
+```
+npm i @ilb/classifiercomponent
+```
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
+Задать переменную `DOSSIER_DOCUMENT_PATH` в .env
 
-## Available Scripts
+### Клиент:
+```
+<Classifier uuid={uuid} name="classifier" schema={classifierSchema} />
+```
 
-### npm start
+Пример schema: https://github.com/ilb/classifiercomponent/blob/master/src/mocks/schema.mjs
 
-Runs the app in the development mode.
-Open http://localhost:8080 to view it in the browser.
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+### Сервер:
 
-### npm run build
+```js
+// pages/api/classifications/[...classifier].js
+import { ClassifierApi } from '@ilb/classifiercomponent/src/server.mjs';
+import { createScope } from '../../../libs/usecases/index.mjs';
+import { onError, onNoMatch } from '../../../libs/middlewares/index.mjs';
 
-Builds a static copy of your site to the `build/` folder.
-Your app is ready to be deployed!
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
 
-**For the best production performance:** Add a build bundler plugin like [@snowpack/plugin-webpack](https://github.com/snowpackjs/snowpack/tree/main/plugins/plugin-webpack) or [snowpack-plugin-rollup-bundle](https://github.com/ParamagicDev/snowpack-plugin-rollup-bundle) to your `snowpack.config.json` config file.
+export default ClassifierApi(createScope, onError, onNoMatch);
 
-### Q: What about Eject?
+```
 
-No eject needed! Snowpack guarantees zero lock-in, and CSA strives for the same.
+В DI должна быть переменная `dossierBuilder` являющаяся экземпляром класса `DossierBuilder`
+
+И, случае использования классификатора: `verificationService`, `verificationRepository`, `classifierQuantity`
