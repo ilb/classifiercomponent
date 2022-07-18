@@ -101,3 +101,5 @@ typings/
 
 /build
 /documents/dossier
+
+package-lock.json

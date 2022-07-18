@@ -1,4 +1,7 @@
 import Response from './Response.mjs';
+import errormailer from '@ilb/mailer/src/errormailer';
+
+const { notify } = errormailer;
 
 export async function defaultHandler(req, res, createScope, usecase) {
   const context = { query: { ...req.params, ...req.body, ...req.files }, req };
@@ -24,8 +27,13 @@ export async function fileHandler(req, res, createScope, usecase) {
 }
 
 export async function processUsecase(context, usecase) {
-  const result = await usecase.process(context.query);
-  return buildResponse(result);
+  try {
+    const result = await usecase.process(context.query);
+    return buildResponse(result);
+  } catch (err) {
+    notify(err).catch(console.log);
+    return errorResponse(err)
+  }
 }
 
 const buildResponse = (result) => {
@@ -36,4 +44,8 @@ const buildResponse = (result) => {
   } else {
     return Response.noContent();
   }
+}
+
+const errorResponse = (err) => {
+  return Response.badRequest(err);
 }
