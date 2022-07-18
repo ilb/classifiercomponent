@@ -4,7 +4,7 @@ export default class DocumentService {
   /**
    * @param {DossierBuilder} dossierBuilder
    */
-  constructor({ dossierBuilder }) {
+  constructor(dossierBuilder) {
     this.dossierBuilder = dossierBuilder;
   }
   /**

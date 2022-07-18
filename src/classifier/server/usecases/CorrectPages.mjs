@@ -1,11 +1,12 @@
+import DocumentService from '../core/DocumentService.mjs';
+
 export default class CorrectPages {
   /**
    *
-   * @param classifierDocumentService
    * @param {DossierBuilder} dossierBuilder
    */
-  constructor({ classifierDocumentService, dossierBuilder }) {
-    this.documentService = classifierDocumentService;
+  constructor({ dossierBuilder }) {
+    this.documentService = new DocumentService(dossierBuilder);
     this.dossierBuilder = dossierBuilder;
   }
 

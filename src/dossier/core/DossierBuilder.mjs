@@ -3,12 +3,9 @@ import Document from '../documents/Document.mjs';
 import PageDocument from '../documents/PageDocument.mjs';
 
 export default class DossierBuilder {
-  /**
-   * @param scope
-   */
-  constructor(scope) {
-    this.documentRepository = scope.documentRepository;
-    this.dossierSchema = scope.dossierSchema;
+  constructor({ documentRepository, dossierSchema }) {
+    this.documentRepository = documentRepository;
+    this.dossierSchema = dossierSchema;
   }
 
   /**

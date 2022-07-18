@@ -1,2 +1,3 @@
 export { default as Classifier } from './classifier/client/components/Classifier';
-export { default as ClassifierSchemaBuilder } from './classifier/schema/builders/ClassifierSchemaBuilder';
+export { default as SchemaBuilder } from './classifier/schema/SchemaBuilder.mjs';
+export { default as TabProcessor } from './classifier/schema/TabProcessor.mjs';

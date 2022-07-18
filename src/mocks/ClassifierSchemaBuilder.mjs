@@ -1,6 +1,6 @@
-import BaseBuilder from './BaseBuilder.mjs';
+import { SchemaBuilder } from '../client.js';
 
-export default class ClassifierSchemaBuilder extends BaseBuilder {
+export default class ClassifierSchemaBuilder extends SchemaBuilder {
   build(schema, context) {
     this.init(schema, context);
 

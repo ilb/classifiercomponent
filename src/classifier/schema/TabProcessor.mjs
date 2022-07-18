@@ -1,4 +1,4 @@
-export default class DefaultProcessor {
+export default class TabProcessor {
   constructor(type, context) {
     this.context = context;
     this.type = type;

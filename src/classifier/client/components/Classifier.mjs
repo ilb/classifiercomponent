@@ -103,7 +103,7 @@ const Classifier = ({
   useEffect(async () => {
     setCountStartedTasks(processTasks.length);
     if (Object.entries(documents).length) {
-      if (!prev && !['UNKNOWN', 'classifier'].includes(selectedTab.type)) {
+      if (!prev && !['unknown', 'classifier'].includes(selectedTab.type)) {
         const tab = documentsTabs.find((tab) => tab.type === selectedTab.type);
         tab.count = documents[tab.type].length;
         tab.count && onUpdate && onUpdate(tab, documents);
@@ -115,7 +115,7 @@ const Classifier = ({
             const tab = documentsTabs.find((tab) => tab.type === type);
             tab.count = documents[type].length;
 
-            !['UNKNOWN', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
+            !['unknown', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
           }
         }
       }

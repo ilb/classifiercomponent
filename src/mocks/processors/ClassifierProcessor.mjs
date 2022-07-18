@@ -1,6 +1,6 @@
-import DefaultProcessor from '../../classifier/schema/processors/DefaultProcessor.mjs';
+import { TabProcessor } from '../../client.js';
 
-export default class ClassifierProcessor extends DefaultProcessor {
+export default class ClassifierProcessor extends TabProcessor {
   constructor(type, context) {
     super(type, context);
   }

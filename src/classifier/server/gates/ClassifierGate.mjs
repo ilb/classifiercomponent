@@ -4,13 +4,9 @@ import fetch from 'isomorphic-fetch';
 import { timeoutPromise } from '../utils.mjs';
 
 export default class ClassifierGate {
-  /**
-   * @param {string} classifierUrl
-   * @param {int} classifierTimeout
-   */
-  constructor({ classifierUrl, classifierTimeout }) {
-    this.classifierUrl = classifierUrl;
-    this.classifierTimeout = classifierTimeout;
+  constructor() {
+    this.classifierUrl = process.env['apps.classifier.ws'];
+    this.classifierTimeout = parseInt(process.env['apps.loanbroker.classifiertimeout']) || 30;
   }
 
   /**

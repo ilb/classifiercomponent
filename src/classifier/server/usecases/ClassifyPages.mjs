@@ -1,32 +1,27 @@
 import ClassifierPage from '../core/ClassifierPage.mjs';
 import { chunkArray, prepareClassifies } from '../utils.mjs';
+import queue from '../../../pqueue/pqueue.mjs';
+import DocumentService from '../core/DocumentService.mjs';
+import ClassifierGate from '../gates/ClassifierGate.mjs';
 
 export default class ClassifyPages {
   /**
    * @param queue
-   * @param {ClassifierGate} classifierGate
    * @param {DossierBuilder} dossierBuilder
-   * @param {VerificationService} verificationService
+   * @param {any} verificationService
    * @param {VerificationRepository} verificationRepository
-   * @param {string} dossierPath
-   * @param {DocumentService} classifierDocumentService
    * @param classifierQuantity
    */
   constructor({
-    queue,
-    classifierGate,
     dossierBuilder,
     verificationService,
     verificationRepository,
-    dossierPath,
-    classifierDocumentService,
     classifierQuantity
   }) {
-    this.classifierGate = classifierGate;
     this.dossierBuilder = dossierBuilder;
     this.verificationService = verificationService;
-    this.documentService = classifierDocumentService;
-    this.dossierPath = dossierPath;
+    this.classifierGate = new ClassifierGate();
+    this.documentService = new DocumentService(dossierBuilder);
     this.verificationRepository = verificationRepository;
     this.classifierQuantity = classifierQuantity;
     // concurrency = 1 чтобы страницы отправлялись на распознавание последовательно,
@@ -45,7 +40,7 @@ export default class ClassifyPages {
   async process({ uuid, availableClasses = [], ...files }) {
     const dossier = await this.dossierBuilder.build(uuid);
     const pages = Object.values(files).map((file) => new ClassifierPage(file));
-    let unknownDocument = dossier.getDocument('UNKNOWN');
+    let unknownDocument = dossier.getDocument('unknown');
     // сначала переместить все в нераспознанные
     for (const page of pages) {
       await unknownDocument.addPage(page);

@@ -1,30 +1,17 @@
-export default class BaseBuilder {
-  constructor({ matching }) {
+export default class SchemaBuilder {
+  constructor(matching) {
     this.processors = {};
     this.matching = matching
   }
 
-  init(schema, context) {
-    this.context = context;
-    this.initializeSchema(schema);
-    this.initializeProcessors(context);
-  }
-
   /**
-   * Инициализация схемы документов
-   *
+   * Инициализация схемы, контекста и процессоров
    * @param schema
-   */
-  initializeSchema(schema) {
-    this.schema = schema;
-  }
-
-  /**
-   * Инициализация процессоров для каждого документа
-   *
    * @param context
    */
-  initializeProcessors(context) {
+  init(schema, context) {
+    this.schema = schema;
+    this.context = context;
     this.processors.classifier = this.getProcessor(this.schema.classifier, context);
 
     for (const documentSchema of this.schema.documents) {
@@ -37,7 +24,7 @@ export default class BaseBuilder {
    *
    * @param documentSchema
    * @param context
-   * @returns {*|DefaultProcessor}
+   * @returns {*|TabProcessor}
    */
   getProcessor(documentSchema, context) {
     return new this.matching[documentSchema.processor](documentSchema, context);

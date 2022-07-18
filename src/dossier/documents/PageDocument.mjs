@@ -23,7 +23,7 @@ export default class PageDocument extends Document {
   constructor(dossier, docData) {
     super(dossier, docData);
     this.documentsPath = process.env['apps.loanbroker.documents'];
-    this.dossierPath = this.dossierPath + '/dossier';
+    this.dossierPath = this.documentsPath + '/dossier';
     this.documentMerger = new DocumentMerger(this.dossierPath);
   }
 
@@ -212,7 +212,7 @@ export default class PageDocument extends Document {
    */
   getDefaultPage() {
     return new ClassifierPage({
-      path: `${this.documentsPath}/default.jpg`,
+      path: `${this.dossierPath}/default.jpg`,
       filename: 'default.jpg',
       mimetype: 'image/jpeg'
     });
