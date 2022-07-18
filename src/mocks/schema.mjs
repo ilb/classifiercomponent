@@ -64,5 +64,15 @@ export default {
         editable: ['CREATION', 'CREATED', 'CONTINUE_QUESTIONNAIRE']
       }
     },
+    {
+      block: 'otherBlock',
+      name: 'Прочее',
+      tooltip: 'Документы, которые распознались, но не могут быть загружены в необходимую вкладку',
+      type: 'otherDocuments',
+      access: {
+        show: '*',
+        editable: '*'
+      }
+    }
   ]
 };

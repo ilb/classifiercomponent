@@ -28,7 +28,7 @@ export const prepareClassifies = (classifies, availableClasses) => {
   return classifies.map(pageClass => {
     const code = getDossierCode(pageClass);
 
-    return availableClasses.includes(code) ? code : 'other';
+    return availableClasses.includes(code) ? code : 'otherDocuments';
   });
 }
 
