@@ -13,7 +13,7 @@ export const uploadMiddleware = multer({
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const destination =  process.env['apps.loanbroker.documents'] + '/dossier/' + req.params.uuid + '/pages';
+      const destination =  process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
 
       if (!fs.existsSync(destination)) {
         fs.mkdirSync(destination, { recursive: true });

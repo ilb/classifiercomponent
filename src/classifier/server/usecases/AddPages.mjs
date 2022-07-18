@@ -1,4 +1,4 @@
-import ClassifierPage from '../core/ClassifierPage.mjs';
+import { Page } from 'dossierjs';
 
 export default class AddPages {
   /**
@@ -23,6 +23,6 @@ export default class AddPages {
     if (!files[0].mimetype.includes('image/') || !document.isImages()) {
       await document.clear();
     }
-    await document.addPages(files.map(file => new ClassifierPage(file)));
+    await document.addPages(files.map(file => new Page(file)));
   }
 }

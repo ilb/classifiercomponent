@@ -1,4 +1,4 @@
-import ClassifierPage from '../core/ClassifierPage.mjs';
+import { Page } from 'dossierjs';
 import { chunkArray, prepareClassifies } from '../utils.mjs';
 import queue from '../../../pqueue/pqueue.mjs';
 import DocumentService from '../core/DocumentService.mjs';

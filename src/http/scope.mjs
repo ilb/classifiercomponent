@@ -1,5 +1,5 @@
 import awilix, { asClass, asValue } from 'awilix';
-import DossierBuilder from '../dossier/core/DossierBuilder.mjs';
+import { DossierBuilder } from '../server.mjs';
 import DocumentRepository from '../mocks/DocumentRepository.mjs';
 import schema from '../mocks/schema.mjs';
 import EventFactory from '../mocks/dossier/EventFactory.mjs';

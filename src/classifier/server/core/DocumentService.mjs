@@ -1,4 +1,4 @@
-import { MessageBus, OutsideMovedEvent, OutsideMovingEvent } from '../../../dossier/index.js';
+import { MessageBus, OutsideMovedEvent, OutsideMovingEvent } from 'dossierjs';
 
 export default class DocumentService {
   /**
