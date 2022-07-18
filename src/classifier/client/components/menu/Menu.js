@@ -30,7 +30,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
             className="classifier-tab"
             active={selected === 'classifier'}
             onClick={onDocumentSelect}>
-            <div style={{ marginTop: -5 }}>
+            <div style={{ marginTop: -8 }}>
               <span style={{ padding: 10 }}>Автомат</span>
               <Checkbox
                 style={{ top: 5 }}

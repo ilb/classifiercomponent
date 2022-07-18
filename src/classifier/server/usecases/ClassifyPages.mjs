@@ -39,7 +39,7 @@ export default class ClassifyPages {
    */
   async process({ uuid, availableClasses = [], ...files }) {
     const dossier = await this.dossierBuilder.build(uuid);
-    const pages = Object.values(files).map((file) => new ClassifierPage(file));
+    const pages = Object.values(files).map((file) => new Page(file));
     let unknownDocument = dossier.getDocument('unknown');
     // сначала переместить все в нераспознанные
     for (const page of pages) {
