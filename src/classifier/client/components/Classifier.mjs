@@ -230,16 +230,13 @@ const Classifier = ({
 
   const handlePageDelete = async (pageSrc) => {
     const activeContainer = findContainer(pageSrc);
-    mutateDocuments(
-      {
-        ...documents,
-        [activeContainer]: documents[activeContainer].filter((item) => item !== pageSrc)
-      },
-      false
-    );
+    const newDocumentsList = {
+      ...documents,
+      [activeContainer]: documents[activeContainer].filter((item) => item !== pageSrc)
+    };
+    mutateDocuments(newDocumentsList, false);
     deletePage(pageSrc).then(async () => {
-      const documents = await revalidateDocuments();
-      onRemove && onRemove(selectedTab, documents);
+      onRemove && onRemove(selectedTab, newDocumentsList);
     });
   };
 
@@ -302,7 +299,7 @@ const Classifier = ({
       }
     }
 
-    revalidateDocuments();
+    // revalidateDocuments();
     setActiveDraggable(null);
     setDraggableOrigin(null);
     onDrag &&
