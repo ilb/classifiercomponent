@@ -42,9 +42,7 @@ export default class ClassifyPages {
     const pages = Object.values(files).map((file) => new Page(file));
     let unknownDocument = dossier.getDocument('unknown');
     // сначала переместить все в нераспознанные
-    for (const page of pages) {
-      await unknownDocument.addPage(page);
-    }
+    await unknownDocument.addPages(pages);
 
     const path = `${uuid}.classification`;
     let verification;

@@ -20,8 +20,7 @@ export default class ClassifierGate {
     const queryParams = previousClass ? new URLSearchParams({ previousClass }).toString() : '';
 
     pages.forEach((page) => {
-      const pageBuffer = fs.readFileSync(page.uri);
-      formData.append('file', pageBuffer);
+      formData.append('file', fs.createReadStream(page.uri));
     });
     const res = await timeoutPromise(fetch(`${this.classifierUrl}/classify?${queryParams}`, {
         method: 'POST',
