@@ -66,10 +66,6 @@ function imgToCanvasWithOrientation(img, rawWidth, rawHeight, orientation) {
   canvas.width = rawWidth;
   canvas.height = rawHeight;
 
-  if (orientation > 1) {
-    console.log('EXIF orientation = ' + orientation + ', rotating picture');
-  }
-
   let ctx = canvas.getContext('2d');
 
   ctx.drawImage(img, 0, 0, rawWidth, rawHeight);
@@ -101,7 +97,6 @@ function processCompress(file, acceptFileSize, maxWidth, maxHeight, quality, cal
       let canvas = imgToCanvasWithOrientation(img, w, h, orientation);
       canvas.toBlob(
         function (blob) {
-          console.log('Resized image to ' + w + 'x' + h + ', ' + (blob.size >> 10) + 'kB');
           callback(blob);
         },
         'image/jpeg',
