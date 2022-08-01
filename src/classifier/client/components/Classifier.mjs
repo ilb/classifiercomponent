@@ -17,6 +17,7 @@ import Menu from './menu/Menu';
 import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } from '../hooks';
 import { toast } from 'react-semantic-toasts';
 import { registerTwain } from '../utils/twain';
+import { compress } from '../utils/compressor.js';
 
 const Classifier = ({
   form,
@@ -183,14 +184,17 @@ const Classifier = ({
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
+    console.log(acceptedFiles);
+
+    const compressedFiles = await compressFiles(acceptedFiles);
 
     if (selectedTab.type === 'classifier') {
       !countStartedTasks && setCountStartedTasks(-1);
       const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
-      classifyDocument(uuid, acceptedFiles, availableClasses).then(revalidateDocuments);
+      classifyDocument(uuid, compressedFiles, availableClasses).then(revalidateDocuments);
     } else {
       setLoading(true);
-      uploadPages(uuid, selectedTab.type, acceptedFiles)
+      uploadPages(uuid, selectedTab.type, compressedFiles)
         .then(async (result) => {
           const documents = await revalidateDocuments();
           const tab = updateSelectedTab();
@@ -201,6 +205,18 @@ const Classifier = ({
         .finally(() => setLoading(false));
     }
   };
+
+  const compressFiles = async (files) => {
+    return Promise.all(files.map(async (file, index) => {
+      if (file.type.includes('image/')) {
+        return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
+          return new File([blob], index + '.jpg');
+        });
+      } else {
+        return file;
+      }
+    }))
+  }
 
   const processError = (error, documents) => {
     if (error?.description?.type === 'signatureError') {
