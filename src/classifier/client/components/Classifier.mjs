@@ -58,10 +58,7 @@ const Classifier = ({
         ? documents[selectedTab.type]
         : []
       : [];
-  const processTasks = tasks.filter(
-    ({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE'
-  );
-  const cancelledTasks = tasks.filter(({ status }) => status.code === 'CANCELLED');
+  const finishedTasks = tasks.filter(({ status }) => status.code === 'FINISHED');
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(MouseSensor),
@@ -101,21 +98,18 @@ const Classifier = ({
     Object.keys(documents).length && onChange && onChange(uniformDocuments);
   }, [documents, form]);
 
-  useEffect(async () => {
+  useEffect(() => {
+    const processTasks = tasks.filter(({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE');
     setCountStartedTasks(processTasks.length);
-    const documents = await revalidateDocuments();
-    if (Object.entries(documents).length) {
-      if (!prev && !['unknown', 'classifier'].includes(selectedTab.type)) {
-        const tab = documentsTabs.find((tab) => tab.type === selectedTab.type);
-        tab.count = documents[tab.type].length;
-        tab.count && onUpdate && onUpdate(tab, documents);
-      }
+  }, [tasks]);
 
+  useEffect(() => {
+    const documents = revalidateDocuments();
+    if (Object.entries(documents).length) {
       if (prev && onUpdate) {
         for (const type in documents) {
           if (prev[type].length !== documents[type].length) {
             const tab = documentsTabs.find((tab) => tab.type === type);
-            tab.count = documents[type].length;
 
             !['unknown', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
           }
@@ -124,7 +118,7 @@ const Classifier = ({
 
       setPrev(documents);
     }
-  }, [processTasks.length, Object.entries(documents).length > 0]);
+  }, [finishedTasks.length])
 
   function updateSelectedTab() {
     const updated = documentsTabs.find((tab) => tab.type === selectedTab.type);
@@ -133,10 +127,6 @@ const Classifier = ({
 
     return updated;
   }
-
-  useEffect(async () => {
-    setCountStartedTasks(processTasks.length);
-  }, [cancelledTasks.length]);
 
   useEffect(() => {
     const interval = setInterval(() => setTwainHandler() && clearInterval(interval), 1000);
@@ -314,7 +304,6 @@ const Classifier = ({
       }
     }
 
-    // revalidateDocuments();
     setActiveDraggable(null);
     setDraggableOrigin(null);
     onDrag &&
@@ -401,7 +390,6 @@ const Classifier = ({
           className="dossier__wrap"
           width={4}>
           <Menu
-            countStartedTasks={countStartedTasks}
             uuid={uuid}
             blocks={schema.blocks}
             classifier={classifier}
@@ -438,8 +426,7 @@ const Classifier = ({
             {!!countStartedTasks && selectedTab.type === 'classifier' && (
               <Dimmer active inverted>
                 <Loader size="large" active>
-                  {countStartedTasks === -1 && 'Документы в обработке'}
-                  {countStartedTasks > 0 && 'Документов в обработке: ' + countStartedTasks}
+                  {!!countStartedTasks && 'Документы в обработке'}
                 </Loader>
               </Dimmer>
             )}
