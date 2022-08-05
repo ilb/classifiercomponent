@@ -199,7 +199,7 @@ const Classifier = ({
     return Promise.all(files.map(async (file, index) => {
       if (file.type.includes('image/')) {
         return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
-          return new File([blob], index + '.jpg');
+          return new File([blob], file.name, { type: file.type });
         });
       } else {
         return file;
