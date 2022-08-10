@@ -33,6 +33,7 @@ const Classifier = ({
   readonlyClassifier = null,
   defaultTab = 'classifier'
 }) => {
+  console.log('Mounted component');
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
@@ -72,6 +73,7 @@ const Classifier = ({
   }
 
   function getSelectedTab() {
+    console.log('Called getSelectedTab()');
     if (defaultTab === 'classifier') {
       if (schema.classifier.disabled) {
         return documentsTabs[0];
@@ -120,14 +122,6 @@ const Classifier = ({
     }
   }, [finishedTasks.length])
 
-  function updateSelectedTab() {
-    const updated = documentsTabs.find((tab) => tab.type === selectedTab.type);
-
-    selectTab(updated);
-
-    return updated;
-  }
-
   useEffect(() => {
     const interval = setInterval(() => setTwainHandler() && clearInterval(interval), 1000);
   }, []);
@@ -138,6 +132,7 @@ const Classifier = ({
 
   useEffect(() => {
     if (classifier.disabled) {
+      console.log('Changed classifier schema');
       selectTab(getSelectedTab());
     }
   }, [classifier]);
@@ -186,8 +181,7 @@ const Classifier = ({
       uploadPages(uuid, selectedTab.type, compressedFiles)
         .then(async (result) => {
           const documents = await revalidateDocuments();
-          const tab = updateSelectedTab();
-          onUpdate && onUpdate(tab, documents);
+          onUpdate && onUpdate(selectedTab, documents);
           setPrev(documents);
           result.error && processError(result.error, documents);
         })
@@ -368,6 +362,7 @@ const Classifier = ({
   };
 
   const changeTab = (_, { name }) => {
+    console.log('Called changeTab()');
     if (name === 'classifier') {
       selectTab({ type: 'classifier', name: 'Автоматически' });
       return;
