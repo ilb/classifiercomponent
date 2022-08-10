@@ -12,7 +12,7 @@ export default function App() {
 
   return (
     <div style={{ marginTop: 50 }} className="ui container">
-      <Classifier uuid={uuid} name="classifier" schema={classifierSchema} />
+      <Classifier uuid={uuid} name="classifier" schema={classifierSchema} onUpdate={console.log} />
     </div>
   );
 };
