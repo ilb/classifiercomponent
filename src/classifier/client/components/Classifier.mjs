@@ -132,12 +132,6 @@ const Classifier = ({
 
   useEffect(() => selectTab(getSelectedTab()), [uuid]);
 
-  useEffect(() => {
-    if (classifier.disabled) {
-      selectTab(getSelectedTab());
-    }
-  }, [classifier]);
-
   const setTwainHandler = () => {
     return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab.type);
   };
