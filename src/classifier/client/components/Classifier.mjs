@@ -33,12 +33,11 @@ const Classifier = ({
   readonlyClassifier = null,
   defaultTab = 'classifier'
 }) => {
-  console.log('Mounted component');
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
   const [documentsTabs, setDocumentsTabs] = useState(schema.tabs);
-  const [selectedTab, selectTab] = useState(getSelectedTab());
+  const [selectedTab, selectTab] = useState({});
   const [clonedItems, setClonedItems] = useState(null);
   const [draggableOrigin, setDraggableOrigin] = useState(null);
   const [activeDraggable, setActiveDraggable] = useState(null);
@@ -47,6 +46,10 @@ const Classifier = ({
   const [prev, setPrev] = useState(null);
   const [pageErrors, setPageErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    selectTab(getSelectedTab());
+  }, []);
 
   useEffect(() => {
     setClassifier(schema.classifier);
@@ -73,7 +76,6 @@ const Classifier = ({
   }
 
   function getSelectedTab() {
-    console.log('Called getSelectedTab()');
     if (defaultTab === 'classifier') {
       if (schema.classifier.disabled) {
         return documentsTabs[0];
@@ -132,7 +134,6 @@ const Classifier = ({
 
   useEffect(() => {
     if (classifier.disabled) {
-      console.log('Changed classifier schema');
       selectTab(getSelectedTab());
     }
   }, [classifier]);
@@ -362,7 +363,6 @@ const Classifier = ({
   };
 
   const changeTab = (_, { name }) => {
-    console.log('Called changeTab()');
     if (name === 'classifier') {
       selectTab({ type: 'classifier', name: 'Автоматически' });
       return;
