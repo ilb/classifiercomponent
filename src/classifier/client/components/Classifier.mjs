@@ -22,6 +22,7 @@ import { compress } from '../utils/compressor.js';
 const Classifier = ({
   form,
   uuid,
+  onInit,
   onUpdate,
   onRemove,
   onChange,
@@ -50,6 +51,13 @@ const Classifier = ({
   useEffect(() => {
     selectTab(getSelectedTab());
   }, []);
+
+  useEffect(() => {
+    if (!prev && Object.keys(documents).length) {
+      onInit && onInit(documents);
+      setPrev(documents);
+    }
+  }, [documents])
 
   useEffect(() => {
     setClassifier(schema.classifier);
