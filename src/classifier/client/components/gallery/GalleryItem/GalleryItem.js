@@ -64,8 +64,8 @@ const GalleryItem = React.memo(
                   ))}
                 </Popup>
               )}
-              {!disabled && <Remove onClick={handleClick} />}
               {!disabled && <Handle {...listeners} />}
+              {!disabled && <Remove onClick={handleClick} />}
               <div {...attributes}>
                 {isImage() && (
                   <Image
