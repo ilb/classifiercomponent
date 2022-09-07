@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Poppler } from 'node-poppler';
 import im from 'imagemagick';
 import { promisify } from 'util';
+import sharp from 'sharp';
 
 export const uploadMiddleware = multer({
   limits: {
@@ -13,7 +14,8 @@ export const uploadMiddleware = multer({
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const destination =  process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
+      const destination =
+        process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
 
       if (!fs.existsSync(destination)) {
         fs.mkdirSync(destination, { recursive: true });
@@ -22,7 +24,7 @@ export const uploadMiddleware = multer({
       return cb(null, destination);
     },
     filename: (req, file, cb) => {
-      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop())
+      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop());
     }
   })
 });
@@ -39,13 +41,13 @@ export const splitPdf = async (req, res, next) => {
       });
       let pages = fs.readdirSync(splitOutputPath);
 
-      pages = pages.map(page => {
+      pages = pages.map((page) => {
         const filename = `${uuidv4()}.jpg`;
         const path = `${file.destination}/${filename}`;
-        fs.renameSync(`${splitOutputPath}/${page}`, path)
+        fs.renameSync(`${splitOutputPath}/${page}`, path);
 
         return { path, filename, mimetype: 'image/jpeg' };
-      })
+      });
 
       fs.unlinkSync(file.path);
       fs.rmdirSync(splitOutputPath);
@@ -76,6 +78,23 @@ export const convertToJpeg = async (req, res, next) => {
     } else {
       return [...files, file];
     }
+  }, []);
+  next();
+};
+
+export const compressImages = async (req, res, next) => {
+  req.files = await req.files?.reduce(async (accumulator, file) => {
+    const files = await accumulator;
+    const processingImage = sharp(file.path);
+    const outputName = `${uuidv4()}.jpg`;
+    const outputPath = `${file.destination}/${outputName}`;
+    await processingImage
+      .toFormat('jpeg')
+      .jpeg({ quality: 80, progressive: true, mozjpeg: true })
+      .toFile(outputPath);
+
+    fs.unlinkSync(file.path);
+    return [...files, { path: outputPath, mimetype: 'image/jpeg', filename: outputName }];
   }, []);
   next();
 };

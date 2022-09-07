@@ -4,21 +4,22 @@ import GetPage from './usecases/GetPage.mjs';
 import DeletePage from './usecases/DeletePage.mjs';
 import CorrectionDocument from './usecases/CorrectPages.mjs';
 import nc from 'next-connect';
-import { uploadMiddleware } from '../../http/middlewares.mjs';
+import { compressImages, uploadMiddleware, splitPdf } from '../../http/middlewares.mjs';
 import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import { convertToJpeg, splitPdf } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
 const ClassifierApi = (createScope, onError, onNoMatch) => {
   const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
   const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
-  const correctPages = async (req, res) => defaultHandler(req, res, createScope, CorrectionDocument);
+  const correctPages = async (req, res) =>
+    defaultHandler(req, res, createScope, CorrectionDocument);
   const getDocuments = async (req, res) => defaultHandler(req, res, createScope, GetDocuments);
   const classifyPages = async (req, res) => defaultHandler(req, res, createScope, ClassifyPages);
-  const checkClassifications = async (req, res) => defaultHandler(req, res, createScope, CheckClassifications);
+  const checkClassifications = async (req, res) =>
+    defaultHandler(req, res, createScope, CheckClassifications);
 
   const getPage = async (req, res) => fileHandler(req, res, createScope, GetPage);
   const getDocument = async (req, res) => fileHandler(req, res, createScope, GetDocument);
@@ -28,7 +29,7 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
     nc({ attachParams: true, onError, onNoMatch })
       .use(uploadMiddleware.array('documents'))
       .use(splitPdf)
-      .use(convertToJpeg)
+      .use(compressImages)
       .use(bodyParser.json())
       .get('/:uuid', checkClassifications)
       .put('/:uuid', classifyPages)

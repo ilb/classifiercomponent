@@ -176,11 +176,11 @@ const Classifier = ({
     if (selectedTab.type === 'classifier') {
       !countStartedTasks && setCountStartedTasks(-1);
       const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
-      const compressedFiles = await compressFiles(acceptedFiles);
+      const compressedFiles = acceptedFiles;//await compressFiles(acceptedFiles);
       classifyDocument(uuid, compressedFiles, availableClasses).then(revalidateDocuments);
     } else {
       setLoading(true);
-      const compressedFiles = await compressFiles(acceptedFiles);
+      const compressedFiles = acceptedFiles; //await compressFiles(acceptedFiles);
       uploadPages(uuid, selectedTab.type, compressedFiles)
         .then(async (result) => {
           const documents = await revalidateDocuments();
