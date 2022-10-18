@@ -29,7 +29,7 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
     nc({ attachParams: true, onError, onNoMatch })
       .use(uploadMiddleware.array('documents'))
       .use(splitPdf)
-      .use(compressImages)
+      // .use(compressImages)
       .use(bodyParser.json())
       .get('/:uuid', checkClassifications)
       .put('/:uuid', classifyPages)
