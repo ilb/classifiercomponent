@@ -1,6 +1,8 @@
-import { Icon, Menu, Popup } from 'semantic-ui-react';
 import { useDroppable } from '@dnd-kit/core';
 import { useDocuments } from '../../hooks';
+import classNames from 'classnames';
+import styles from '../Global.module.css';
+import Popup from '../elements/Popup';
 
 const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, hidden }) => {
   let className = '';
@@ -25,23 +27,30 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
     <>
       {!hidden && (
         <div key={document.type} ref={setNodeRef}>
-          <Menu.Item
-            disabled={disabled}
-            className={className}
-            name={document.type}
-            active={selected}
-            onClick={onDocumentSelect}>
+          <div
+            className={classNames(
+              className,
+              styles.menuItem,
+              styles.menuItemTab,
+              selected && styles.menuItemSelected,
+              disabled && styles.menuItemDisabled
+            )}
+            onClick={(e) => {
+              if (!disabled) {
+                onDocumentSelect(e, { name: document.type });
+              }
+            }}>
             <span>
               {document.tooltip && (
                 <Popup
                   content={document.tooltip}
-                  trigger={<Icon name="question circle outline" />}
+                  trigger={<i className={classNames(styles.iconQuestion, styles.icon)} />}
                 />
               )}
               {document.name} {countPages ? '(' + countPages + ')' : ''}
               {isRequired && <span style={{ color: 'red' }}>*</span>}
             </span>
-          </Menu.Item>
+          </div>
         </div>
       )}
     </>

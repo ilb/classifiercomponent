@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Dimmer, Grid, Loader } from 'semantic-ui-react';
+import { Dimmer, Loader } from 'semantic-ui-react';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import {
@@ -18,6 +18,8 @@ import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } fro
 import { toast } from 'react-semantic-toasts';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
+import classNames from 'classnames';
+import styles from './Global.module.css'
 
 const Classifier = ({
   form,
@@ -374,7 +376,7 @@ const Classifier = ({
   };
 
   return (
-    <Grid columns={2} centered className="dossier classifier">
+    <div className={classNames('dossier classifier', styles.grid, styles.gridCentered)}>
       <DndContext
         sensors={sensors}
         modifiers={[snapCenterToCursor]}
@@ -382,10 +384,7 @@ const Classifier = ({
         onDragEnd={onDragEnd}
         onDragOver={onDragOver}
         onDragCancel={onDragCancel}>
-        <Grid.Column
-          textAlign="center"
-          className="dossier__wrap"
-          width={4}>
+        <div className={classNames('dossier__wrap')} style={{ width: '25%', padding: '0 10px' }}>
           <Menu
             uuid={uuid}
             blocks={schema.blocks}
@@ -396,16 +395,16 @@ const Classifier = ({
             selected={selectedTab.type}
             onDocumentSelect={changeTab}
           />
-        </Grid.Column>
-        <Grid.Column
-          className="dossier__wrap"
-          width={11}
-          textAlign="center"
+        </div>
+        <div
+          className={classNames('dossier__wrap')}
+          // width={11}
+          // textAlign="center"
           style={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
+            // marginLeft: 'auto',
+            // marginRight: 'auto',
             minHeight: 700,
-            width: '73.75%!important'
+            width: '73.75%'
           }}>
           <Dimmer active={loading} inverted>
             <Loader style={{ display: 'block' }} size="big">
@@ -435,9 +434,9 @@ const Classifier = ({
               active={activeDraggable}
             />
           </Dimmer.Dimmable>
-        </Grid.Column>
+        </div>
       </DndContext>
-    </Grid>
+    </div>
   );
 };
 

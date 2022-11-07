@@ -1,6 +1,7 @@
 import MenuTab from './MenuTab';
-import { Icon, Menu } from 'semantic-ui-react';
 import { useState } from 'react';
+import styles from '../Global.module.css';
+import classNames from 'classnames';
 
 const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
   const [isOpened, setOpen] = useState(block.open);
@@ -9,13 +10,16 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
       {!!block?.documents?.length && (
         <>
           {block.collapsed && (
-            <Menu.Item onClick={() => setOpen(!isOpened)} style={{ cursor: 'pointer' }}>
+            <div
+              className={styles.menuItem}
+              onClick={() => setOpen(!isOpened)}
+              style={{ cursor: 'pointer' }}>
               <span>
-                {isOpened && <Icon color="grey" name="chevron up" />}
-                {!isOpened && <Icon color="grey" name="chevron down" />}
+                {isOpened && <i className={classNames(styles.iconChevronUp, styles.icon)} />}
+                {!isOpened && <i className={classNames(styles.iconChevronDown, styles.icon)} />}
                 {block.name}
               </span>
-            </Menu.Item>
+            </div>
           )}
           {block.documents.map((document) => {
             return (

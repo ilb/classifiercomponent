@@ -1,6 +1,8 @@
-import { Checkbox, Divider, Menu as SemanticMenu } from 'semantic-ui-react';
 import { useEffect, useState } from 'react';
 import MenuBlock from './MenuBlock';
+import classNames from 'classnames';
+import styles from '../Global.module.css';
+
 const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect, hiddenTabs }) => {
   const [docBlocks, setDocBlocks] = useState([]);
 
@@ -21,26 +23,31 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
   }, [blocks]);
 
   return (
-    <SemanticMenu fluid vertical stackable>
+    <div className={styles.menu}>
       {!classifier.disabled && (
         <>
-          <SemanticMenu.Item
-            disabled={classifier.readonly}
-            name="classifier"
-            className="classifier-tab"
-            active={selected === 'classifier'}
-            onClick={onDocumentSelect}>
-            <div style={{ marginTop: -8 }}>
+          <div
+            className={classNames(
+              'classifier-tab',
+              styles.menuItem,
+              styles.menuItemTab,
+              classifier.readonly && styles.menuItemDisabled,
+              selected === 'classifier' && styles.menuItemSelected
+            )}
+            onClick={(e) => {
+              onDocumentSelect(e, { name: 'classifier' });
+            }}>
+            <div>
               <span style={{ padding: 10 }}>Автомат</span>
-              <Checkbox
-                style={{ top: 5 }}
-                className="native-checkbox"
-                checked={selected === 'classifier'}
-                toggle
-              />
+              {/*<Checkbox*/}
+              {/*  style={{ top: 5 }}*/}
+              {/*  className="native-checkbox"*/}
+              {/*  checked={selected === 'classifier'}*/}
+              {/*  toggle*/}
+              {/*/>*/}
             </div>
-          </SemanticMenu.Item>
-          <Divider style={{ margin: 0 }} />
+          </div>
+          <div className={styles.divider} />
         </>
       )}
       {docBlocks.map((block) => {
@@ -55,7 +62,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
           />
         );
       })}
-    </SemanticMenu>
+    </div>
   );
 };
 

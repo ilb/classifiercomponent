@@ -1,9 +1,8 @@
 import Image from 'next/image';
 import React, { useEffect } from 'react';
-import { Card, Icon, Placeholder, Popup } from 'semantic-ui-react';
 import { Handle } from '../SortableGalleryItem/Handle';
 import { Remove } from '../SortableGalleryItem/Remove';
-import { div } from 'carbone/formatters/number';
+import styles from '../../Global.module.css';
 
 const GalleryItem = React.memo(
   React.forwardRef(
@@ -44,26 +43,27 @@ const GalleryItem = React.memo(
       const getPath = () => src.path || src; // todo как-то избавиться от такого
       return (
         <div ref={ref} style={style}>
-          <Card>
-            <Card.Content style={{ padding: 4 }}>
-              {errors?.count && (
-                <Popup
-                  trigger={
-                    <Icon
-                      style={{ display: 'block', position: 'absolute', zIndex: 10, margin: 10 }}
-                      size="large"
-                      color="red"
-                      name="attention"
-                    />
-                  }>
-                  <div>
-                    {errors.description ? 'Отсутствует:' : 'Отсутствует подписей: ' + errors.count}
-                  </div>
-                  {errors.description.split('\n').map((error) => (
-                    <div>{error}</div>
-                  ))}
-                </Popup>
-              )}
+          <div className={styles.segment}>
+            <div style={{ padding: 4 }}>
+              {/* todo проверка подписей, сделать без semantic-ui */}
+              {/*{errors?.count && (*/}
+              {/*  <Popup*/}
+              {/*    trigger={*/}
+              {/*      <Icon*/}
+              {/*        style={{ display: 'block', position: 'absolute', zIndex: 10, margin: 10 }}*/}
+              {/*        size="large"*/}
+              {/*        color="red"*/}
+              {/*        name="attention"*/}
+              {/*      />*/}
+              {/*    }>*/}
+              {/*    <div>*/}
+              {/*      {errors.description ? 'Отсутствует:' : 'Отсутствует подписей: ' + errors.count}*/}
+              {/*    </div>*/}
+              {/*    {errors.description.split('\n').map((error) => (*/}
+              {/*      <div>{error}</div>*/}
+              {/*    ))}*/}
+              {/*  </Popup>*/}
+              {/*)}*/}
               {!disabled && <Handle {...listeners} />}
               {!disabled && <Remove onClick={handleClick} />}
               <div {...attributes}>
@@ -85,15 +85,15 @@ const GalleryItem = React.memo(
                   />
                 )}
                 {!isImage() && (
-                  <Placeholder style={{ backgroundImage: 'none' }}>
+                  <div style={{ backgroundImage: 'none' }}>
                     <div style={{ paddingTop: '51.5%', paddingBottom: '51.5%' }}>
                       Невозможно отобразить или переместить. Документ не является картинкой.
                     </div>
-                  </Placeholder>
+                  </div>
                 )}
               </div>
-            </Card.Content>
-          </Card>
+            </div>
+          </div>
         </div>
       );
     }

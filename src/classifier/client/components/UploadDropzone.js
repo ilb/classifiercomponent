@@ -1,5 +1,5 @@
 import { useDropzone } from 'react-dropzone';
-import { Segment } from 'semantic-ui-react';
+import styles from './Global.module.css';
 
 const UploadDropzone = ({
   onDrop,
@@ -20,22 +20,23 @@ const UploadDropzone = ({
   });
 
   return (
-    <Segment.Group className="dossier__uploads" horizontal style={{ cursor: 'pointer' }}>
-      <Segment
-        textAlign="center"
-        style={{ padding: 10 }}
-        {...dropzone.getRootProps({
-          className: 'updateDropzone'
-        })}>
-        <div>
-          <span>
-            {fileType?.includes('image/') || !fileType ? 'Загрузить файлы' : 'Заменить файл'}
-          </span>
+    <div className={styles.segment}>
+      <div className="dossier__uploads" style={{ cursor: 'pointer' }}>
+        <div
+          style={{ padding: 10 }}
+          {...dropzone.getRootProps({
+            className: 'updateDropzone'
+          })}>
+          <div>
+            <span>
+              {fileType?.includes('image/') || !fileType ? 'Загрузить файлы' : 'Заменить файл'}
+            </span>
+          </div>
+          <div>Нажмите или перетащите</div>
+          <input {...dropzone.getInputProps()} />
         </div>
-        <div>Нажмите или перетащите</div>
-        <input {...dropzone.getInputProps()} />
-      </Segment>
-    </Segment.Group>
+      </div>
+    </div>
   );
 };
 

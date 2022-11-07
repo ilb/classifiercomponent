@@ -1,11 +1,11 @@
 import { DragOverlay } from '@dnd-kit/core';
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { Grid } from 'semantic-ui-react';
 import GalleryItem from './GalleryItem/GalleryItem';
 import SortableGalleryItem from './SortableGalleryItem';
 import SegmentItem from './GalleryItem/SegmentItem';
 import React, { useEffect, useState } from 'react';
 import ControlsMenu from '../gallery/GalleryItem/ControlsMenu';
+import styles from '../Global.module.css';
 
 const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
   const [state, setState] = useState({
@@ -80,17 +80,10 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
             marginRight: 'auto'
           }}>
           {!state.previewOpen && (
-            <Grid columns={3} only="large screen" container stackable padded>
+            <div className={styles.grid}>
               {srcSet.map((src) => {
                 return (
-                  <Grid.Column
-                    key={src.id}
-                    className="custom-collumn-1600"
-                    style={{ padding: 3 }}
-                    largeScreen={5}
-                    computer={5}
-                    tablet={8}
-                    mobile={16}>
+                  <div style={{ padding: 3 }} key={src.id} className={styles.column}>
                     <SortableGalleryItem
                       src={src}
                       errors={pageErrors[src.uuid]}
@@ -102,10 +95,10 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
                         setState({ ...state, previewOpen: true, src: src.id });
                       }}
                     />
-                  </Grid.Column>
+                  </div>
                 );
               })}
-            </Grid>
+            </div>
           )}
           {state.previewOpen && (
             <SegmentItem
