@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Dimmer, Loader } from 'semantic-ui-react';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import {
@@ -20,6 +19,8 @@ import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
 import classNames from 'classnames';
 import styles from './Global.module.css'
+import Dimmable from './elements/Dimmable.js';
+import Loader from './elements/Loader.js';
 
 const Classifier = ({
   form,
@@ -398,19 +399,10 @@ const Classifier = ({
         </div>
         <div
           className={classNames('dossier__wrap')}
-          // width={11}
-          // textAlign="center"
           style={{
-            // marginLeft: 'auto',
-            // marginRight: 'auto',
             minHeight: 700,
             width: '73.75%'
           }}>
-          <Dimmer active={loading} inverted>
-            <Loader style={{ display: 'block' }} size="big">
-              Загрузка...
-            </Loader>
-          </Dimmer>
           {!selectedTab.readonly && (
             <UploadDropzone
               onDrop={handleDocumentsDrop}
@@ -418,14 +410,8 @@ const Classifier = ({
               fileType={selectedTab.fileType}
             />
           )}
-          <Dimmer.Dimmable>
-            {!!countStartedTasks && selectedTab.type === 'classifier' && (
-              <Dimmer active inverted>
-                <Loader size="large" active>
-                  {!!countStartedTasks && 'Документы в обработке'}
-                </Loader>
-              </Dimmer>
-            )}
+          <Dimmable>
+            <Loader active={(!!countStartedTasks && selectedTab.type === 'classifier') || loading} loaderText="Загрузка..." />
             <SortableGallery
               pageErrors={pageErrors}
               tab={selectedTab}
@@ -433,7 +419,7 @@ const Classifier = ({
               onRemove={handlePageDelete}
               active={activeDraggable}
             />
-          </Dimmer.Dimmable>
+          </Dimmable>
         </div>
       </DndContext>
     </div>
