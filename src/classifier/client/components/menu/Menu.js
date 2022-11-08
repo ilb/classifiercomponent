@@ -22,46 +22,50 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
   }, [blocks]);
 
   return (
-    <div className="menu">
-      {!classifier.disabled && (
-        <>
-          <div
-            className={classNames(
-              'classifier-tab',
-              'menuItem',
-              'menuItemTab',
-              classifier.readonly && 'menuItemDisabled',
-              selected === 'classifier' && 'menuItemSelected'
-            )}
-            onClick={(e) => {
-              onDocumentSelect(e, { name: 'classifier' });
-            }}>
-            <div>
-              <span style={{ padding: 10 }}>Автомат</span>
-              {/*<Checkbox*/}
-              {/*  style={{ top: 5 }}*/}
-              {/*  className="native-checkbox"*/}
-              {/*  checked={selected === 'classifier'}*/}
-              {/*  toggle*/}
-              {/*/>*/}
-            </div>
-          </div>
-          <div className="divider" />
-        </>
+    <>
+      {!!documents.length && (
+        <div className="menu">
+          {!classifier.disabled && (
+            <>
+              <div
+                className={classNames(
+                  'classifier-tab',
+                  'menuItem',
+                  'menuItemTab',
+                  classifier.readonly && 'menuItemDisabled',
+                  selected === 'classifier' && 'menuItemSelected'
+                )}
+                onClick={(e) => {
+                  onDocumentSelect(e, { name: 'classifier' });
+                }}>
+                <div>
+                  <span style={{ padding: 10 }}>Автомат</span>
+                  {/*<Checkbox*/}
+                  {/*  style={{ top: 5 }}*/}
+                  {/*  className="native-checkbox"*/}
+                  {/*  checked={selected === 'classifier'}*/}
+                  {/*  toggle*/}
+                  {/*/>*/}
+                </div>
+              </div>
+              <div className="divider" />
+            </>
+          )}
+          {docBlocks.map((block) => {
+            return (
+              <MenuBlock
+                uuid={uuid}
+                key={block.type}
+                hiddenTabs={hiddenTabs}
+                selected={selected}
+                onDocumentSelect={onDocumentSelect}
+                block={block}
+              />
+            );
+          })}
+        </div>
       )}
-      {docBlocks.map((block) => {
-        return (
-          <MenuBlock
-            uuid={uuid}
-            key={block.type}
-            hiddenTabs={hiddenTabs}
-            selected={selected}
-            onDocumentSelect={onDocumentSelect}
-            block={block}
-          />
-        );
-      })}
-    </div>
+    </>
   );
 };
 

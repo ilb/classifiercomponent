@@ -1,6 +1,6 @@
 {
   "name": "@ilb/classifiercomponent",
-  "version": "2.1.12",
+  "version": "2.1.19",
   "description": "",
   "main": "src/index.js",
   "scripts": {

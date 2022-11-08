@@ -50,8 +50,10 @@ const Classifier = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    selectTab(getSelectedTab());
-  }, []);
+    if (!documentsTabs.find(tab => tab.type === selectedTab?.type)) {
+      selectTab(getSelectedTab());
+    }
+  }, [documentsTabs]);
 
   useEffect(() => {
     if (!prev && Object.keys(documents).length) {
@@ -66,9 +68,9 @@ const Classifier = ({
   }, [schema]);
 
   const selectedDocument =
-    selectedTab.type !== 'classifier'
-      ? documents[selectedTab.type]
-        ? documents[selectedTab.type]
+    selectedTab?.type !== 'classifier'
+      ? documents[selectedTab?.type]
+        ? documents[selectedTab?.type]
         : []
       : [];
   const finishedTasks = tasks.filter(({ status }) => status.code === 'FINISHED');
@@ -93,7 +95,9 @@ const Classifier = ({
       return { type: 'classifier' };
     }
 
-    return documentsTabs.find((tab) => tab.type === defaultTab);
+    const tab = documentsTabs.find((tab) => tab.type === defaultTab);
+
+    return tab || { type: null };
   }
 
   /**
@@ -146,7 +150,7 @@ const Classifier = ({
   }, [uuid]);
 
   const setTwainHandler = () => {
-    return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab.type);
+    return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab?.type);
   };
 
   const findContainer = (id) => {
@@ -177,6 +181,8 @@ const Classifier = ({
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
+
+    if (!selectedTab) return;
 
     if (selectedTab.type === 'classifier') {
       !countStartedTasks && setCountStartedTasks(-1);
@@ -398,7 +404,7 @@ const Classifier = ({
               name={name}
               documents={schema.tabs}
               hiddenTabs={hiddenTabs}
-              selected={selectedTab.type}
+              selected={selectedTab?.type}
               onDocumentSelect={changeTab}
             />
           </div>
@@ -408,7 +414,7 @@ const Classifier = ({
               minHeight: 700,
               width: '73.75%'
             }}>
-            {!selectedTab.readonly && (
+            {selectedTab && !selectedTab.readonly && (
               <UploadDropzone
                 onDrop={handleDocumentsDrop}
                 accept={selectedTab.accept}
@@ -416,7 +422,7 @@ const Classifier = ({
               />
             )}
             <Dimmable>
-              <Loader active={(!!countStartedTasks && selectedTab.type === 'classifier') || loading}
+              <Loader active={(!!countStartedTasks && selectedTab?.type === 'classifier') || loading}
                       loaderText="Загрузка..."/>
               <SortableGallery
                 pageErrors={pageErrors}
