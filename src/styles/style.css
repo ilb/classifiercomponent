@@ -314,3 +314,11 @@
   font-size: 16px;
   font-weight: 600;
 }
+
+.classifier .pagePreviewer {
+  height: 75vh;
+  overflow: auto;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto
+}

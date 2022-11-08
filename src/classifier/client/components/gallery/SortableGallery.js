@@ -70,14 +70,7 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
             scale={state.scale}
           />
         )}
-        <div
-          style={{
-            height: '75vh',
-            overflow: 'auto',
-            width: 'auto',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }}>
+        <div className="pagePreviewer">
           {!state.previewOpen && (
             <div className="grid">
               {srcSet.map((src) => {
