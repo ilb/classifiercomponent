@@ -1,4 +1,4 @@
-import { SchemaBuilder } from '../client.js';
+import { SchemaBuilder } from '../../client.js';
 
 export default class ClassifierSchemaBuilder extends SchemaBuilder {
   build(schema, context) {

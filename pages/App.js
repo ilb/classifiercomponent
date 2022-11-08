@@ -2,7 +2,7 @@ import { Classifier } from '../src/client';
 import { useState } from 'react';
 import matching from '../src/mocks/matching.mjs';
 import schema from '../src/mocks/schema.mjs';
-import ClassifierSchemaBuilder from '../src/mocks/ClassifierSchemaBuilder.mjs';
+import ClassifierSchemaBuilder from '../src/classifier/schema/ClassifierSchemaBuilder.mjs';
 
 const builder = new ClassifierSchemaBuilder(matching);
 
