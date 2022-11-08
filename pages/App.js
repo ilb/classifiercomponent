@@ -11,8 +11,17 @@ export default function App() {
   const [classifierSchema] = useState(builder.build(schema, { stateCode: 'CREATION' }));
 
   return (
-    <div style={{ marginTop: 50 }} className="ui container">
+    <div
+      style={{
+        marginTop: 50,
+        width: 1127,
+        marginLeft: 'auto !important',
+        marginRight: 'auto !important',
+        display: 'block',
+        maxWidth: '100% !important'
+      }}
+      className="ui container">
       <Classifier uuid={uuid} name="classifier" schema={classifierSchema} onUpdate={console.log} />
     </div>
   );
-};
+}

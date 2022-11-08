@@ -1,8 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Menu, Dropdown } from 'semantic-ui-react';
-import styles from '../../Global.module.css';
-import classNames from 'classnames';
 
 function ControlsMenu({
   rotateImage,
@@ -13,57 +10,61 @@ function ControlsMenu({
   scale
 }) {
   return (
-    // <div className={classNames('file-dossier-file-controls', styles.controlsMenu)}>
-    <Menu inverted className="file-dossier-file-controls">
-      <Menu.Menu style={{ display: 'flex', margin: 'auto', width: 380 }}>
+    <>
+      <div className="file-dossier-file-controls controlsMenu">
         <div
-          className={classNames(styles.menuItem, styles.menuItemHorizontal)}
+          className="menuItem menuItemHorizontal"
           onClick={(e) => {
             zoomImageOut(e, { scaleNum: scale });
           }}>
-          <i className={classNames(styles.icon, styles.iconMinus)} />
+          <i className="icon iconMinus" />
         </div>
         <div
-          className={classNames(styles.menuItem, styles.menuItemHorizontal)}
+          className="menuItem menuItemHorizontal"
           onClick={(e) => {
             zoomImageIn(e, { scaleNum: scale });
           }}>
-          <i className={classNames(styles.icon, styles.iconPlus)} />
+          <i className="icon iconPlus" />
         </div>
+        <select
+          className="zoomDropdown"
+          onChange={(e) => {
+            zoomImageWithDropdown(e.target.value);
+          }}>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="4">400%</option>
+        </select>
         <div
-          className={classNames(
-            'file-dossier-no-padding',
-            styles.menuItem,
-            styles.menuItemDropdown
-          )}>
-          <Dropdown
-            item
-            text={scale ? `${Math.round(scale * 100)}%` : ''}
-            onChange={(e, { value }) => {
-              zoomImageWithDropdown(value);
-            }}
-            options={[
-              { key: '0.5', value: 0.5, text: '50%' },
-              { key: '0.75', value: 0.75, text: '75%' },
-              { key: '1', value: 1, text: '100%' },
-              { key: '1.25', value: 1.25, text: '125%' },
-              { key: '1.5', value: 1.5, text: '150%' },
-              { key: '2', value: 2, text: '200%' },
-              { key: '3', value: 3, text: '300%' },
-              { key: '4', value: 4, text: '400%' }
-            ]}
-            selectOnNavigation={false}
-            selectOnBlur={false}
-          />
+          style={{
+            display: 'flex',
+            marginLeft: 'auto'
+          }}>
+          <div
+            className="menuItem menuItemHorizontal"
+            onClick={(e) => {
+              rotateImage(e, { angle: -90 });
+            }}>
+            <i className="icon iconUndo" />
+          </div>
+          <div
+            className="menuItem menuItemHorizontal"
+            onClick={(e) => {
+              rotateImage(e, { angle: 90 });
+            }}>
+            <i className="icon iconRedo" />
+          </div>
+          <div className="menuItem menuItemHorizontal" onClick={closePreview}>
+            <i className="icon iconClose" />
+          </div>
         </div>
-      </Menu.Menu>
-      <Menu.Menu position="center">
-        <Menu.Item link icon="undo" angle={-90} onClick={rotateImage} />
-        <Menu.Item link icon="redo" angle={90} onClick={rotateImage} />
-        <Menu.Item link icon="close" onClick={closePreview} />
-      </Menu.Menu>
-    </Menu>
-    // </div>
+      </div>
+    </>
   );
 }
 

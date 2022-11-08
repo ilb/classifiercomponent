@@ -1,7 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 import { useDocuments } from '../../hooks';
 import classNames from 'classnames';
-import styles from '../Global.module.css';
 import Popup from '../elements/Popup';
 
 const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, hidden }) => {
@@ -30,10 +29,10 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
           <div
             className={classNames(
               className,
-              styles.menuItem,
-              styles.menuItemTab,
-              selected && styles.menuItemSelected,
-              disabled && styles.menuItemDisabled
+              'menuItem',
+              'menuItemTab',
+              selected && 'menuItemSelected',
+              disabled && 'menuItemDisabled'
             )}
             onClick={(e) => {
               if (!disabled) {
@@ -42,10 +41,7 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
             }}>
             <span>
               {document.tooltip && (
-                <Popup
-                  content={document.tooltip}
-                  trigger={<i className={classNames(styles.iconQuestion, styles.icon)} />}
-                />
+                <Popup content={document.tooltip} trigger={<i className="iconQuestion icon" />} />
               )}
               {document.name} {countPages ? '(' + countPages + ')' : ''}
               {isRequired && <span style={{ color: 'red' }}>*</span>}

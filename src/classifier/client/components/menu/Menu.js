@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import MenuBlock from './MenuBlock';
 import classNames from 'classnames';
-import styles from '../Global.module.css';
 
 const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect, hiddenTabs }) => {
   const [docBlocks, setDocBlocks] = useState([]);
@@ -23,16 +22,16 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
   }, [blocks]);
 
   return (
-    <div className={styles.menu}>
+    <div className="menu">
       {!classifier.disabled && (
         <>
           <div
             className={classNames(
               'classifier-tab',
-              styles.menuItem,
-              styles.menuItemTab,
-              classifier.readonly && styles.menuItemDisabled,
-              selected === 'classifier' && styles.menuItemSelected
+              'menuItem',
+              'menuItemTab',
+              classifier.readonly && 'menuItemDisabled',
+              selected === 'classifier' && 'menuItemSelected'
             )}
             onClick={(e) => {
               onDocumentSelect(e, { name: 'classifier' });
@@ -47,7 +46,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
               {/*/>*/}
             </div>
           </div>
-          <div className={styles.divider} />
+          <div className="divider" />
         </>
       )}
       {docBlocks.map((block) => {

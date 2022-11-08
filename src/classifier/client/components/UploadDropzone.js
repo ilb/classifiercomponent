@@ -1,5 +1,4 @@
 import { useDropzone } from 'react-dropzone';
-import styles from './Global.module.css';
 
 const UploadDropzone = ({
   onDrop,
@@ -20,7 +19,7 @@ const UploadDropzone = ({
   });
 
   return (
-    <div className={styles.segment}>
+    <div className="segment">
       <div className="dossier__uploads" style={{ cursor: 'pointer' }}>
         <div
           style={{ padding: 10 }}

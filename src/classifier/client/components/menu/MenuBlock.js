@@ -1,7 +1,5 @@
 import MenuTab from './MenuTab';
 import { useState } from 'react';
-import styles from '../Global.module.css';
-import classNames from 'classnames';
 
 const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
   const [isOpened, setOpen] = useState(block.open);
@@ -11,12 +9,12 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
         <>
           {block.collapsed && (
             <div
-              className={styles.menuItem}
+              className="menuItem"
               onClick={() => setOpen(!isOpened)}
               style={{ cursor: 'pointer' }}>
               <span>
-                {isOpened && <i className={classNames(styles.iconChevronUp, styles.icon)} />}
-                {!isOpened && <i className={classNames(styles.iconChevronDown, styles.icon)} />}
+                {isOpened && <i className="iconChevronUp icon" />}
+                {!isOpened && <i className="iconChevronDown icon" />}
                 {block.name}
               </span>
             </div>

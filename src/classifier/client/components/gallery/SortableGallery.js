@@ -5,7 +5,6 @@ import SortableGalleryItem from './SortableGalleryItem';
 import SegmentItem from './GalleryItem/SegmentItem';
 import React, { useEffect, useState } from 'react';
 import ControlsMenu from '../gallery/GalleryItem/ControlsMenu';
-import styles from '../Global.module.css';
 
 const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
   const [state, setState] = useState({
@@ -80,10 +79,10 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
             marginRight: 'auto'
           }}>
           {!state.previewOpen && (
-            <div className={styles.grid}>
+            <div className="grid">
               {srcSet.map((src) => {
                 return (
-                  <div style={{ padding: 3 }} key={src.id} className={styles.column}>
+                  <div style={{ padding: 3 }} key={src.id} className="column">
                     <SortableGalleryItem
                       src={src}
                       errors={pageErrors[src.uuid]}

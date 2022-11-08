@@ -2,7 +2,6 @@ import Image from 'next/image';
 import React, { useEffect } from 'react';
 import { Handle } from '../SortableGalleryItem/Handle';
 import { Remove } from '../SortableGalleryItem/Remove';
-import styles from '../../Global.module.css';
 
 const GalleryItem = React.memo(
   React.forwardRef(
@@ -43,7 +42,7 @@ const GalleryItem = React.memo(
       const getPath = () => src.path || src; // todo как-то избавиться от такого
       return (
         <div ref={ref} style={style}>
-          <div className={styles.segment}>
+          <div className="segment">
             <div style={{ padding: 4 }}>
               {/* todo проверка подписей, сделать без semantic-ui */}
               {/*{errors?.count && (*/}

@@ -1,10 +1,8 @@
-import styles from './Popup.module.css';
-
 const Popup = ({ content, trigger }) => {
   return (
-    <div className={styles.tooltip}>
+    <div className="tooltip">
       {trigger}
-      <span className={styles.tooltiptext}>{content}</span>
+      <span className="tooltiptext">{content}</span>
     </div>
   );
 };

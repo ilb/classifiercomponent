@@ -14,29 +14,27 @@ import SortableGallery from './gallery/SortableGallery';
 import UploadDropzone from './UploadDropzone';
 import Menu from './menu/Menu';
 import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } from '../hooks';
-import { toast } from 'react-semantic-toasts';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
 import classNames from 'classnames';
-import styles from './Global.module.css'
 import Dimmable from './elements/Dimmable.js';
 import Loader from './elements/Loader.js';
 
 const Classifier = ({
-  form,
-  uuid,
-  onInit,
-  onUpdate,
-  onRemove,
-  onChange,
-  onDrag,
-  name,
-  showError,
-  schema,
-  hiddenTabs = [],
-  readonlyClassifier = null,
-  defaultTab = 'classifier'
-}) => {
+                      form,
+                      uuid,
+                      onInit,
+                      onUpdate,
+                      onRemove,
+                      onChange,
+                      onDrag,
+                      name,
+                      showError,
+                      schema,
+                      hiddenTabs = [],
+                      readonlyClassifier = null,
+                      defaultTab = 'classifier'
+                    }) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
@@ -60,7 +58,7 @@ const Classifier = ({
       onInit && onInit(documents);
       setPrev(documents);
     }
-  }, [documents])
+  }, [documents]);
 
   useEffect(() => {
     setClassifier(schema.classifier);
@@ -133,7 +131,7 @@ const Classifier = ({
 
       setPrev(documents);
     }
-  }, [finishedTasks.length])
+  }, [finishedTasks.length]);
 
   useEffect(() => {
     const interval = setInterval(() => setTwainHandler() && clearInterval(interval), 1000);
@@ -204,34 +202,36 @@ const Classifier = ({
       } else {
         return file;
       }
-    }))
-  }
+    }));
+  };
 
   const processError = (error, documents) => {
-    if (error?.description?.type === 'signatureError') {
-      addPagesErrors(error.description.info, documents);
-      toast({
-        type: 'info',
-        title: error.description.info
-      });
-    } else {
-      toast({
-        type: 'error',
-        title: error.description
-      });
-    }
+    console.log(error, documents);
+    alert("При загрузке документа произошла ошибка");
+    // if (error?.description?.type === 'signatureError') {
+    //   addPagesErrors(error.description.info, documents);
+    //   toast({
+    //     type: 'info',
+    //     title: error.description.info
+    //   });
+    // } else {
+    //   toast({
+    //     type: 'error',
+    //     title: error.description
+    //   });
+    // }
   };
 
-  const addPagesErrors = (errors, documents) => {
-    setPageErrors({
-      ...pageErrors,
-      ...errors.reduce((acc, { number, count, description }) => {
-        acc[documents[selectedTab.type][number - 1].uuid] = { count, description };
-
-        return acc;
-      }, [])
-    });
-  };
+  // const addPagesErrors = (errors, documents) => {
+  //   setPageErrors({
+  //     ...pageErrors,
+  //     ...errors.reduce((acc, { number, count, description }) => {
+  //       acc[documents[selectedTab.type][number - 1].uuid] = { count, description };
+  //
+  //       return acc;
+  //     }, [])
+  //   });
+  // };
 
   const handlePageDelete = async (pageSrc) => {
     const activeContainer = findContainer(pageSrc);
@@ -307,11 +307,11 @@ const Classifier = ({
     setActiveDraggable(null);
     setDraggableOrigin(null);
     onDrag &&
-      onDrag(
-        documentsTabs.find((tab) => tab.type === dragFrom.type),
-        selectedTab,
-        documents
-      );
+    onDrag(
+      documentsTabs.find((tab) => tab.type === dragFrom.type),
+      selectedTab,
+      documents
+    );
   };
 
   const onDragOver = ({ active, over }) => {
@@ -377,51 +377,54 @@ const Classifier = ({
   };
 
   return (
-    <div className={classNames('dossier classifier', styles.grid, styles.gridCentered)}>
-      <DndContext
-        sensors={sensors}
-        modifiers={[snapCenterToCursor]}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-        onDragCancel={onDragCancel}>
-        <div className={classNames('dossier__wrap')} style={{ width: '25%', padding: '0 10px' }}>
-          <Menu
-            uuid={uuid}
-            blocks={schema.blocks}
-            classifier={classifier}
-            name={name}
-            documents={schema.tabs}
-            hiddenTabs={hiddenTabs}
-            selected={selectedTab.type}
-            onDocumentSelect={changeTab}
-          />
-        </div>
-        <div
-          className={classNames('dossier__wrap')}
-          style={{
-            minHeight: 700,
-            width: '73.75%'
-          }}>
-          {!selectedTab.readonly && (
-            <UploadDropzone
-              onDrop={handleDocumentsDrop}
-              accept={selectedTab.accept}
-              fileType={selectedTab.fileType}
+    <div className="dossier classifier">
+      <div className="grid gridCentered">
+        <DndContext
+          sensors={sensors}
+          modifiers={[snapCenterToCursor]}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+          onDragCancel={onDragCancel}>
+          <div className={classNames('dossier__wrap')} style={{ width: '25%', padding: '0 10px' }}>
+            <Menu
+              uuid={uuid}
+              blocks={schema.blocks}
+              classifier={classifier}
+              name={name}
+              documents={schema.tabs}
+              hiddenTabs={hiddenTabs}
+              selected={selectedTab.type}
+              onDocumentSelect={changeTab}
             />
-          )}
-          <Dimmable>
-            <Loader active={(!!countStartedTasks && selectedTab.type === 'classifier') || loading} loaderText="Загрузка..." />
-            <SortableGallery
-              pageErrors={pageErrors}
-              tab={selectedTab}
-              srcSet={selectedDocument}
-              onRemove={handlePageDelete}
-              active={activeDraggable}
-            />
-          </Dimmable>
-        </div>
-      </DndContext>
+          </div>
+          <div
+            className={classNames('dossier__wrap')}
+            style={{
+              minHeight: 700,
+              width: '73.75%'
+            }}>
+            {!selectedTab.readonly && (
+              <UploadDropzone
+                onDrop={handleDocumentsDrop}
+                accept={selectedTab.accept}
+                fileType={selectedTab.fileType}
+              />
+            )}
+            <Dimmable>
+              <Loader active={(!!countStartedTasks && selectedTab.type === 'classifier') || loading}
+                      loaderText="Загрузка..."/>
+              <SortableGallery
+                pageErrors={pageErrors}
+                tab={selectedTab}
+                srcSet={selectedDocument}
+                onRemove={handlePageDelete}
+                active={activeDraggable}
+              />
+            </Dimmable>
+          </div>
+        </DndContext>
+      </div>
     </div>
   );
 };
