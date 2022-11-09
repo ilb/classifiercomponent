@@ -396,7 +396,7 @@ const Classifier = ({
           onDragEnd={onDragEnd}
           onDragOver={onDragOver}
           onDragCancel={onDragCancel}>
-          <div className={classNames('dossier__wrap')} style={{ width: '25%', padding: '0 10px' }}>
+          <div className="dossier__wrap dossier__wrap__menu">
             <Menu
               uuid={uuid}
               blocks={schema.blocks}
@@ -408,12 +408,7 @@ const Classifier = ({
               onDocumentSelect={changeTab}
             />
           </div>
-          <div
-            className={classNames('dossier__wrap')}
-            style={{
-              minHeight: 700,
-              width: '73.75%'
-            }}>
+          <div className="dossier__wrap_preview">
             {selectedTab && !selectedTab.readonly && (
               <UploadDropzone
                 onDrop={handleDocumentsDrop}
