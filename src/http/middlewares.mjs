@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Poppler } from 'node-poppler';
 import im from 'imagemagick';
 import { promisify } from 'util';
-import sharp from 'sharp';
+// import sharp from 'sharp';
 
 export const uploadMiddleware = multer({
   limits: {
@@ -82,19 +82,19 @@ export const convertToJpeg = async (req, res, next) => {
   next();
 };
 
-export const compressImages = async (req, res, next) => {
-  req.files = await req.files?.reduce(async (accumulator, file) => {
-    const files = await accumulator;
-    const processingImage = sharp(file.path);
-    const outputName = `${uuidv4()}.jpg`;
-    const outputPath = `${file.destination}/${outputName}`;
-    await processingImage
-      .toFormat('jpeg')
-      .jpeg({ quality: 80, progressive: true, mozjpeg: true })
-      .toFile(outputPath);
-
-    fs.unlinkSync(file.path);
-    return [...files, { path: outputPath, mimetype: 'image/jpeg', filename: outputName }];
-  }, []);
-  next();
-};
+// export const compressImages = async (req, res, next) => {
+//   req.files = await req.files?.reduce(async (accumulator, file) => {
+//     const files = await accumulator;
+//     const processingImage = sharp(file.path);
+//     const outputName = `${uuidv4()}.jpg`;
+//     const outputPath = `${file.destination}/${outputName}`;
+//     await processingImage
+//       .toFormat('jpeg')
+//       .jpeg({ quality: 80, progressive: true, mozjpeg: true })
+//       .toFile(outputPath);
+//
+//     fs.unlinkSync(file.path);
+//     return [...files, { path: outputPath, mimetype: 'image/jpeg', filename: outputName }];
+//   }, []);
+//   next();
+// };
