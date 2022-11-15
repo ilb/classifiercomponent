@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import {
@@ -20,21 +20,22 @@ import classNames from 'classnames';
 import Dimmable from './elements/Dimmable.js';
 import Loader from './elements/Loader.js';
 
-const Classifier = ({
-                      form,
-                      uuid,
-                      onInit,
-                      onUpdate,
-                      onRemove,
-                      onChange,
-                      onDrag,
-                      name,
-                      showError,
-                      schema,
-                      hiddenTabs = [],
-                      readonlyClassifier = null,
-                      defaultTab = 'classifier'
-                    }) => {
+const Classifier = forwardRef(({
+  form,
+  uuid,
+  onInit,
+  onUpdate,
+  onRemove,
+  onChange,
+  onChangeTab,
+  onDrag,
+  name,
+  showError,
+  schema,
+  hiddenTabs = [],
+  readonlyClassifier = null,
+  defaultTab = 'classifier'
+}, ref) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
@@ -48,6 +49,15 @@ const Classifier = ({
   const [prev, setPrev] = useState(null);
   const [pageErrors, setPageErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    changeSelectedTab(type) {
+      const tab = documentsTabs.find(tab => tab.type === type);
+      if (tab) {
+        selectTab(tab)
+      }
+    }
+  }));
 
   useEffect(() => {
     if (!documentsTabs.find(tab => tab.type === selectedTab?.type)) {
@@ -378,12 +388,14 @@ const Classifier = ({
   };
 
   const changeTab = (_, { name }) => {
+    let tab;
     if (name === 'classifier') {
-      selectTab({ type: 'classifier', name: 'Автоматически' });
-      return;
+      tab = { type: 'classifier', name: 'Автоматически' }
+    } else {
+      tab = documentsTabs.find((tab) => tab.type === name);
     }
-    const tab = documentsTabs.find((tab) => tab.type === name);
     selectTab(tab);
+    onChangeTab && onChangeTab(tab);
   };
 
   return (
@@ -432,6 +444,6 @@ const Classifier = ({
       </div>
     </div>
   );
-};
+});
 
 export default Classifier;
