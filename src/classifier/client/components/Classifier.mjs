@@ -16,9 +16,9 @@ import Menu from './menu/Menu';
 import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } from '../hooks';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
-import classNames from 'classnames';
 import Dimmable from './elements/Dimmable.js';
 import Loader from './elements/Loader.js';
+import ListGallery from './gallery/ListGallery.js';
 
 const Classifier = forwardRef(({
   form,
@@ -34,7 +34,9 @@ const Classifier = forwardRef(({
   schema,
   hiddenTabs = [],
   readonlyClassifier = null,
-  defaultTab = 'classifier'
+  defaultTab = 'classifier',
+  withViewTypes = false,
+  defaultViewType = 'grid'
 }, ref) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
@@ -49,6 +51,7 @@ const Classifier = forwardRef(({
   const [prev, setPrev] = useState(null);
   const [pageErrors, setPageErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState(defaultViewType);
 
   useImperativeHandle(ref, () => ({
     changeSelectedTab(type) {
@@ -410,6 +413,9 @@ const Classifier = forwardRef(({
           onDragCancel={onDragCancel}>
           <div className="dossier__wrap dossier__wrap__menu">
             <Menu
+              withViewTypes={withViewTypes}
+              view={view}
+              onChangeView={setView}
               uuid={uuid}
               blocks={schema.blocks}
               classifier={classifier}
@@ -431,13 +437,18 @@ const Classifier = forwardRef(({
             <Dimmable>
               <Loader active={(!!countStartedTasks && selectedTab?.type === 'classifier') || loading}
                       loaderText="Загрузка..."/>
-              <SortableGallery
-                pageErrors={pageErrors}
-                tab={selectedTab}
-                srcSet={selectedDocument}
-                onRemove={handlePageDelete}
-                active={activeDraggable}
-              />
+              {view === 'grid' && (
+                <SortableGallery
+                  pageErrors={pageErrors}
+                  tab={selectedTab}
+                  srcSet={selectedDocument}
+                  onRemove={handlePageDelete}
+                  active={activeDraggable}
+                />
+              )}
+              {view === 'list' && (
+                <ListGallery srcSet={selectedDocument} />
+              )}
             </Dimmable>
           </div>
         </DndContext>

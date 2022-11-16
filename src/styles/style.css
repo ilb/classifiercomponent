@@ -22,6 +22,26 @@
   height: auto;
 }
 
+.classifier .dossier__wrap .classifier-panel {
+  padding: 3px;
+  border-bottom: 1px solid rgba(34,36,38,.15);
+  height: 45px;
+}
+
+.classifier .dossier__wrap .classifier-panel .classifier-panel-btn {
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+}
+
+.classifier .dossier__wrap .classifier-panel .classifier-panel-btn.selected {
+  background-color: #e7e5e5;
+}
+
+.classifier .dossier__wrap .classifier-panel .classifier-panel-btn:hover {
+  background-color: #f1efef;
+}
+
 .classifier .dossier__wrap *, :after, :before {
   box-sizing: inherit;
 }

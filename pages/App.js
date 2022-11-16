@@ -30,6 +30,8 @@ export default function App() {
         ref={childRef}
         uuid={uuid}
         name="classifier"
+        withViewTypes
+        defaultViewType="list"
         schema={classifierSchema}
         onUpdate={console.log}
       />

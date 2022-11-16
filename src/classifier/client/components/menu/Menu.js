@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react';
 import MenuBlock from './MenuBlock';
 import classNames from 'classnames';
+import Panel from './Panel';
 
-const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect, hiddenTabs }) => {
+const Menu = ({
+  uuid,
+  classifier,
+  documents,
+  blocks,
+  selected,
+  onDocumentSelect,
+  hiddenTabs,
+  withViewTypes,
+  view,
+  onChangeView
+}) => {
   const [docBlocks, setDocBlocks] = useState([]);
 
   useEffect(() => {
@@ -25,6 +37,7 @@ const Menu = ({ uuid, classifier, documents, blocks, selected, onDocumentSelect,
     <>
       {!!documents.length && (
         <div className="menu">
+          {withViewTypes && <Panel view={view} onChangeView={onChangeView} />}
           {!classifier.disabled && (
             <>
               <div
