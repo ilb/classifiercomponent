@@ -427,29 +427,31 @@ const Classifier = forwardRef(({
             />
           </div>
           <div className="dossier__wrap_preview">
-            {selectedTab && !selectedTab.readonly && (
-              <UploadDropzone
-                onDrop={handleDocumentsDrop}
-                accept={selectedTab.accept}
-                fileType={selectedTab.fileType}
-              />
+            {view === 'grid' && (
+              <>
+                {selectedTab && !selectedTab.readonly && (
+                  <UploadDropzone
+                    onDrop={handleDocumentsDrop}
+                    accept={selectedTab.accept}
+                    fileType={selectedTab.fileType}
+                  />
+                )}
+                <Dimmable>
+                  <Loader active={(!!countStartedTasks && selectedTab?.type === 'classifier') || loading}
+                          loaderText="Загрузка..."/>
+                  <SortableGallery
+                    pageErrors={pageErrors}
+                    tab={selectedTab}
+                    srcSet={selectedDocument}
+                    onRemove={handlePageDelete}
+                    active={activeDraggable}
+                  />
+                </Dimmable>
+              </>
             )}
-            <Dimmable>
-              <Loader active={(!!countStartedTasks && selectedTab?.type === 'classifier') || loading}
-                      loaderText="Загрузка..."/>
-              {view === 'grid' && (
-                <SortableGallery
-                  pageErrors={pageErrors}
-                  tab={selectedTab}
-                  srcSet={selectedDocument}
-                  onRemove={handlePageDelete}
-                  active={activeDraggable}
-                />
-              )}
-              {view === 'list' && (
-                <ListGallery srcSet={selectedDocument} />
-              )}
-            </Dimmable>
+            {view === 'list' && (
+              <ListGallery srcSet={selectedDocument} />
+            )}
           </div>
         </DndContext>
       </div>
