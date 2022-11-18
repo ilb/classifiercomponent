@@ -10,10 +10,14 @@ const Panel = ({ onChangeView, view }) => {
 
   return (
     <div className="classifier-panel">
-      <span className={classNames('classifier-panel-btn', view === 'grid' && 'selected')} onClick={() => onClick('grid')}>
+      <span
+        className={classNames('classifier-panel-btn', view === 'grid' && 'selected')}
+        onClick={() => onClick('grid')}>
         <Image src={grid_icon.src} alt="Picture of the author" width={30} height={30} />
       </span>
-      <span className={classNames('classifier-panel-btn', view === 'list' && 'selected')} onClick={() => onClick('list')}>
+      <span
+        className={classNames('classifier-panel-btn', view === 'list' && 'selected')}
+        onClick={() => onClick('list')}>
         <Image src={horizontal_icon.src} alt="Picture of the author" width={30} height={30} />
       </span>
     </div>

@@ -19,25 +19,26 @@ import { compress } from '../utils/compressor.js';
 import Dimmable from './elements/Dimmable.js';
 import Loader from './elements/Loader.js';
 import ListGallery from './gallery/ListGallery.js';
+import ListMenu from './menu/ListMenu.js';
 
 const Classifier = forwardRef(({
-  form,
-  uuid,
-  onInit,
-  onUpdate,
-  onRemove,
-  onChange,
-  onChangeTab,
-  onDrag,
-  name,
-  showError,
-  schema,
-  hiddenTabs = [],
-  readonlyClassifier = null,
-  defaultTab = 'classifier',
-  withViewTypes = false,
-  defaultViewType = 'grid'
-}, ref) => {
+                                 form,
+                                 uuid,
+                                 onInit,
+                                 onUpdate,
+                                 onRemove,
+                                 onChange,
+                                 onChangeTab,
+                                 onDrag,
+                                 name,
+                                 showError,
+                                 schema,
+                                 hiddenTabs = [],
+                                 readonlyClassifier = null,
+                                 defaultTab = 'classifier',
+                                 withViewTypes = false,
+                                 defaultViewType = 'grid'
+                               }, ref) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
@@ -57,7 +58,7 @@ const Classifier = forwardRef(({
     changeSelectedTab(type) {
       const tab = documentsTabs.find(tab => tab.type === type);
       if (tab) {
-        selectTab(tab)
+        selectTab(tab);
       }
     }
   }));
@@ -74,6 +75,10 @@ const Classifier = forwardRef(({
       setPrev(documents);
     }
   }, [documents]);
+
+  useEffect(() => {
+    onChangeTab && onChangeTab(selectedTab);
+  }, [selectedTab.type])
 
   useEffect(() => {
     setClassifier(schema.classifier);
@@ -155,7 +160,7 @@ const Classifier = forwardRef(({
   }, []);
 
   useEffect(() => {
-    setTwainHandler()
+    setTwainHandler();
   }, [selectedTab]);
 
   useEffect(() => {
@@ -230,7 +235,7 @@ const Classifier = forwardRef(({
 
   const processError = (error, documents) => {
     console.log(error, documents);
-    alert("При загрузке документа произошла ошибка");
+    alert('При загрузке документа произошла ошибка');
     // if (error?.description?.type === 'signatureError') {
     //   addPagesErrors(error.description.info, documents);
     //   toast({
@@ -393,42 +398,41 @@ const Classifier = forwardRef(({
   const changeTab = (_, { name }) => {
     let tab;
     if (name === 'classifier') {
-      tab = { type: 'classifier', name: 'Автоматически' }
+      tab = { type: 'classifier', name: 'Автоматически' };
     } else {
       tab = documentsTabs.find((tab) => tab.type === name);
     }
     selectTab(tab);
-    onChangeTab && onChangeTab(tab);
   };
 
   return (
     <div className="dossier classifier">
       <div className="grid gridCentered">
-        <DndContext
-          sensors={sensors}
-          modifiers={[snapCenterToCursor]}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-          onDragOver={onDragOver}
-          onDragCancel={onDragCancel}>
-          <div className="dossier__wrap dossier__wrap__menu">
-            <Menu
-              withViewTypes={withViewTypes}
-              view={view}
-              onChangeView={setView}
-              uuid={uuid}
-              blocks={schema.blocks}
-              classifier={classifier}
-              name={name}
-              documents={schema.tabs}
-              hiddenTabs={hiddenTabs}
-              selected={selectedTab?.type}
-              onDocumentSelect={changeTab}
-            />
-          </div>
-          <div className="dossier__wrap_preview">
-            {view === 'grid' && (
-              <>
+        {view === 'grid' && (
+          <>
+            <DndContext
+              sensors={sensors}
+              modifiers={[snapCenterToCursor]}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              onDragOver={onDragOver}
+              onDragCancel={onDragCancel}>
+              <div className="dossier__wrap dossier__wrap__menu dossier__wrap__menu__grid">
+                <Menu
+                  withViewTypes={withViewTypes}
+                  view={view}
+                  onChangeView={setView}
+                  uuid={uuid}
+                  blocks={schema.blocks}
+                  classifier={classifier}
+                  name={name}
+                  documents={schema.tabs}
+                  hiddenTabs={hiddenTabs}
+                  selected={selectedTab?.type}
+                  onDocumentSelect={changeTab}
+                />
+              </div>
+              <div className="dossier__wrap_preview">
                 {selectedTab && !selectedTab.readonly && (
                   <UploadDropzone
                     onDrop={handleDocumentsDrop}
@@ -447,13 +451,24 @@ const Classifier = forwardRef(({
                     active={activeDraggable}
                   />
                 </Dimmable>
-              </>
-            )}
-            {view === 'list' && (
-              <ListGallery srcSet={selectedDocument} />
-            )}
-          </div>
-        </DndContext>
+              </div>
+            </DndContext>
+          </>
+        )}
+        {view === 'list' && (
+         <div className="dossier__wrap dossier__wrap__menu dossier__wrap__menu__list">
+         <ListMenu
+             withViewTypes={withViewTypes}
+             view={view}
+             documents={schema.tabs}
+             hiddenTabs={hiddenTabs}
+             selected={selectedTab?.type}
+             onDocumentSelect={changeTab}
+             onChangeView={setView}
+           />
+           <ListGallery srcSet={selectedDocument}/>
+         </div>
+        )}
       </div>
     </div>
   );

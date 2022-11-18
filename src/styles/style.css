@@ -24,8 +24,52 @@
 
 .classifier .dossier__wrap .classifier-panel {
   padding: 3px;
-  border-bottom: 1px solid rgba(34,36,38,.15);
   height: 45px;
+}
+.classifier .dossier__wrap .classifier-menu-list {
+  padding-bottom: 8px;
+}
+.classifier .dossier__wrap__menu__grid .classifier-panel {
+  border-bottom: 1px solid rgba(34,36,38,.15);
+}
+
+.classifier .dossier__wrap__menu.dossier__wrap__menu__list {
+  width: 100%;
+}
+
+.classifier .classifier-list-gallery {
+  display: block !important;
+}
+
+.classifier .dossier__wrap__menu__list > div {
+  width: 100%;
+  display: inline-flex;
+}
+
+.classifier .classifier-list-gallery-item img {
+  max-width: 100%;
+}
+
+.classifier .dossier__wrap__menu__list .select-search-container {
+  margin-left: 12px;
+}
+
+.classifier .dossier__wrap__menu__list .select-search-input {
+  height: 40px;
+  margin-top: 2px;
+}
+
+.classifier .dossier__wrap__menu__list .select-search-input {
+  border: 1px solid #bababc;
+}
+
+.classifier .dossier__wrap__menu__list .select-search-select {
+  border: 1px solid #bababc;
+}
+
+.classifier .dossier__wrap__menu__list .select-search-options {
+  padding: 0;
+  margin: 0;
 }
 
 .classifier .dossier__wrap .classifier-panel .classifier-panel-btn {

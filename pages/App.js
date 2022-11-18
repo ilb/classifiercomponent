@@ -15,6 +15,9 @@ export default function App() {
   return (
     <div
       style={{
+        border: '1px solid #b0b0b0',
+        borderRadius: 10,
+        padding: 20,
         marginTop: 50,
         width: 1127,
         marginLeft: 'auto !important',
@@ -23,15 +26,18 @@ export default function App() {
         maxWidth: '100% !important'
       }}
       className="ui container">
-      <button style={{ margin: 20 }} onClick={() => childRef.current.changeSelectedTab('passport')}>
-        Select passport
-      </button>
+      {/*<button style={{ margin: 20 }} onClick={() => {*/}
+      {/*  console.log(childRef);*/}
+      {/*  return childRef.current.changeSelectedTab('passport');*/}
+      {/*}}>*/}
+      {/*  Select passport*/}
+      {/*</button>*/}
       <Classifier
         ref={childRef}
         uuid={uuid}
         name="classifier"
         withViewTypes
-        defaultViewType="list"
+        defaultViewType="grid"
         schema={classifierSchema}
         onUpdate={console.log}
       />
