@@ -75,7 +75,7 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
             <div className="grid">
               {srcSet.map((src) => {
                 return (
-                  <div style={{ padding: 3 }} key={src.id} className="column">
+                  <div key={src.id} className="column">
                     <SortableGalleryItem
                       src={src}
                       errors={pageErrors[src.uuid]}

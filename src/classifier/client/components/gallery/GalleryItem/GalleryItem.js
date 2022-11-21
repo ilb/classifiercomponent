@@ -42,7 +42,7 @@ const GalleryItem = React.memo(
       const getPath = () => src.path || src; // todo как-то избавиться от такого
       return (
         <div ref={ref} style={style}>
-          <div className="segment">
+          <div className="segment" style={{ margin: 3 }}>
             <div style={{ padding: 4 }}>
               {/* todo проверка подписей, сделать без semantic-ui */}
               {/*{errors?.count && (*/}
