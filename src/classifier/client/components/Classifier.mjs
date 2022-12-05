@@ -22,23 +22,23 @@ import ListGallery from './gallery/ListGallery.js';
 import ListMenu from './menu/ListMenu.js';
 
 const Classifier = forwardRef(({
-                                 form,
-                                 uuid,
-                                 onInit,
-                                 onUpdate,
-                                 onRemove,
-                                 onChange,
-                                 onChangeTab,
-                                 onDrag,
-                                 name,
-                                 showError,
-                                 schema,
-                                 hiddenTabs = [],
-                                 readonlyClassifier = null,
-                                 defaultTab = 'classifier',
-                                 withViewTypes = false,
-                                 defaultViewType = 'grid'
-                               }, ref) => {
+   form,
+   uuid,
+   onInit,
+   onUpdate,
+   onRemove,
+   onChange,
+   onChangeTab,
+   onDrag,
+   name,
+   showError,
+   schema,
+   hiddenTabs = [],
+   readonlyClassifier = null,
+   defaultTab = 'classifier',
+   withViewTypes = false,
+   defaultViewType = 'grid'
+ }, ref) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
   const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
@@ -161,6 +161,12 @@ const Classifier = forwardRef(({
 
   useEffect(() => {
     setTwainHandler();
+  }, [selectedTab]);
+
+  useEffect(() => {
+    if (documents[selectedTab.type]?.length === 0) {
+      setView('grid')
+    }
   }, [selectedTab]);
 
   useEffect(() => {
