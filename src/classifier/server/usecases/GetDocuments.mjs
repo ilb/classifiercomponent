@@ -18,7 +18,7 @@ export default class GetDocuments {
           id: `${url}/${document.type}/${i + 1}?_nocache=${document.structure.lastModified}`,
           path: `${url}/${document.type}/${i + 1}?_nocache=${document.structure.lastModified}`,
           uuid: page.uuid,
-          type: mime.lookup(page.extension)
+          type: mime.lookup(page.extension) || page.mimeType
         };
       });
 
