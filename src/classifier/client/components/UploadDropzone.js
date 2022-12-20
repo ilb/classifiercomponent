@@ -19,7 +19,7 @@ const UploadDropzone = ({
   });
 
   return (
-    <div className="segment">
+    <div className="segment dropzone_wrapper">
       <div className="dossier__uploads" style={{ cursor: 'pointer' }}>
         <div
           style={{ padding: 10 }}

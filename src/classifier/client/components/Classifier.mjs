@@ -472,6 +472,13 @@ const Classifier = forwardRef(({
              onDocumentSelect={changeTab}
              onChangeView={setView}
            />
+           {selectedTab && !selectedTab.readonly && (
+             <UploadDropzone
+               onDrop={handleDocumentsDrop}
+               accept={selectedTab.accept}
+               fileType={selectedTab.fileType}
+             />
+           )}
            <ListGallery srcSet={selectedDocument}/>
          </div>
         )}

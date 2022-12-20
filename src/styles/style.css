@@ -117,6 +117,10 @@
   width: 33.33%;
 }
 
+.classifier .dossier__uploads {
+  width: 100%;
+}
+
 .classifier .menuItem {
   width: 100%;
   position: relative;
