@@ -2,7 +2,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../utils/fetcher';
 
 const basePath = process.env.API_PATH || '/api';
-const dossierCorePath = process.env.DOSSIER_CORE_PATH
+const dossierCorePath = process.env.DOSSIER_CORE_PATH || 'http://localhost:3001';
 
 export const classifyDocument = async (uuid, files, availableClasses) => {
   const formData = new FormData();
@@ -15,9 +15,9 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
   const result = await fetch(`${basePath}/classifications/${uuid}`, {
     method: 'PUT',
     headers: {
-      accept: '*/*'
+      accept: '*/*',
     },
-    body: formData
+    body: formData,
   });
 
   if (result.ok) {
@@ -36,9 +36,9 @@ export const uploadPages = async (uuid, document, files) => {
   const result = await fetch(`${dossierCorePath}/${uuid}/documents/${document}`, {
     method: 'PUT',
     headers: {
-      accept: '*/*'
+      accept: '*/*',
     },
-    body: formData
+    body: formData,
   });
 
   if (result.ok) {
@@ -49,9 +49,13 @@ export const uploadPages = async (uuid, document, files) => {
 };
 
 export const deletePage = async (pageSrc) => {
-  const url = dossierCorePath + '/' + pageSrc.path.slice(0, pageSrc.path.lastIndexOf('/')) + `/${pageSrc.uuid}`;
+  const url =
+    dossierCorePath +
+    '/' +
+    pageSrc.path.slice(0, pageSrc.path.lastIndexOf('/')) +
+    `/${pageSrc.uuid}`;
   const result = await fetch(url, {
-    method: 'DELETE'
+    method: 'DELETE',
   });
 
   if (result.ok) {
@@ -65,10 +69,10 @@ export const correctDocuments = async (uuid, from, to) => {
   const res = await fetch(`${dossierCorePath}/${uuid}/documents/correction`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
     redirect: 'follow',
-    body: JSON.stringify([{ from, to }])
+    body: JSON.stringify([{ from, to }]),
   });
 
   if (res.ok) {
@@ -87,42 +91,34 @@ export const usePages = (uuid, documentName) => {
     documentName ? `${dossierCorePath}/${uuid}/documents/${documentName}` : null,
     fetcher,
     {
-      fallbackData: []
-    }
+      fallbackData: [],
+    },
   );
   return {
     pages,
     mutatePages: mutate,
     revalidatePages: () =>
-      mutateGlobal(
-        documentName
-          ? `${dossierCorePath}/${uuid}/documents/${documentName}`
-          : null
-      )
+      mutateGlobal(documentName ? `${dossierCorePath}/${uuid}/documents/${documentName}` : null),
   };
 };
 
 export const useDocuments = (uuid) => {
   const { mutate: mutateGlobal } = useSWRConfig();
-  const { data: documents, mutate } = useSWR(
-    `${dossierCorePath}/${uuid}/documents`,
-    fetcher,
-    {
-      fallbackData: {}
-    }
-  );
+  const { data: documents, mutate } = useSWR(`${dossierCorePath}/${uuid}/documents`, fetcher, {
+    fallbackData: {},
+  });
   return {
     documents,
     mutateDocuments: mutate,
     correctDocuments: (from, to) => correctDocuments(uuid, from, to),
-    revalidateDocuments: () => mutateGlobal(`${dossierCorePath}/${uuid}/documents`)
+    revalidateDocuments: () => mutateGlobal(`${dossierCorePath}/${uuid}/documents`),
   };
 };
 
 export const useTasks = (uuid) => {
   const { data: tasks } = useSWR(`${basePath}/classifications/${uuid}`, fetcher, {
     fallbackData: [],
-    refreshInterval: 5000
+    refreshInterval: 5000,
   });
   return { tasks };
 };
