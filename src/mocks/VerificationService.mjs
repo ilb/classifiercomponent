@@ -2,8 +2,7 @@ export default class VerificationService {
   /**
    *
    */
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * Добавление таска
@@ -12,8 +11,7 @@ export default class VerificationService {
    * @param path
    * @returns {Promise<*>}
    */
-  async add(type, path) {
-  }
+  async add(type, path) {}
 
   /**
    * Старт таска
@@ -21,8 +19,7 @@ export default class VerificationService {
    * @param verification
    * @returns {Promise<*>}
    */
-  async start(verification) {
-  }
+  async start(verification) {}
 
   /**
    * Завершение таска
@@ -31,8 +28,7 @@ export default class VerificationService {
    * @param data
    * @returns {Promise<*>}
    */
-  async finish(verification, data = []) {
-  }
+  async finish(verification, data = []) {}
 
   /**
    * Отмена таска
@@ -41,6 +37,5 @@ export default class VerificationService {
    * @param data
    * @returns {Promise<*>}
    */
-  async cancel(verification, data = []) {
-  }
+  async cancel(verification, data = []) {}
 }

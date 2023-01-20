@@ -12,7 +12,7 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
 
   availableClasses.map((availableClass) => formData.append(`availableClasses`, availableClass));
 
-  const result = await fetch(`${basePath}/classifications/${uuid}`, {
+  const result = await fetch(`${dossierCorePath}/classifier/api/${uuid}`, {
     method: 'PUT',
     headers: {
       accept: '*/*',
@@ -33,7 +33,7 @@ export const uploadPages = async (uuid, document, files) => {
     formData.append(`documents`, f);
   });
 
-  const result = await fetch(`${dossierCorePath}/${uuid}/documents/${document}`, {
+  const result = await fetch(`${dossierCorePath}/dossiercore/api/${uuid}/documents/${document}`, {
     method: 'PUT',
     headers: {
       accept: '*/*',
@@ -65,14 +65,14 @@ export const deletePage = async (pageSrc) => {
   }
 };
 
-export const correctDocuments = async (uuid, from, to) => {
-  const res = await fetch(`${dossierCorePath}/${uuid}/documents/correction`, {
+export const correctDocuments = async (uuid, documents) => {
+  const res = await fetch(`${dossierCorePath}/dossiercore/api/${uuid}/documents/correction`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     redirect: 'follow',
-    body: JSON.stringify([{ from, to }]),
+    body: JSON.stringify({ documents }),
   });
 
   if (res.ok) {
@@ -85,10 +85,23 @@ export const correctDocuments = async (uuid, from, to) => {
   }
 };
 
+export const getSchema = async (project) => {
+  const res = fetch(`${dossierCoreUrl}/dossiercore/api/schema/${project}`, {
+    method: 'GET',
+  });
+
+  if (res.ok) {
+    const schema = await res.json();
+    return schema;
+  } else {
+    throw Error(`Не удалось полуичть схему`);
+  }
+};
+
 export const usePages = (uuid, documentName) => {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { data: pages, mutate } = useSWR(
-    documentName ? `${dossierCorePath}/${uuid}/documents/${documentName}` : null,
+    documentName ? `${dossierCorePath}/dossiercore/api/${uuid}/documents/${documentName}` : null,
     fetcher,
     {
       fallbackData: [],
@@ -98,20 +111,28 @@ export const usePages = (uuid, documentName) => {
     pages,
     mutatePages: mutate,
     revalidatePages: () =>
-      mutateGlobal(documentName ? `${dossierCorePath}/${uuid}/documents/${documentName}` : null),
+      mutateGlobal(
+        documentName
+          ? `${dossierCorePath}/dossiercore/api/${uuid}/documents/${documentName}`
+          : null,
+      ),
   };
 };
 
 export const useDocuments = (uuid) => {
   const { mutate: mutateGlobal } = useSWRConfig();
-  const { data: documents, mutate } = useSWR(`${dossierCorePath}/${uuid}/documents`, fetcher, {
-    fallbackData: {},
-  });
+  const { data: documents, mutate } = useSWR(
+    `${dossierCorePath}/dossiercore/api/${uuid}/documents`,
+    fetcher,
+    {
+      fallbackData: {},
+    },
+  );
   return {
     documents,
     mutateDocuments: mutate,
     correctDocuments: (from, to) => correctDocuments(uuid, from, to),
-    revalidateDocuments: () => mutateGlobal(`${dossierCorePath}/${uuid}/documents`),
+    revalidateDocuments: () => mutateGlobal(`${dossierCorePath}/dossiercore/api/${uuid}/documents`),
   };
 };
 
