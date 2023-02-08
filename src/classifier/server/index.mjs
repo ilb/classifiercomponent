@@ -10,6 +10,7 @@ import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
+import { compressImages } from '../../http/middlewares.mjs';
 
 const ClassifierApi = (createScope, onError, onNoMatch) => {
   const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
@@ -29,7 +30,7 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
     nc({ attachParams: true, onError, onNoMatch })
       .use(uploadMiddleware.array('documents'))
       .use(splitPdf)
-      // .use(compressImages)
+      .use(compressImages)
       .use(bodyParser.json())
       .get('/:uuid', checkClassifications)
       .put('/:uuid', classifyPages)
