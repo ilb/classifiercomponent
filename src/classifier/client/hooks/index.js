@@ -49,11 +49,7 @@ export const uploadPages = async (uuid, document, files) => {
 };
 
 export const deletePage = async (pageSrc) => {
-  const url =
-    dossierCorePath +
-    '/' +
-    pageSrc.path.slice(0, pageSrc.path.lastIndexOf('/')) +
-    `/${pageSrc.uuid}`;
+  const url = pageSrc.path.slice(0, pageSrc.path.lastIndexOf('/')) + `/${pageSrc.uuid}`;
   const result = await fetch(url, {
     method: 'DELETE',
   });
