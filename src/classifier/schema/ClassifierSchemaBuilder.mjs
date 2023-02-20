@@ -19,36 +19,39 @@ export default class ClassifierSchemaBuilder extends SchemaBuilder {
    */
   getClassifierProperties(access) {
     return {
-      disabled: access === 'read' ? true : !this.processors.classifier.isDisplay()
+      disabled: access === 'read' ? true : !this.classifierProcessor.isDisplay(),
     };
   }
 
   getBlocksProperties() {
-    return this.schema.blocks.map((block) => ({
+    return this.schema.documents.map((block) => ({
       name: block.name || '',
       type: block.type,
       collapsed: block.collapsed || false,
-      open: block?.open?.includes(this.context.stateCode) || false
+      open: block?.open?.includes(this.context.stateCode) || false,
     }));
   }
 
-  getTabsProperties(access) {
-    return this.schema.documents
-      .filter((documentSchema) => this.processors[documentSchema.type].isDisplay())
-      .map((documentSchema) => ({
-        name: documentSchema.name,
-        type: documentSchema.type,
-        accept: documentSchema.accept,
-        block: documentSchema.block,
-        tooltip: documentSchema.tooltip || null,
-        required: this.processors[documentSchema.type].isRequired(),
-        readonly: access === 'read' ? true : this.processors[documentSchema.type].isReadonly()
-      }));
+  getTabsProperties() {
+    return this.schema.documents.map((documentSchema) => {
+      const documentFromMainSchema = this.context.schema.find(
+        (document) => document.type === documentSchema.type,
+      );
+
+      return {
+        ...documentFromMainSchema,
+        ...documentSchema,
+        required: this.processor.isRequired() || false,
+        readonly: this.processor.isReadonly() || false,
+        tooltip: null,
+        block: documentSchema.type,
+      };
+    });
   }
 
   getMeta(tabs) {
     return {
-      required: tabs.filter(tab => tab.required && !tab.readonly).map(tab => tab.type)
+      required: tabs.filter((tab) => tab.required && !tab.readonly).map((tab) => tab.type),
     };
   }
 }
