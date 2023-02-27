@@ -16,8 +16,8 @@ export default class SchemaBuilder {
     // this.processors.classifier = this.getProcessor(this.schema.classifier, context);
 
     // console.log('this.processors.classifier', this.processors.classifier);
-    this.processor = this.getProcessor(schema, context);
 
+    this.processor = schema.processor;
     this.classifierProcessor = new schema.classifier.processor(schema.classifier, context);
   }
 
