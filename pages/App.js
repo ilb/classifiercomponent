@@ -3,13 +3,11 @@ import { useRef, useState } from 'react';
 import matching from '../src/mocks/matching.mjs';
 import schema from '../src/mocks/schema.mjs';
 import ClassifierSchemaBuilder from '../src/classifier/schema/ClassifierSchemaBuilder.mjs';
-import { getSchema } from '../src/classifier/client/hooks';
 
 const builder = new ClassifierSchemaBuilder(matching);
 
 export default function App() {
   const uuid = '7533b049-88ca-489b-878a-3ac1c8616fe7';
-  //Получение схемы из ядра
   const [classifierSchema] = useState(builder.build(schema, { stateCode: 'CREATION' }));
 
   const childRef = useRef();
