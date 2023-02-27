@@ -26,6 +26,7 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
       {!hidden && (
         <div key={document.type} ref={setNodeRef}>
           <Menu.Item
+            id={document.type}
             disabled={disabled}
             className={className}
             name={document.type}
