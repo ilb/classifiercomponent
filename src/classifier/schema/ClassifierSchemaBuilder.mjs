@@ -36,8 +36,8 @@ export default class ClassifierSchemaBuilder extends SchemaBuilder {
     return this.schema.documents.map((documentSchema) => {
       return {
         ...documentSchema,
-        required: this.processor.isRequired() || false,
-        readonly: this.processor.isReadonly() || false,
+        required: this.processor.isRequired(documentSchema.type) || false,
+        readonly: this.processor.isReadonly(documentSchema.type) || false,
         tooltip: null,
         block: documentSchema.type,
       };
