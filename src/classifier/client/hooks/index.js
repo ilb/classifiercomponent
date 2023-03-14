@@ -2,7 +2,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../utils/fetcher';
 
 const basePath = process.env.API_PATH || '/api';
-const dossierCorePath = process.env.DOSSIER_CORE_PATH || 'http://localhost:3001';
+const dossierCorePath = process.env['apps.loandossier.ws'] || 'http://localhost:3001';
 
 export const classifyDocument = async (uuid, files, availableClasses) => {
   const formData = new FormData();
