@@ -13,7 +13,7 @@ import {
 import SortableGallery from './gallery/SortableGallery';
 import UploadDropzone from './UploadDropzone';
 import Menu from './menu/Menu';
-import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } from '../hooks';
+import { useDocuments, useTasks } from '../hooks';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
 import Dimmable from './elements/Dimmable.js';
@@ -35,6 +35,7 @@ const Classifier = forwardRef(
       name,
       showError,
       schema,
+      dossierUrl,
       hiddenTabs = [],
       readonlyClassifier = null,
       defaultTab = 'classifier',
@@ -45,8 +46,15 @@ const Classifier = forwardRef(
   ) => {
     const [classifier, setClassifier] = useState(schema.classifier);
     const { tasks } = useTasks(uuid);
-    const { documents, mutateDocuments, correctDocuments, revalidateDocuments } =
-      useDocuments(uuid);
+    const {
+      documents,
+      mutateDocuments,
+      correctDocuments,
+      revalidateDocuments,
+      classifyDocument,
+      deletePage,
+      uploadPages,
+    } = useDocuments(uuid, dossierUrl);
     const [documentsTabs, setDocumentsTabs] = useState(schema.tabs);
     const [selectedTab, selectTab] = useState({});
     const [clonedItems, setClonedItems] = useState(null);
@@ -337,19 +345,15 @@ const Classifier = forwardRef(
         }
 
         if (draggableOrigin.container !== overContainer) {
-          correctDocuments([
-            {
-              from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
-              to: { class: overContainer, page: overIndex + 1 },
-            },
-          ]);
+          correctDocuments(
+            { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
+            { class: overContainer, page: overIndex + 1 },
+          );
         } else {
-          correctDocuments([
-            {
-              from: { class: activeContainer, page: activeIndex + 1 },
-              to: { class: overContainer, page: overIndex + 1 },
-            },
-          ]);
+          correctDocuments(
+            { class: activeContainer, page: activeIndex + 1 },
+            { class: overContainer, page: overIndex + 1 },
+          );
         }
       }
 

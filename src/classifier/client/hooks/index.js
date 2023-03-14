@@ -2,9 +2,8 @@ import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../utils/fetcher';
 
 const basePath = process.env.API_PATH || '/api';
-const dossierCorePath = process.env['apps.loandossier.ws'] || 'http://localhost:3001';
 
-export const classifyDocument = async (uuid, files, availableClasses) => {
+export const classifyDocument = async (uuid, files, availableClasses, dossierUrl) => {
   const formData = new FormData();
   files.forEach((f) => {
     formData.append(`documents`, f);
@@ -12,7 +11,7 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
 
   availableClasses.map((availableClass) => formData.append(`availableClasses`, availableClass));
 
-  const result = await fetch(`${dossierCorePath}/classifier/api/${uuid}`, {
+  const result = await fetch(`${dossierUrl}/classifier/api/${uuid}`, {
     method: 'PUT',
     headers: {
       accept: '*/*',
@@ -27,13 +26,13 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
   }
 };
 
-export const uploadPages = async (uuid, document, files) => {
+export const uploadPages = async (uuid, document, files, dossierUrl) => {
   const formData = new FormData();
   files.forEach((f) => {
     formData.append(`documents`, f);
   });
 
-  const result = await fetch(`${dossierCorePath}/dossiercore/api/${uuid}/documents/${document}`, {
+  const result = await fetch(`${dossierUrl}/dossiercore/api/${uuid}/documents/${document}`, {
     method: 'PUT',
     headers: {
       accept: '*/*',
@@ -61,8 +60,8 @@ export const deletePage = async (pageSrc) => {
   }
 };
 
-export const correctDocuments = async (uuid, documents) => {
-  const res = await fetch(`${dossierCorePath}/dossiercore/api/${uuid}/documents/correction`, {
+export const correctDocuments = async (uuid, documents, dossierUrl) => {
+  const res = await fetch(`${dossierUrl}/dossiercore/api/${uuid}/documents/correction`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -81,8 +80,8 @@ export const correctDocuments = async (uuid, documents) => {
   }
 };
 
-export const getSchema = async (project) => {
-  const res = fetch(`${dossierCoreUrl}/dossiercore/api/schema/${project}`, {
+export const getSchema = async (project, dossierUrl) => {
+  const res = fetch(`${dossierUrl}/dossiercore/api/schema/${project}`, {
     method: 'GET',
   });
 
@@ -94,10 +93,10 @@ export const getSchema = async (project) => {
   }
 };
 
-export const usePages = (uuid, documentName) => {
+export const usePages = (uuid, documentName, dossierUrl) => {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { data: pages, mutate } = useSWR(
-    documentName ? `${dossierCorePath}/dossiercore/api/${uuid}/documents/${documentName}` : null,
+    documentName ? `${dossierUrl}/dossiercore/api/${uuid}/documents/${documentName}` : null,
     fetcher,
     {
       fallbackData: [],
@@ -108,17 +107,15 @@ export const usePages = (uuid, documentName) => {
     mutatePages: mutate,
     revalidatePages: () =>
       mutateGlobal(
-        documentName
-          ? `${dossierCorePath}/dossiercore/api/${uuid}/documents/${documentName}`
-          : null,
+        documentName ? `${dossierUrl}/dossiercore/api/${uuid}/documents/${documentName}` : null,
       ),
   };
 };
 
-export const useDocuments = (uuid) => {
+export const useDocuments = (uuid, dossierUrl) => {
   const { mutate: mutateGlobal } = useSWRConfig();
   const { data: documents, mutate } = useSWR(
-    `${dossierCorePath}/dossiercore/api/${uuid}/documents`,
+    `${dossierUrl}/dossiercore/api/${uuid}/documents`,
     fetcher,
     {
       fallbackData: {},
@@ -127,8 +124,12 @@ export const useDocuments = (uuid) => {
   return {
     documents,
     mutateDocuments: mutate,
-    correctDocuments: (from, to) => correctDocuments(uuid, from, to),
-    revalidateDocuments: () => mutateGlobal(`${dossierCorePath}/dossiercore/api/${uuid}/documents`),
+    correctDocuments: (from, to) => correctDocuments(uuid, from, to, dossierUrl),
+    revalidateDocuments: () => mutateGlobal(`${dossierUrl}/dossiercore/api/${uuid}/documents`),
+    classifyDocument: (uuid, files, availableClasses) =>
+      classifyDocument(uuid, files, availableClasses, dossierUrl),
+    deletePage,
+    uploadPages: (uuid, document, files) => uploadPages(uuid, document, files, dossierUrl),
   };
 };
 
