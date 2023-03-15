@@ -86,10 +86,9 @@ export const getSchema = async (project, dossierUrl) => {
   });
 
   if (res.ok) {
-    const schema = await res.json();
-    return schema;
+    return await res.json();
   } else {
-    throw Error(`Не удалось полуичть схему`);
+    throw Error(`Не удалось получить схему`);
   }
 };
 
