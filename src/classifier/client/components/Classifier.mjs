@@ -229,11 +229,13 @@ const Classifier = forwardRef(
           .filter((tab) => !tab.readonly)
           .map((tab) => tab.type);
         const compressedFiles = acceptedFiles; //await compressFiles(acceptedFiles);
-        classifyDocument(uuid, compressedFiles, availableClasses).then(revalidateDocuments);
+        classifyDocument(uuid, compressedFiles, availableClasses, dossierUrl).then(
+          revalidateDocuments,
+        );
       } else {
         setLoading(true);
         const compressedFiles = acceptedFiles; //await compressFiles(acceptedFiles);
-        uploadPages(uuid, selectedTab.type, compressedFiles)
+        uploadPages(uuid, selectedTab.type, compressedFiles, dossierUrl)
           .then(async (result) => {
             const documents = await revalidateDocuments();
             onUpdate && onUpdate(selectedTab, documents);
@@ -346,13 +348,23 @@ const Classifier = forwardRef(
 
         if (draggableOrigin.container !== overContainer) {
           correctDocuments(
-            { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
-            { class: overContainer, page: overIndex + 1 },
+            [
+              {
+                from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
+                to: { class: overContainer, page: overIndex + 1 },
+              },
+            ],
+            dossierUrl,
           );
         } else {
           correctDocuments(
-            { class: activeContainer, page: activeIndex + 1 },
-            { class: overContainer, page: overIndex + 1 },
+            [
+              {
+                from: { class: activeContainer, page: activeIndex + 1 },
+                to: { class: overContainer, page: overIndex + 1 },
+              },
+            ],
+            dossierUrl,
           );
         }
       }
@@ -455,6 +467,7 @@ const Classifier = forwardRef(
                     hiddenTabs={hiddenTabs}
                     selected={selectedTab?.type}
                     onDocumentSelect={changeTab}
+                    dossierUrl={dossierUrl}
                   />
                 </div>
                 <div className="dossier__wrap_preview">

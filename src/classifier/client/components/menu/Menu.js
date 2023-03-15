@@ -13,7 +13,8 @@ const Menu = ({
   hiddenTabs,
   withViewTypes,
   view,
-  onChangeView
+  onChangeView,
+  dossierUrl,
 }) => {
   const [docBlocks, setDocBlocks] = useState([]);
 
@@ -27,9 +28,9 @@ const Menu = ({
           collapsed: block.collapsed,
           name: block.name,
           type: block.type,
-          open: block.open
+          open: block.open,
         };
-      })
+      }),
     );
   }, [blocks]);
 
@@ -46,7 +47,7 @@ const Menu = ({
                   'menuItem',
                   'menuItemTab',
                   classifier.readonly && 'menuItemDisabled',
-                  selected === 'classifier' && 'menuItemSelected'
+                  selected === 'classifier' && 'menuItemSelected',
                 )}
                 onClick={(e) => {
                   onDocumentSelect(e, { name: 'classifier' });
@@ -73,6 +74,7 @@ const Menu = ({
                 selected={selected}
                 onDocumentSelect={onDocumentSelect}
                 block={block}
+                dossierUrl={dossierUrl}
               />
             );
           })}
