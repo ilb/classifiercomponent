@@ -2,8 +2,8 @@ import fs from 'fs';
 import FormData from 'form-data';
 import fetch from 'isomorphic-fetch';
 export default class DossierCoreGate {
-  constructor() {
-    this.dossierCoreUrl = process.env['apps.dossierCore.ws'] || '';
+  constructor({ dossierCoreUrl }) {
+    this.dossierCoreUrl = dossierCoreUrl || '';
   }
 
   /**
