@@ -1,7 +1,7 @@
 export default class SchemaBuilder {
   constructor(matching) {
     this.processors = {};
-    this.matching = matching
+    this.matching = matching;
   }
 
   /**
@@ -12,11 +12,13 @@ export default class SchemaBuilder {
   init(schema, context) {
     this.schema = schema;
     this.context = context;
-    this.processors.classifier = this.getProcessor(this.schema.classifier, context);
 
-    for (const documentSchema of this.schema.documents) {
-      this.processors[documentSchema.type] = this.getProcessor(documentSchema, context);
-    }
+    // this.processors.classifier = this.getProcessor(this.schema.classifier, context);
+
+    // console.log('this.processors.classifier', this.processors.classifier);
+
+    this.processor = schema.processor;
+    this.classifierProcessor = new schema.classifier.processor(schema.classifier, context);
   }
 
   /**

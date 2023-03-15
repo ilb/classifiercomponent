@@ -3,11 +3,20 @@ import { useDocuments } from '../../hooks';
 import classNames from 'classnames';
 import Popup from '../elements/Popup';
 
-const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, hidden }) => {
+const MenuTab = ({
+  uuid,
+  document,
+  selected,
+  disabled,
+  onDocumentSelect,
+  error,
+  hidden,
+  dossierUrl,
+}) => {
   let className = '';
   let isNotImage = false;
   let isRequired = !document.readonly && document.required;
-  const { documents } = useDocuments(uuid);
+  const { documents } = useDocuments(uuid, dossierUrl);
   const tabDocuments = documents[document.type];
   const countPages = tabDocuments?.length;
   if (countPages && !tabDocuments[0].type.includes('image/')) {
@@ -16,7 +25,7 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
   const { setNodeRef } = useDroppable({
     id: document.type,
     data: { tab: true },
-    disabled: document.readonly || disabled || isNotImage
+    disabled: document.readonly || disabled || isNotImage,
   });
 
   if (error) className += ' error';
@@ -32,7 +41,7 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
               'menuItem',
               'menuItemTab',
               selected && 'menuItemSelected',
-              disabled && 'menuItemDisabled'
+              disabled && 'menuItemDisabled',
             )}
             onClick={(e) => {
               if (!disabled) {

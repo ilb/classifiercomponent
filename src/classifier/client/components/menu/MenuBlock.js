@@ -1,7 +1,7 @@
 import MenuTab from './MenuTab';
 import { useState } from 'react';
 
-const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
+const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect, dossierUrl }) => {
   const [isOpened, setOpen] = useState(block.open);
   return (
     <>
@@ -29,6 +29,7 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect }) => {
                 selected={document.type === selected}
                 onDocumentSelect={onDocumentSelect}
                 hidden={!isOpened && block.collapsed}
+                dossierUrl={dossierUrl}
               />
             );
           })}

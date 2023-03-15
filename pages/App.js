@@ -23,7 +23,7 @@ export default function App() {
         marginLeft: 'auto !important',
         marginRight: 'auto !important',
         display: 'block',
-        maxWidth: '100% !important'
+        maxWidth: '100% !important',
       }}
       className="ui container">
       {/*<button style={{ margin: 20 }} onClick={() => {*/}
