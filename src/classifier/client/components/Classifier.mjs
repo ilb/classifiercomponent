@@ -229,13 +229,11 @@ const Classifier = forwardRef(
           .filter((tab) => !tab.readonly)
           .map((tab) => tab.type);
         const compressedFiles = acceptedFiles; //await compressFiles(acceptedFiles);
-        classifyDocument(uuid, compressedFiles, availableClasses, dossierUrl).then(
-          revalidateDocuments,
-        );
+        classifyDocument(uuid, compressedFiles, availableClasses).then(revalidateDocuments);
       } else {
         setLoading(true);
         const compressedFiles = acceptedFiles; //await compressFiles(acceptedFiles);
-        uploadPages(uuid, selectedTab.type, compressedFiles, dossierUrl)
+        uploadPages(uuid, selectedTab.type, compressedFiles)
           .then(async (result) => {
             const documents = await revalidateDocuments();
             onUpdate && onUpdate(selectedTab, documents);
@@ -347,25 +345,19 @@ const Classifier = forwardRef(
         }
 
         if (draggableOrigin.container !== overContainer) {
-          correctDocuments(
-            [
-              {
-                from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
-                to: { class: overContainer, page: overIndex + 1 },
-              },
-            ],
-            dossierUrl,
-          );
+          correctDocuments([
+            {
+              from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
+              to: { class: overContainer, page: overIndex + 1 },
+            },
+          ]);
         } else {
-          correctDocuments(
-            [
-              {
-                from: { class: activeContainer, page: activeIndex + 1 },
-                to: { class: overContainer, page: overIndex + 1 },
-              },
-            ],
-            dossierUrl,
-          );
+          correctDocuments([
+            {
+              from: { class: activeContainer, page: activeIndex + 1 },
+              to: { class: overContainer, page: overIndex + 1 },
+            },
+          ]);
         }
       }
 

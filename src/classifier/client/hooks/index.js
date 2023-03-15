@@ -124,7 +124,7 @@ export const useDocuments = (uuid, dossierUrl) => {
   return {
     documents,
     mutateDocuments: mutate,
-    correctDocuments: (from, to) => correctDocuments(uuid, from, to),
+    correctDocuments: (documents) => correctDocuments(uuid, documents, dossierUrl),
     revalidateDocuments: () => mutateGlobal(`${dossierUrl}/dossiercore/api/${uuid}/documents`),
     classifyDocument: (uuid, files, availableClasses) =>
       classifyDocument(uuid, files, availableClasses, dossierUrl),
