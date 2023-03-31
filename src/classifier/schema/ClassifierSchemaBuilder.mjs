@@ -38,7 +38,7 @@ export default class ClassifierSchemaBuilder extends SchemaBuilder {
         ...documentSchema,
         required: this.processor.isRequired(documentSchema.type) || false,
         readonly: this.processor.isReadonly(documentSchema.type) || false,
-        tooltip: null,
+        tooltip: documentSchema.tooltip,
         block: documentSchema.type,
       };
     });
