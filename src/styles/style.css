@@ -328,14 +328,13 @@
 }
 
 .classifier .tooltip {
-  z-index: 2000;
   position: relative;
   display: inline-block;
 }
 
 .classifier .tooltiptext {
   visibility: hidden;
-  width: 220px;
+  width: 400px;
   padding: 10px;
   text-align: center;
   border-radius: 6px;
@@ -345,8 +344,11 @@
   position: absolute;
   z-index: 1;
   line-height: 18px;
-  bottom: 190%;
-  left: -60%;
+  max-height: 500px;
+  overflow-y: scroll;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 .classifier .tooltiptext:before {
