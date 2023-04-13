@@ -138,7 +138,8 @@ const Classifier = forwardRef(
       const uniformDocuments = {};
 
       for (const type in documents) {
-        if (documents[type].length) {
+        // Убрал проверку длины массива
+        if (documents[type]) {
           uniformDocuments[type] = documents[type];
         }
       }
