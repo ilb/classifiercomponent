@@ -17,7 +17,7 @@ const MenuTab = ({
   let isNotImage = false;
   let isRequired = !document.readonly && document.required;
   const { documents } = useDocuments(uuid, dossierUrl);
-  const tabDocuments = documents[document.type];
+  const tabDocuments = documents[document.type]?.pages;
   const countPages = tabDocuments?.length;
   if (countPages && !tabDocuments[0].type.includes('image/')) {
     isNotImage = true;
@@ -48,13 +48,16 @@ const MenuTab = ({
                 onDocumentSelect(e, { name: document.type });
               }
             }}>
-            <span>
-              {document.tooltip && (
-                <Popup content={document.tooltip} trigger={<i className="iconQuestion icon" />} />
-              )}
-              {document.name} {countPages ? '(' + countPages + ')' : ''}
-              {isRequired && <span style={{ color: 'red' }}>*</span>}
-            </span>
+            {document.tooltip && (
+              <Popup content={document.tooltip} trigger={<i className="iconQuestion icon" />} />
+            )}
+            <div style={{ display: 'inline-block' }}>
+              <span>
+                {document.name} {countPages ? '(' + countPages + ')' : ''}
+              </span>
+            </div>
+            <Popup content={document.tooltip} trigger={<i className="iconExclamation icon" />} />
+            {isRequired && <span style={{ color: 'red' }}>*</span>}
           </div>
         </div>
       )}

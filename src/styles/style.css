@@ -176,12 +176,11 @@
   border: 1px solid rgba(34,36,38,.15);
 }
 
-.classifier .icon {
+.icon {
   display: inline-block;
-  opacity: 1;
   margin: 0;
-  width: 1.18em;
-  height: 1em;
+  width: 14px;
+  height: 14px;
   font-family: Icons;
   font-style: normal;
   font-weight: 400;
@@ -233,6 +232,12 @@
   font-family: outline-icons;
   color: #767676;
   content: "\f059";
+}
+
+.iconExclamation:before {
+  font-family: outline-icons;
+  color: #f00808;
+  content: "\0021";
 }
 
 .classifier .divider {
@@ -327,51 +332,29 @@
   100% { transform: rotate(360deg); }
 }
 
-.classifier .tooltip {
-  position: relative;
-  display: inline-block;
+.target {
+  width: fit-content;
+  height: fit-content;
+  display: inline-block
 }
 
-.classifier .tooltiptext {
-  visibility: hidden;
+.tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  text-align: left;
+  white-space: pre-line;
   width: 400px;
+  max-height: 500px;
   padding: 10px;
-  text-align: center;
+  overflow-y: scroll;
+  word-wrap: break-word;
   border-radius: 6px;
   border: 1px solid #bababc;
   background-color: #fff;
   box-shadow: 0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%);
-  position: absolute;
-  z-index: 1;
   line-height: 18px;
-  max-height: 500px;
-  overflow-y: scroll;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-}
-
-.classifier .tooltiptext:before {
-  position: absolute;
-  content: '';
-  width: 0.71428571em;
-  height: 0.71428571em;
-  background: #fff;
-  -webkit-transform: rotate(45deg);
-  transform: rotate(45deg);
-  z-index: 1000;
-  -webkit-box-shadow: 1px 1px 0 0 #bababc;
-  box-shadow: 1px 1px 0 0 #bababc;
-  bottom: -0.30714286em;
-  left: 1em;
-  top: auto;
-  right: auto;
-  margin-left: 0;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.classifier .tooltip:hover .tooltiptext {
-  visibility: visible;
 }
 
 .classifier .controlsMenu .menuItem:hover {
