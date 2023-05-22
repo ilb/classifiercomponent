@@ -82,6 +82,8 @@ const Classifier = forwardRef(
       }
     }, [documentsTabs]);
 
+    const selectedDocument =
+      (selectedTab?.type !== 'classifier' && documents[selectedTab?.type]?.pages) || [];
     useEffect(() => {
       if (!prev && Object.keys(documents).length) {
         onInit && onInit(documents);
@@ -98,12 +100,6 @@ const Classifier = forwardRef(
       setDocumentsTabs(schema.tabs);
     }, [schema]);
 
-    const selectedDocument =
-      selectedTab?.type !== 'classifier'
-        ? documents[selectedTab?.type]?.pages
-          ? documents[selectedTab?.type]?.pages
-          : []
-        : [];
     const finishedTasks = tasks.filter(({ status }) => status.code === 'FINISHED');
     const sensors = useSensors(
       useSensor(PointerSensor),
@@ -313,7 +309,7 @@ const Classifier = forwardRef(
       });
     };
 
-    const onDragEnd = ({ active, over }) => {
+    const onDragEnd = async ({ active, over }) => {
       const activeContainer = findContainer(active.id);
       if (!activeContainer) {
         setActiveDraggable(null);
@@ -353,20 +349,22 @@ const Classifier = forwardRef(
         }
 
         if (draggableOrigin.container !== overContainer) {
-          correctDocuments([
+          await correctDocuments([
             {
               from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
               to: { class: overContainer, page: overIndex + 1 },
             },
           ]);
         } else {
-          correctDocuments([
+          await correctDocuments([
             {
               from: { class: activeContainer, page: activeIndex + 1 },
               to: { class: overContainer, page: overIndex + 1 },
             },
           ]);
         }
+
+        await revalidateDocuments();
       }
 
       setActiveDraggable(null);
@@ -448,7 +446,6 @@ const Classifier = forwardRef(
       }
       selectTab(tab);
     };
-
     return (
       <div className="dossier classifier">
         <div className="grid gridCentered">
