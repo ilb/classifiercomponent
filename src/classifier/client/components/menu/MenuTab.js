@@ -56,7 +56,15 @@ const MenuTab = ({
                 {document.name} {countPages ? '(' + countPages + ')' : ''}
               </span>
             </div>
-            <Popup content={document.tooltip} trigger={<i className="iconExclamation icon" />} />
+            {documents[document.type]?.errors ? (
+              <Popup
+                content={documents[document.type]?.errors}
+                trigger={<i className="iconExclamation icon" />}
+              />
+            ) : (
+              ''
+            )}
+
             {isRequired && <span style={{ color: 'red' }}>*</span>}
           </div>
         </div>
