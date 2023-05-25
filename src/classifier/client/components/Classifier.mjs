@@ -155,7 +155,7 @@ const Classifier = forwardRef(
       if (Object.entries(documents).length) {
         if (prev && onUpdate) {
           for (const type in documents) {
-            if (prev[type].length !== documents[type].pagas.length) {
+            if (prev[type].length !== documents[type].pages.length) {
               const tab = documentsTabs.find((tab) => tab.type === type);
 
               !['unknown', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
