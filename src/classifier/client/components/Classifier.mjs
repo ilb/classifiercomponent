@@ -45,7 +45,7 @@ const Classifier = forwardRef(
     ref,
   ) => {
     const [classifier, setClassifier] = useState(schema.classifier);
-    const { tasks } = useTasks(uuid);
+    const { tasks } = useTasks(uuid, dossierUrl);
     const {
       documents,
       mutateDocuments,
@@ -82,6 +82,8 @@ const Classifier = forwardRef(
       }
     }, [documentsTabs]);
 
+    const selectedDocument =
+      (selectedTab?.type !== 'classifier' && documents[selectedTab?.type]?.pages) || [];
     useEffect(() => {
       if (!prev && Object.keys(documents).length) {
         onInit && onInit(documents);
@@ -98,12 +100,6 @@ const Classifier = forwardRef(
       setDocumentsTabs(schema.tabs);
     }, [schema]);
 
-    const selectedDocument =
-      selectedTab?.type !== 'classifier'
-        ? documents[selectedTab?.type]
-          ? documents[selectedTab?.type]
-          : []
-        : [];
     const finishedTasks = tasks.filter(({ status }) => status.code === 'FINISHED');
     const sensors = useSensors(
       useSensor(PointerSensor),
@@ -140,7 +136,7 @@ const Classifier = forwardRef(
       for (const type in documents) {
         // Убрал проверку длины массива
         if (documents[type]) {
-          uniformDocuments[type] = documents[type];
+          uniformDocuments[type] = documents[type]?.pages;
         }
       }
 
@@ -159,7 +155,7 @@ const Classifier = forwardRef(
       if (Object.entries(documents).length) {
         if (prev && onUpdate) {
           for (const type in documents) {
-            if (prev[type].length !== documents[type].length) {
+            if (prev[type].length !== documents[type].pages.length) {
               const tab = documentsTabs.find((tab) => tab.type === type);
 
               !['unknown', 'classifier'].includes(tab.type) && onUpdate(tab, documents);
@@ -180,7 +176,7 @@ const Classifier = forwardRef(
     }, [selectedTab]);
 
     useEffect(() => {
-      if (documents[selectedTab.type]?.length === 0) {
+      if (documents[selectedTab.type]?.pages?.length === 0) {
         setView('grid');
       }
     }, [selectedTab]);
@@ -188,7 +184,6 @@ const Classifier = forwardRef(
     useEffect(() => {
       selectTab(getSelectedTab());
     }, [uuid]);
-
     const setTwainHandler = () => {
       return registerTwain((file) => file && handleDocumentsDrop([file]), selectedTab?.type);
     };
@@ -202,7 +197,9 @@ const Classifier = forwardRef(
         id = id.path;
       }
 
-      return Object.keys(documents).find((key) => documents[key].find((item) => item.path === id));
+      return Object.keys(documents).find((key) =>
+        documents[key]?.pages?.find((item) => item.path === id),
+      );
     };
 
     const onDragCancel = () => {
@@ -289,9 +286,13 @@ const Classifier = forwardRef(
 
     const handlePageDelete = async (pageSrc) => {
       const activeContainer = findContainer(pageSrc);
+
       const newDocumentsList = {
         ...documents,
-        [activeContainer]: documents[activeContainer].filter((item) => item !== pageSrc),
+        [activeContainer]: {
+          pages: documents[activeContainer]?.pages.filter((item) => item !== pageSrc),
+          errors: documents[activeContainer]?.errors | [],
+        },
       };
       mutateDocuments(newDocumentsList, false);
       deletePage(pageSrc).then(async () => {
@@ -308,7 +309,7 @@ const Classifier = forwardRef(
       });
     };
 
-    const onDragEnd = ({ active, over }) => {
+    const onDragEnd = async ({ active, over }) => {
       const activeContainer = findContainer(active.id);
       if (!activeContainer) {
         setActiveDraggable(null);
@@ -325,41 +326,45 @@ const Classifier = forwardRef(
       const overContainer = findContainer(overId);
 
       if (overContainer) {
-        const activeIndex = documents[activeContainer].map((item) => item.path).indexOf(active.id);
-        let overIndex = documents[overContainer].map((item) => item.path).indexOf(overId);
+        const activeIndex = documents[activeContainer]?.pages
+          .map((item) => item.path)
+          .indexOf(active.id);
+        let overIndex = documents[overContainer]?.pages.map((item) => item.path).indexOf(overId);
         if (activeIndex === -1) {
           return;
         }
 
         if (overIndex === -1) {
-          overIndex = documents[overContainer].length - 1;
+          overIndex = documents[overContainer]?.pages.length - 1;
         }
 
         if (activeIndex !== overIndex) {
           mutateDocuments(
             {
               ...documents,
-              [overContainer]: arrayMove(documents[overContainer], activeIndex, overIndex),
+              [overContainer]: arrayMove(documents[overContainer]?.pages, activeIndex, overIndex),
             },
             false,
           );
         }
 
         if (draggableOrigin.container !== overContainer) {
-          correctDocuments([
+          await correctDocuments([
             {
               from: { class: draggableOrigin.container, page: draggableOrigin.index + 1 },
               to: { class: overContainer, page: overIndex + 1 },
             },
           ]);
         } else {
-          correctDocuments([
+          await correctDocuments([
             {
               from: { class: activeContainer, page: activeIndex + 1 },
               to: { class: overContainer, page: overIndex + 1 },
             },
           ]);
         }
+
+        await revalidateDocuments();
       }
 
       setActiveDraggable(null);
@@ -374,7 +379,6 @@ const Classifier = forwardRef(
 
     const onDragOver = ({ active, over }) => {
       const overId = over?.id;
-
       if (!overId || overId === 'void' || active.id in documents) {
         return;
       }
@@ -386,14 +390,13 @@ const Classifier = forwardRef(
 
       const overContainer = findContainer(overId);
       const activeContainer = findContainer(active.id);
-
       if (!overContainer || !activeContainer) {
         return;
       }
 
       if (activeContainer !== overContainer) {
-        const activeItems = documents[activeContainer];
-        const overItems = documents[overContainer];
+        const activeItems = documents[activeContainer]?.pages;
+        const overItems = documents[overContainer]?.pages;
         const overIndex = overItems.map((item) => item.path).indexOf(overId);
         const activeIndex = activeItems.map((item) => item.path).indexOf(active.id);
 
@@ -413,12 +416,21 @@ const Classifier = forwardRef(
         }
         const newDocuments = {
           ...documents,
-          [activeContainer]: documents[activeContainer].filter((item) => item.path !== active.id),
-          [overContainer]: [
-            ...documents[overContainer].slice(0, newIndex),
-            documents[activeContainer][activeIndex],
-            ...documents[overContainer].slice(newIndex, documents[overContainer].length),
-          ],
+          [activeContainer]: {
+            errors: documents[activeContainer].errors,
+            pages: documents[activeContainer]?.pages.filter((item) => item.path !== active.id),
+          },
+          [overContainer]: {
+            errors: documents[overContainer].errors,
+            pages: [
+              ...documents[overContainer]?.pages.slice(0, newIndex),
+              documents[activeContainer]?.pages[activeIndex],
+              ...documents[overContainer]?.pages.slice(
+                newIndex,
+                documents[overContainer]?.pages.length,
+              ),
+            ],
+          },
         };
 
         mutateDocuments(newDocuments, false);
@@ -434,7 +446,6 @@ const Classifier = forwardRef(
       }
       selectTab(tab);
     };
-
     return (
       <div className="dossier classifier">
         <div className="grid gridCentered">

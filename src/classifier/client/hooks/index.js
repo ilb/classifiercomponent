@@ -132,8 +132,8 @@ export const useDocuments = (uuid, dossierUrl) => {
   };
 };
 
-export const useTasks = (uuid) => {
-  const { data: tasks } = useSWR(`${basePath}/classifications/${uuid}`, fetcher, {
+export const useTasks = (uuid, dossierUrl) => {
+  const { data: tasks } = useSWR(`${dossierUrl}/classifier/api/${uuid}`, fetcher, {
     fallbackData: [],
     refreshInterval: 5000,
   });
