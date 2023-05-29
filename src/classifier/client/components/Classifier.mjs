@@ -29,6 +29,7 @@ const Classifier = forwardRef(
       onInit,
       onUpdate,
       onRemove,
+      onChange,
       onAfterChange,
       onChangeTab,
       onDrag,
@@ -140,7 +141,11 @@ const Classifier = forwardRef(
         }
       }
 
-      Object.keys(documents).length && onAfterChange && onAfterChange(uniformDocuments);
+      if (Object.keys(documents).length) {
+        onAfterChange && onAfterChange(uniformDocuments)
+        onChange && onChange(uniformDocuments)
+      }
+
     }, [documents, form]);
 
     useEffect(() => {
