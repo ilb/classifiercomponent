@@ -335,6 +335,7 @@
 .target {
   width: auto;
   height: 20px;
+  margin-left: 1px;
 }
 
 .tooltip {
