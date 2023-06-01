@@ -333,9 +333,8 @@
 }
 
 .target {
-  width: fit-content;
-  height: fit-content;
-  display: inline-block
+  width: auto;
+  height: 20px;
 }
 
 .tooltip {

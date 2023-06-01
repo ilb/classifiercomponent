@@ -2,6 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { useDocuments } from '../../hooks';
 import classNames from 'classnames';
 import Popup from '../elements/Popup';
+import { Alert, CheckSuccess, Question } from '../../icons/CustomIcons';
 
 const MenuTab = ({
   uuid,
@@ -48,24 +49,25 @@ const MenuTab = ({
                 onDocumentSelect(e, { name: document.type });
               }
             }}>
-            {document.tooltip && (
-              <Popup content={document.tooltip} trigger={<i className="iconQuestion icon" />} />
-            )}
-            <div style={{ display: 'inline-block' }}>
-              <span>
-                {document.name} {countPages ? '(' + countPages + ')' : ''}
-              </span>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {document.tooltip && <Popup content={document.tooltip} trigger={<Question />} />}
+              <div>
+                <span>
+                  {document.name} {countPages ? '(' + countPages + ')' : ''}
+                </span>
+              </div>
+              {documents[document.type]?.verificationResult &&
+                (documents[document.type]?.verificationResult === 'error' ? (
+                  <Popup content={documents[document.type]?.errors} trigger={<Alert />} />
+                ) : (
+                  <Popup content={'Все проверки завершены успешно'} trigger={<CheckSuccess />} />
+                ))}
+              {isRequired && (
+                <div>
+                  <span style={{ color: 'red' }}>*</span>{' '}
+                </div>
+              )}
             </div>
-            {documents[document.type]?.errors ? (
-              <Popup
-                content={documents[document.type]?.errors}
-                trigger={<i className="iconExclamation icon" />}
-              />
-            ) : (
-              ''
-            )}
-
-            {isRequired && <span style={{ color: 'red' }}>*</span>}
           </div>
         </div>
       )}
