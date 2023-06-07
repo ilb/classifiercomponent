@@ -13,7 +13,8 @@ export const uploadMiddleware = multer({
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const destination =  process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
+      const destination =
+        process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
 
       if (!fs.existsSync(destination)) {
         fs.mkdirSync(destination, { recursive: true });
@@ -22,7 +23,7 @@ export const uploadMiddleware = multer({
       return cb(null, destination);
     },
     filename: (req, file, cb) => {
-      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop())
+      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop());
     }
   })
 });
@@ -39,18 +40,41 @@ export const splitPdf = async (req, res, next) => {
       });
       let pages = fs.readdirSync(splitOutputPath);
 
-      pages = pages.map(page => {
+      pages = pages.map((page) => {
         const filename = `${uuidv4()}.jpg`;
         const path = `${file.destination}/${filename}`;
-        fs.renameSync(`${splitOutputPath}/${page}`, path)
+        fs.renameSync(`${splitOutputPath}/${page}`, path);
 
         return { path, filename, mimetype: 'image/jpeg' };
-      })
+      });
 
       fs.unlinkSync(file.path);
       fs.rmdirSync(splitOutputPath);
 
       return [...files, ...pages];
+    } else {
+      return [...files, file];
+    }
+  }, []);
+  next();
+};
+
+//https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
+export const jfifToJpeg = async (req, res, next) => {
+  req.files = await req.files?.reduce(async (accumulator, file) => {
+    const files = await accumulator;
+    if (/\.jfif$/.test(file.originalname)) {
+      const jpegOutput = `${file.destination}/${file.filename.split('.')[0]}.jpg`;
+      fs.renameSync(file.path, jpegOutput);
+      return [
+        ...files,
+        {
+          ...file,
+          originalname: file.originalname.replace('.jfif', '.jpg'),
+          filename: file.filename.replace('.jfif', '.jpg'),
+          path: jpegOutput
+        }
+      ];
     } else {
       return [...files, file];
     }
