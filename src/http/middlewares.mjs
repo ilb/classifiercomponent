@@ -61,14 +61,11 @@ export const splitPdf = async (req, res, next) => {
 
 //https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
 export const jfifToJpeg = async (req, res, next) => {
-  const convert = promisify(im.convert);
   req.files = await req.files?.reduce(async (accumulator, file) => {
     const files = await accumulator;
-    const regex = /\.jfif$/;
-    if (regex.test(file.originalname)) {
+    if (/\.jfif$/.test(file.originalname)) {
       const jpegOutput = `${file.destination}/${file.filename.split('.')[0]}.jpg`;
-      await convert([file.path, '-format', 'jpg', jpegOutput]);
-      fs.unlinkSync(file.path);
+      fs.renameSync(file.path, jpegOutput);
       return [
         ...files,
         {
