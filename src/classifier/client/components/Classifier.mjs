@@ -37,6 +37,7 @@ const Classifier = forwardRef(
       showError,
       schema,
       dossierUrl,
+      error,
       hiddenTabs = [],
       readonlyClassifier = null,
       defaultTab = 'classifier',
@@ -469,6 +470,7 @@ const Classifier = forwardRef(
                     view={view}
                     onChangeView={setView}
                     uuid={uuid}
+                    errors={error?.messages}
                     blocks={schema.blocks}
                     classifier={classifier}
                     name={name}

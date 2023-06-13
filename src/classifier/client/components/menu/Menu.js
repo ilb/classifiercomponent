@@ -15,6 +15,7 @@ const Menu = ({
   view,
   onChangeView,
   dossierUrl,
+  errors,
 }) => {
   const [docBlocks, setDocBlocks] = useState([]);
 
@@ -69,6 +70,7 @@ const Menu = ({
             return (
               <MenuBlock
                 uuid={uuid}
+                errors={errors}
                 key={block.type}
                 hiddenTabs={hiddenTabs}
                 selected={selected}

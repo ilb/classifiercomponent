@@ -12,6 +12,7 @@ const MenuTab = ({
   onDocumentSelect,
   error,
   hidden,
+  validationErrorMessage,
   dossierUrl,
 }) => {
   let className = '';
@@ -50,18 +51,24 @@ const MenuTab = ({
               }
             }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {document.tooltip && <Popup content={document.tooltip} trigger={<Question />} />}
+              <div className="icons" style={{ position: 'absolute', left: 8, display: 'flex' }}>
+                {!!validationErrorMessage && (
+                  <Popup content={validationErrorMessage} trigger={<Alert />} />
+                )}
+                {documents[document.type]?.verificationResult &&
+                  (documents[document.type]?.verificationResult === 'error' ? (
+                    <Popup content={documents[document.type]?.errors} trigger={<Alert />} />
+                  ) : (
+                    <Popup content={'Все проверки завершены успешно'} trigger={<CheckSuccess />} />
+                  ))}
+                {document.tooltip && <Popup content={document.tooltip} trigger={<Question />} />}
+              </div>
+
               <div>
                 <span>
                   {document.name} {countPages ? '(' + countPages + ')' : ''}
                 </span>
               </div>
-              {documents[document.type]?.verificationResult &&
-                (documents[document.type]?.verificationResult === 'error' ? (
-                  <Popup content={documents[document.type]?.errors} trigger={<Alert />} />
-                ) : (
-                  <Popup content={'Все проверки завершены успешно'} trigger={<CheckSuccess />} />
-                ))}
               {isRequired && (
                 <div>
                   <span style={{ color: 'red' }}>*</span>{' '}

@@ -1,7 +1,7 @@
 import MenuTab from './MenuTab';
 import { useState } from 'react';
 
-const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect, dossierUrl }) => {
+const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect, dossierUrl, errors = {} }) => {
   const [isOpened, setOpen] = useState(block.open);
   return (
     <>
@@ -19,10 +19,10 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect, dossie
               </span>
             </div>
           )}
-          {block.documents.map((document) => {
-            return (
+          {block.documents.map((document) => (
               <MenuTab
                 uuid={uuid}
+                validationErrorMessage={errors[document.type]}
                 disabled={hiddenTabs.includes(document.type)}
                 key={document.type}
                 document={document}
@@ -31,8 +31,7 @@ const MenuBlock = ({ uuid, block, selected, hiddenTabs, onDocumentSelect, dossie
                 hidden={!isOpened && block.collapsed}
                 dossierUrl={dossierUrl}
               />
-            );
-          })}
+            ))}
         </>
       )}
     </>
