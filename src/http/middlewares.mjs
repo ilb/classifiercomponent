@@ -13,7 +13,8 @@ export const uploadMiddleware = multer({
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const destination =  process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
+      const destination =
+        process.env.DOSSIER_DOCUMENT_PATH + '/dossier/' + req.params.uuid + '/pages';
 
       if (!fs.existsSync(destination)) {
         fs.mkdirSync(destination, { recursive: true });
@@ -22,7 +23,7 @@ export const uploadMiddleware = multer({
       return cb(null, destination);
     },
     filename: (req, file, cb) => {
-      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop())
+      return cb(null, uuidv4() + '.' + file.originalname.split('.').pop());
     }
   })
 });
@@ -39,23 +40,54 @@ export const splitPdf = async (req, res, next) => {
       });
       let pages = fs.readdirSync(splitOutputPath);
 
-      pages = pages.map(page => {
+      pages = pages.map((page) => {
         const filename = `${uuidv4()}.jpg`;
         const path = `${file.destination}/${filename}`;
-        fs.renameSync(`${splitOutputPath}/${page}`, path)
+        fs.renameSync(`${splitOutputPath}/${page}`, path);
 
         return { path, filename, mimetype: 'image/jpeg' };
-      })
+      });
 
       fs.unlinkSync(file.path);
       fs.rmdirSync(splitOutputPath);
-
+      await resizePage(pages);
       return [...files, ...pages];
     } else {
       return [...files, file];
     }
   }, []);
   next();
+};
+
+export const resizePage = async (files) => {
+  const size = await getImageSize(files);
+  const resize = promisify(im.resize);
+  for (const file of files) {
+    await resize({
+      srcPath: file.path,
+      dstPath: file.path,
+      width: size.width,
+      height: size.height
+    });
+  }
+};
+
+export const getImageSize = async (files) => {
+  let width = 0;
+  let height = 0;
+
+  for (const file of files) {
+    const identify = promisify(im.identify);
+    const infoPage = await identify(file.path);
+
+    if (width < infoPage.width) {
+      width = infoPage.width;
+    }
+    if (height < infoPage.height) {
+      height = infoPage.height;
+    }
+  }
+  return { width, height };
 };
 
 export const convertToJpeg = async (req, res, next) => {
