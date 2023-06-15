@@ -90,6 +90,29 @@ export const getImageSize = async (files) => {
   return { width, height };
 };
 
+//https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
+export const jfifToJpeg = async (req, res, next) => {
+  req.files = await req.files?.reduce(async (accumulator, file) => {
+    const files = await accumulator;
+    if (/\.jfif$/.test(file.originalname)) {
+      const jpegOutput = `${file.destination}/${file.filename.split('.')[0]}.jpg`;
+      fs.renameSync(file.path, jpegOutput);
+      return [
+        ...files,
+        {
+          ...file,
+          originalname: file.originalname.replace('.jfif', '.jpg'),
+          filename: file.filename.replace('.jfif', '.jpg'),
+          path: jpegOutput
+        }
+      ];
+    } else {
+      return [...files, file];
+    }
+  }, []);
+  next();
+};
+
 export const convertToJpeg = async (req, res, next) => {
   const convert = promisify(im.convert);
   req.files = await req.files?.reduce(async (accumulator, file) => {
