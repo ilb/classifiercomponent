@@ -134,3 +134,73 @@ export const convertToJpeg = async (req, res, next) => {
   }, []);
   next();
 };
+
+//проверка на пустой лист перенести в docier как подключу его новый
+export const checkEmptyList = async (req, res, next) => {
+  const convert = promisify(im.convert);
+  req.files = await req.files?.reduce(async (accumulator, file) => {
+    // Задаем параметры для вывода в avr
+    const files = await accumulator;
+    const colorSpace = 'sRGB';
+    const size = '100x100';
+    const format = '%[pixel:u]';
+    const outputFormat = 'txt';
+
+    const options = [
+      file.path,
+      '-colorspace',
+      colorSpace,
+      '-scale',
+      size,
+      '-depth',
+      '8',
+      '-format',
+      format,
+      outputFormat + ':-'
+    ];
+
+    const result = await convert(options);
+
+    const lines = result.trim().split('\n').slice(1);
+    //разбить текст на объект для удобной работы с ним
+    const objectsAvg = lines.map((line) => {
+      const [xy, color] = line.split(': ');
+      const [x, y] = xy.split(',');
+      const [rgb, hex, name] = color.split('  ');
+
+      return {
+        x: parseInt(x),
+        y: parseInt(y),
+        color: {
+          r: parseInt(rgb.slice(1, 4)),
+          g: parseInt(rgb.slice(5, 8)),
+          b: parseInt(rgb.slice(9, 12)),
+          name: name,
+          hex: hex
+        }
+      };
+    });
+
+    const counters = {};
+    let maxCount = 0;
+    // получить количество цвета в %
+    for (let obj of objectsAvg) {
+      const name = obj.color.name;
+      counters[name] = (counters[name] || 0) + 1; // увеличиваем счетчик
+      if (counters[name] > maxCount) {
+        // обновляем максимальное значение
+        maxCount = counters[name];
+      }
+    }
+
+    const maxCountPercent = maxCount / (objectsAvg.length / 100);
+
+    if (maxCountPercent > 99) {
+      fs.unlinkSync(file.path);
+      return [...files];
+    } else {
+      return [...files, file];
+    }
+  }, []);
+  next();
+};
