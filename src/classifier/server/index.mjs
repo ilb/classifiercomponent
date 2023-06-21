@@ -9,13 +9,7 @@ import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import {
-  convertToJpeg,
-  splitPdf,
-  jfifToJpeg,
-  checkEmptyList,
-  measureTime
-} from '../../http/middlewares.mjs';
+import { convertToJpeg, splitPdf, jfifToJpeg, checkEmptyList } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
 const ClassifierApi = (createScope, onError, onNoMatch) => {
@@ -31,26 +25,24 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
   const getPage = async (req, res) => fileHandler(req, res, createScope, GetPage);
   const getDocument = async (req, res) => fileHandler(req, res, createScope, GetDocument);
 
-  return nc()
-    .use(measureTime)
-    .use(
-      '/api/classifications',
-      nc({ attachParams: true, onError, onNoMatch })
-        .use(uploadMiddleware.array('documents'))
-        .use(splitPdf)
-        .use(jfifToJpeg)
-        .use(convertToJpeg)
-        .use(checkEmptyList)
-        .use(bodyParser.json())
-        .get('/:uuid', checkClassifications)
-        .put('/:uuid', classifyPages)
-        .get('/:uuid/documents', getDocuments)
-        .post('/:uuid/documents/correction', correctPages)
-        .get('/:uuid/documents/:name', getDocument)
-        .put('/:uuid/documents/:name', addPages)
-        .get('/:uuid/documents/:name/:number', getPage)
-        .delete('/:uuid/documents/:name/:pageUuid', deletePage)
-    );
+  return nc().use(
+    '/api/classifications',
+    nc({ attachParams: true, onError, onNoMatch })
+      .use(uploadMiddleware.array('documents'))
+      .use(splitPdf)
+      .use(jfifToJpeg)
+      .use(convertToJpeg)
+      .use(checkEmptyList)
+      .use(bodyParser.json())
+      .get('/:uuid', checkClassifications)
+      .put('/:uuid', classifyPages)
+      .get('/:uuid/documents', getDocuments)
+      .post('/:uuid/documents/correction', correctPages)
+      .get('/:uuid/documents/:name', getDocument)
+      .put('/:uuid/documents/:name', addPages)
+      .get('/:uuid/documents/:name/:number', getPage)
+      .delete('/:uuid/documents/:name/:pageUuid', deletePage)
+  );
 };
 
 export default ClassifierApi;
