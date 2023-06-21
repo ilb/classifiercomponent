@@ -50,13 +50,44 @@ export const splitPdf = async (req, res, next) => {
 
       fs.unlinkSync(file.path);
       fs.rmdirSync(splitOutputPath);
-
+      await resizePage(pages);
       return [...files, ...pages];
     } else {
       return [...files, file];
     }
   }, []);
   next();
+};
+
+export const resizePage = async (files) => {
+  const size = await getImageSize(files);
+  const resize = promisify(im.resize);
+  for (const file of files) {
+    await resize({
+      srcPath: file.path,
+      dstPath: file.path,
+      width: size.width,
+      height: size.height
+    });
+  }
+};
+
+export const getImageSize = async (files) => {
+  let width = 0;
+  let height = 0;
+
+  for (const file of files) {
+    const identify = promisify(im.identify);
+    const infoPage = await identify(file.path);
+
+    if (width < infoPage.width) {
+      width = infoPage.width;
+    }
+    if (height < infoPage.height) {
+      height = infoPage.height;
+    }
+  }
+  return { width, height };
 };
 
 //https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
