@@ -16,13 +16,15 @@ export default class AddPages {
    * @return {Promise<*>}
    */
   async process({ uuid, name, ...files }) {
-    const dossier = await this.dossierBuilder.build(uuid);
-    const document = dossier.getDocument(name);
-    files = Object.values(files);
-    // если загружается не картинка или документ не является набором картинок, то все страницы документа затираются
-    if (!files[0].mimetype.includes('image/') || !document.isImages()) {
-      await document.clear();
+    if (Object.keys(files).length) {
+      const dossier = await this.dossierBuilder.build(uuid);
+      const document = dossier.getDocument(name);
+      files = Object.values(files);
+      // если загружается не картинка или документ не является набором картинок, то все страницы документа затираются
+      if (!files[0].mimetype.includes('image/') || !document.isImages()) {
+        await document.clear();
+      }
+      await document.addPages(files.map((file) => new Page(file)));
     }
-    await document.addPages(files.map(file => new Page(file)));
   }
 }

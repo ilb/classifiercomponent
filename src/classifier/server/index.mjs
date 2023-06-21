@@ -9,7 +9,7 @@ import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import { convertToJpeg, splitPdf, jfifToJpeg } from '../../http/middlewares.mjs';
+import { convertToJpeg, splitPdf, jfifToJpeg, checkEmptyList } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
 const ClassifierApi = (createScope, onError, onNoMatch) => {
@@ -32,6 +32,7 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
       .use(splitPdf)
       .use(jfifToJpeg)
       .use(convertToJpeg)
+      .use(checkEmptyList)
       .use(bodyParser.json())
       .get('/:uuid', checkClassifications)
       .put('/:uuid', classifyPages)
