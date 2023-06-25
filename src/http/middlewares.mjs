@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Poppler } from 'node-poppler';
 import im from 'imagemagick';
 import { promisify } from 'util';
+import sharp from 'sharp';
 
 export const uploadMiddleware = multer({
   limits: {
@@ -60,34 +61,44 @@ export const splitPdf = async (req, res, next) => {
 };
 
 export const resizePage = async (files) => {
-  const size = await getImageSize(files);
-  const resize = promisify(im.resize);
-  for (const file of files) {
-    await resize({
-      srcPath: file.path,
-      dstPath: file.path,
-      width: size.width,
-      height: size.height
-    });
+  const objectToResize = await getImageSize(files);
+  for (const file of objectToResize.arrToResize) {
+    sharp(file.path)
+      .resize({
+        width: objectToResize.width,
+        height: objectToResize.height
+      })
+      .toBuffer((err, buffer) => {
+        fs.writeFile(file.path, buffer, () => {});
+      });
   }
 };
 
 export const getImageSize = async (files) => {
-  let width = 0;
-  let height = 0;
-
+  const objectToResize = {
+    width: 0,
+    height: 0,
+    arrToResize: []
+  };
   for (const file of files) {
-    const identify = promisify(im.identify);
-    const infoPage = await identify(file.path);
-
-    if (width < infoPage.width) {
-      width = infoPage.width;
+    const infoPage = await sharp(file.path).metadata();
+    objectToResize.arrToResize.push({
+      width: infoPage.width,
+      height: infoPage.height,
+      path: file.path
+    });
+    if (objectToResize.width < infoPage.width) {
+      objectToResize.width = infoPage.width;
     }
-    if (height < infoPage.height) {
-      height = infoPage.height;
+    if (objectToResize.height < infoPage.height) {
+      objectToResize.height = infoPage.height;
     }
   }
-  return { width, height };
+  objectToResize.arrToResize = objectToResize.arrToResize.filter(
+    (pageInfo) =>
+      !(objectToResize.width === pageInfo.width && objectToResize.height === pageInfo.height)
+  );
+  return objectToResize;
 };
 
 //https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
