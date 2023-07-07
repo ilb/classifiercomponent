@@ -58,7 +58,7 @@ const Classifier = forwardRef(
       uploadPages,
     } = useDocuments(uuid, dossierUrl);
     const [documentsTabs, setDocumentsTabs] = useState(schema.tabs);
-    const [selectedTab, selectTab] = useState({});
+    const [selectedTab, selectTab] = useState(getSelectedTab());
     const [clonedItems, setClonedItems] = useState(null);
     const [draggableOrigin, setDraggableOrigin] = useState(null);
     const [activeDraggable, setActiveDraggable] = useState(null);
@@ -77,12 +77,6 @@ const Classifier = forwardRef(
         }
       },
     }));
-
-    useEffect(() => {
-      if (!documentsTabs.find((tab) => tab.type === selectedTab?.type)) {
-        selectTab(getSelectedTab());
-      }
-    }, [documentsTabs]);
 
     const selectedDocument =
       (selectedTab?.type !== 'classifier' && documents[selectedTab?.type]?.pages) || [];
