@@ -1,4 +1,4 @@
-import { Page } from 'dossierjs';
+import { Page } from '@ilb/dossierjs';
 
 export default class AddPages {
   /**

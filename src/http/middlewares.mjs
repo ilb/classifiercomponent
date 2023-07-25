@@ -51,54 +51,12 @@ export const splitPdf = async (req, res, next) => {
 
       fs.unlinkSync(file.path);
       fs.rmdirSync(splitOutputPath);
-      await resizePage(pages);
       return [...files, ...pages];
     } else {
       return [...files, file];
     }
   }, []);
   next();
-};
-
-export const resizePage = async (files) => {
-  const objectToResize = await getImageSize(files);
-  for (const file of objectToResize.arrToResize) {
-    sharp(file.path)
-      .resize({
-        width: objectToResize.width,
-        height: objectToResize.height
-      })
-      .toBuffer((err, buffer) => {
-        fs.writeFile(file.path, buffer, () => {});
-      });
-  }
-};
-
-export const getImageSize = async (files) => {
-  const objectToResize = {
-    width: 0,
-    height: 0,
-    arrToResize: []
-  };
-  for (const file of files) {
-    const infoPage = await sharp(file.path).metadata();
-    objectToResize.arrToResize.push({
-      width: infoPage.width,
-      height: infoPage.height,
-      path: file.path
-    });
-    if (objectToResize.width < infoPage.width) {
-      objectToResize.width = infoPage.width;
-    }
-    if (objectToResize.height < infoPage.height) {
-      objectToResize.height = infoPage.height;
-    }
-  }
-  objectToResize.arrToResize = objectToResize.arrToResize.filter(
-    (pageInfo) =>
-      !(objectToResize.width === pageInfo.width && objectToResize.height === pageInfo.height)
-  );
-  return objectToResize;
 };
 
 //https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию

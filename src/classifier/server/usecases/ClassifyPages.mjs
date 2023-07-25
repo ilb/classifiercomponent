@@ -1,4 +1,4 @@
-import { Page } from 'dossierjs';
+import { Page } from '@ilb/dossierjs';
 import { chunkArray, prepareClassifies } from '../utils.mjs';
 import queue from '../../../pqueue/pqueue.mjs';
 import DocumentService from '../core/DocumentService.mjs';
@@ -12,12 +12,7 @@ export default class ClassifyPages {
    * @param {VerificationRepository} verificationRepository
    * @param classifierQuantity
    */
-  constructor({
-    dossierBuilder,
-    verificationService,
-    verificationRepository,
-    classifierQuantity
-  }) {
+  constructor({ dossierBuilder, verificationService, verificationRepository, classifierQuantity }) {
     this.dossierBuilder = dossierBuilder;
     this.verificationService = verificationService;
     this.classifierGate = new ClassifierGate();
@@ -60,12 +55,14 @@ export default class ClassifyPages {
             if (currentClassificationResult.length) {
               previousClass = currentClassificationResult.pop().code;
             } else {
-              const lastFinishedTask = await this.verificationRepository.findLastFinishedByPath(path);
+              const lastFinishedTask = await this.verificationRepository.findLastFinishedByPath(
+                path
+              );
               previousClass = lastFinishedTask?.data?.classifiedPages?.pop().code || null;
             }
 
             unknownDocument.structure.refresh();
-            const unknownPages = unknownDocument.getPagesByUuids(chunk.map(page => page.uuid));
+            const unknownPages = unknownDocument.getPagesByUuids(chunk.map((page) => page.uuid));
             let classifies = await this.classifierGate.classify(unknownPages, previousClass);
 
             classifies = prepareClassifies(classifies, availableClasses);
@@ -76,7 +73,8 @@ export default class ClassifyPages {
             unknownDocument.structure.refresh();
             for (const { code, page } of classifiedPages) {
               const unknownPage = unknownDocument.getPageByUuid(page.uuid);
-              if (unknownPage) { // страница может быть перемещена пользователем
+              if (unknownPage) {
+                // страница может быть перемещена пользователем
                 const document = dossier.getDocument(code);
                 document.structure.refresh();
                 await this.documentService.movePage(unknownDocument, unknownPage, document);
@@ -84,7 +82,9 @@ export default class ClassifyPages {
             }
             currentClassificationResult = [...currentClassificationResult, ...classifiedPages];
           }
-          await this.verificationService.finish(verification, { classifiedPages: currentClassificationResult });
+          await this.verificationService.finish(verification, {
+            classifiedPages: currentClassificationResult
+          });
         },
         { path }
       )
