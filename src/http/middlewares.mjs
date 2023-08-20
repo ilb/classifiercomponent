@@ -104,6 +104,9 @@ export const convertToJpeg = async (req, res, next) => {
   next();
 };
 
+export const defaultRejectUnauthorized = (req, res, next) => {
+  next();
+};
 //проверка на пустой лист перенести в docier как подключу его новый
 export const checkEmptyList = async (req, res, next) => {
   const convert = promisify(im.convert);

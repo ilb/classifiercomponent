@@ -9,10 +9,21 @@ import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import { convertToJpeg, splitPdf, jfifToJpeg, checkEmptyList } from '../../http/middlewares.mjs';
+import {
+  convertToJpeg,
+  splitPdf,
+  jfifToJpeg,
+  checkEmptyList,
+  defaultRejectUnauthorized
+} from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
-const ClassifierApi = (createScope, onError, onNoMatch) => {
+const ClassifierApi = (
+  createScope,
+  onError,
+  onNoMatch,
+  rejectUnauthorized = defaultRejectUnauthorized
+) => {
   const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
   const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
   const correctPages = async (req, res) =>
@@ -24,10 +35,10 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
 
   const getPage = async (req, res) => fileHandler(req, res, createScope, GetPage);
   const getDocument = async (req, res) => fileHandler(req, res, createScope, GetDocument);
-
   return nc().use(
     '/api/classifications',
     nc({ attachParams: true, onError, onNoMatch })
+      .use(rejectUnauthorized)
       .use(uploadMiddleware.array('documents'))
       .use(splitPdf)
       .use(jfifToJpeg)
