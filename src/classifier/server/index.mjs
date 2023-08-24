@@ -9,20 +9,14 @@ import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import {
-  convertToJpeg,
-  splitPdf,
-  jfifToJpeg,
-  checkEmptyList,
-  defaultRejectUnauthorized
-} from '../../http/middlewares.mjs';
+import { convertToJpeg, splitPdf, jfifToJpeg, checkEmptyList } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
 const ClassifierApi = (
   createScope,
   onError,
   onNoMatch,
-  rejectUnauthorized = defaultRejectUnauthorized
+  rejectUnauthorized = (req, res, next) => next()
 ) => {
   const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
   const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
