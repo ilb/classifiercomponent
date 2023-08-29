@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Poppler } from 'node-poppler';
 import im from 'imagemagick';
 import { promisify } from 'util';
-import sharp from 'sharp';
+import mime from 'mime-types';
+import Errors from '../util/Errors.mjs';
 
 export const uploadMiddleware = multer({
   limits: {
@@ -100,6 +101,26 @@ export const convertToJpeg = async (req, res, next) => {
     } else {
       return [...files, file];
     }
+  }, []);
+  next();
+};
+
+// Проверка на получение тип документа
+export const checkMimeType = async (req, res, next) => {
+  req.files = await req.files?.reduce(async (accumulator, file) => {
+    const files = await accumulator;
+    const firstPageMimeType = mime.lookup(file.path);
+    if (!firstPageMimeType) {
+      const destinationPath = `${file.destination}/errorDocument/${file.filename}`;
+      const sourcePath = file.path;
+      //Создаем новую папку
+      fs.mkdir(`${file.destination}/errorDocument`, { recursive: true }, () => {
+        //Переносим исходный фаил
+        fs.rename(sourcePath, destinationPath, () => {});
+      });
+      throw Errors.critical(`Возникла проблема с файлом : ${file.filename}`);
+    }
+    return [...files, file];
   }, []);
   next();
 };
