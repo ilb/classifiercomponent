@@ -216,7 +216,7 @@ const Classifier = forwardRef(
 
     const handleDocumentsDrop = async (acceptedFiles) => {
       if (!acceptedFiles.length) {
-        return showError('Файл выбранного типа не доступен для загрузки.');
+        return showError('Загрузите файл в формате PDF или JPG.');
       }
 
       if (!selectedTab) return;
