@@ -34,7 +34,7 @@ const MenuTab = ({
   if (document.readonly) className += 'readonly';
 
   return (
-    <>
+    <div id={document.type}>
       {!hidden && (
         <div key={document.type} ref={setNodeRef}>
           <div
@@ -78,7 +78,7 @@ const MenuTab = ({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

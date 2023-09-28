@@ -32,7 +32,7 @@ const UploadDropzone = ({
             </span>
           </div>
           <div>Нажмите или перетащите</div>
-          <input {...dropzone.getInputProps()} />
+          <input id={'dropzone_input'} {...dropzone.getInputProps()} />
         </div>
       </div>
     </div>
