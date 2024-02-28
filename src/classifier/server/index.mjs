@@ -18,7 +18,7 @@ import {
 } from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
 
-const ClassifierApi = (createScope, onError, onNoMatch) => {
+const ClassifierApi = (createScope, onError, onNoMatch, rejectUnauthorized = (req, res, next) => next()) => {
   const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
   const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
   const correctPages = async (req, res) =>
@@ -34,6 +34,7 @@ const ClassifierApi = (createScope, onError, onNoMatch) => {
   return nc().use(
     '/api/classifications',
     nc({ attachParams: true, onError, onNoMatch })
+      .use(rejectUnauthorized)
       .use(uploadMiddleware.array('documents'))
       .use(splitPdf)
       .use(jfifToJpeg)
