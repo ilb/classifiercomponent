@@ -40,6 +40,14 @@ export default class DocumentMerger {
       files = [files]
     }
 
+    for (const file of files) {
+      try {
+        await fs.promises.access(file, fs.constants.F_OK);
+      } catch (error) {
+        throw new Error(`Merge files. Файл по пути ${file} не найден`);
+      }
+    }
+
     await convert([...files, tempPath]);
     const mergedFile = fs.readFileSync(tempPath);
 
