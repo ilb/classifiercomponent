@@ -89,6 +89,13 @@ export const convertToJpeg = async (req, res, next) => {
     const files = await accumulator;
     if (['image/bmp', 'image/tiff', 'image/heic'].includes(file.mimetype)) {
       const jpegOutput = `${file.destination}/${file.filename.split('.')[0]}.jpg`;
+
+      try {
+        await fs.promises.access(file.path, fs.constants.F_OK);
+      } catch (error) {
+        throw new Error(`Файл по пути ${file.path} не найден`);
+      }
+
       await convert([file.path, '-format', 'jpg', jpegOutput]);
       fs.unlinkSync(file.path);
       return [
@@ -148,6 +155,12 @@ export const checkEmptyList = async (req, res, next) => {
       format,
       outputFormat + ':-'
     ];
+
+    try {
+      await fs.promises.access(file.path, fs.constants.F_OK);
+    } catch (error) {
+      throw new Error(`Файл по пути ${file.path} не найден`);
+    }
 
     const result = await convert(options);
 
