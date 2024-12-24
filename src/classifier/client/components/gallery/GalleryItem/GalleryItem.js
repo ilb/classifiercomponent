@@ -74,6 +74,7 @@ const GalleryItem = React.memo(
                     height={height}
                     layout="responsive"
                     quality={10}
+                    unoptimized={true}
                     onClick={onClick}
                     className="img-ofit"
                     style={{
