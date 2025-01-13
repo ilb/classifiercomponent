@@ -7,7 +7,7 @@ import SegmentItem from './GalleryItem/SegmentItem';
 import React, { useEffect, useState } from 'react';
 import ControlsMenu from '../gallery/GalleryItem/ControlsMenu';
 
-const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
+const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors, unoptimized }) => {
   const [state, setState] = useState({
     scale: 1,
     rotation: 0,
@@ -92,6 +92,7 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
                     tablet={8}
                     mobile={16}>
                     <SortableGalleryItem
+                      unoptimized={unoptimized}
                       src={src}
                       errors={pageErrors[src.uuid]}
                       disabled={tab.readonly}
@@ -109,6 +110,7 @@ const SortableGallery = ({ srcSet, active, onRemove, tab, pageErrors }) => {
           )}
           {state.previewOpen && (
             <SegmentItem
+              unoptimized={unoptimized}
               src={state.src}
               rotation={state.rotation}
               scale={state.scale}

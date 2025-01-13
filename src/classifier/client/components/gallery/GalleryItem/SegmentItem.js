@@ -2,7 +2,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import ScrollContainer from 'react-indiana-drag-scroll';
 
-const SegmentItem = ({ src, onClick, rotation, scale }) => {
+const SegmentItem = ({ src, onClick, rotation, scale, unoptimized }) => {
   const [[width, height], setWidthHeight] = useState([460, 600]);
   const contentRef = useRef(null);
   useEffect(() => {
@@ -26,6 +26,7 @@ const SegmentItem = ({ src, onClick, rotation, scale }) => {
           src={src}
           //width={width * scale}
           //height={height * scale}
+          unoptimized={unoptimized}
           width={rotation === 0 || rotation === 180 ? width * scale : height * scale}
           height={rotation === 90 || rotation === 270 ? width * scale : height * scale}
           layout="fixed"

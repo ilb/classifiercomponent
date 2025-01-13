@@ -32,6 +32,7 @@ const Classifier = ({
   schema,
   hiddenTabs = [],
   readonlyClassifier = null,
+  unoptimized = true,
   defaultTab = 'classifier'
 }) => {
   const [classifier, setClassifier] = useState(schema.classifier);
@@ -433,6 +434,7 @@ const Classifier = ({
               srcSet={selectedDocument}
               onRemove={handlePageDelete}
               active={activeDraggable}
+              unoptimized={unoptimized}
             />
           </Dimmer.Dimmable>
         </Grid.Column>
