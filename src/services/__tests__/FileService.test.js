@@ -34,14 +34,16 @@ describe('FileService', () => {
     path.join.mockImplementation((...parts) => parts.join('/'));
     path.extname.mockImplementation((filename) => {
       const parts = filename.split('.');
-      if (parts.length <= 1) return '';
+      if (parts.length <= 1) {
+        return '';
+      }
       return '.' + parts[parts.length - 1];
     });
 
     // Create service instance
     fileService = new FileService();
     fileService.config = mockConfig;
-    
+
     // Mock the ensureDirectoryExists method
     fileService.ensureDirectoryExists = jest.fn().mockImplementation((dirPath) => dirPath);
   });
@@ -50,15 +52,15 @@ describe('FileService', () => {
     it('should create directory if it does not exist', () => {
       // Save original implementation
       const originalEnsureDirectoryExists = fileService.ensureDirectoryExists;
-      
+
       // Reset mock and restore real implementation temporarily
-      fileService.ensureDirectoryExists = function(dirPath) {
+      fileService.ensureDirectoryExists = function (dirPath) {
         if (!fs.existsSync(dirPath)) {
           fs.mkdirSync(dirPath, { recursive: true });
         }
         return dirPath;
       };
-      
+
       fs.existsSync.mockReturnValue(false);
       const dirPath = '/test/dir';
 
@@ -66,7 +68,7 @@ describe('FileService', () => {
 
       expect(fs.existsSync).toHaveBeenCalledWith(dirPath);
       expect(fs.mkdirSync).toHaveBeenCalledWith(dirPath, { recursive: true });
-      
+
       // Restore mock implementation
       fileService.ensureDirectoryExists = originalEnsureDirectoryExists;
     });
@@ -74,15 +76,15 @@ describe('FileService', () => {
     it('should not create directory if it already exists', () => {
       // Save original implementation
       const originalEnsureDirectoryExists = fileService.ensureDirectoryExists;
-      
+
       // Reset mock and restore real implementation temporarily
-      fileService.ensureDirectoryExists = function(dirPath) {
+      fileService.ensureDirectoryExists = function (dirPath) {
         if (!fs.existsSync(dirPath)) {
           fs.mkdirSync(dirPath, { recursive: true });
         }
         return dirPath;
       };
-      
+
       fs.existsSync.mockReturnValue(true);
       const dirPath = '/test/dir';
 
@@ -90,7 +92,7 @@ describe('FileService', () => {
 
       expect(fs.existsSync).toHaveBeenCalledWith(dirPath);
       expect(fs.mkdirSync).not.toHaveBeenCalled();
-      
+
       // Restore mock implementation
       fileService.ensureDirectoryExists = originalEnsureDirectoryExists;
     });

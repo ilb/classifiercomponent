@@ -4,7 +4,12 @@ import GetPage from './usecases/GetPage.mjs';
 import DeletePage from './usecases/DeletePage.mjs';
 import CorrectionDocument from './usecases/CorrectPages.mjs';
 import nc from 'next-connect';
-import { checkMimeType, jfifToJpeg, uploadMiddleware } from '../../http/middlewares.mjs';
+import {
+  checkMimeType,
+  convertToJpeg,
+  jfifToJpeg,
+  uploadMiddleware
+} from '../../http/middlewares.mjs';
 import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
@@ -51,8 +56,9 @@ const ClassifierApi = (
     nc({ attachParams: true, onError, onNoMatch })
       .use(rejectUnauthorized)
       .use(uploadMiddleware.array('documents'))
-      .use(checkMimeType)
       .use(jfifToJpeg)
+      .use(convertToJpeg)
+      .use(checkMimeType)
       .use(bodyParser.json())
       .get('/:uuid', handlers.checkClassifications)
       .put('/:uuid', handlers.classifyPages)

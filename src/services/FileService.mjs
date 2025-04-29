@@ -23,6 +23,7 @@ export default class FileService {
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
+
     return dirPath;
   }
 
@@ -33,6 +34,7 @@ export default class FileService {
    */
   getDocumentPath(uuid) {
     const basePath = this.config.paths.dossier;
+
     return path.join(basePath, 'dossier', uuid);
   }
 
@@ -43,6 +45,7 @@ export default class FileService {
    */
   getPagesPath(uuid) {
     const documentPath = this.getDocumentPath(uuid);
+
     return path.join(documentPath, 'pages');
   }
 
@@ -57,7 +60,7 @@ export default class FileService {
     const fileUuid = uuidv4();
     const extension = path.extname(originalName).slice(1).toLowerCase();
 
-    // Handle special case for jfif files
+    // Handle a special case for jfif files
     const normalizedExtension = extension === 'jfif' ? 'jpg' : extension;
     const filename = `${fileUuid}.${normalizedExtension}`;
     const filePath = path.join(savePath, filename);
@@ -131,7 +134,7 @@ export default class FileService {
       const pages = fs.readdirSync(splitOutputPath);
 
       // Process each page
-      const processedPages = pages.map((page) => {
+      return pages.map((page) => {
         const pageUuid = uuidv4();
         const filename = `${pageUuid}.jpg`;
         const pagePath = path.join(savePath, filename);
@@ -149,8 +152,6 @@ export default class FileService {
           extension: 'jpg'
         };
       });
-
-      return processedPages;
     } finally {
       // Clean up temporary files
       if (fs.existsSync(tmpFilePath)) {
@@ -190,21 +191,6 @@ export default class FileService {
       return true;
     }
     return false;
-  }
-
-  /**
-   * Check if a file is an empty image (zero bytes or very small)
-   * @param {Object} file File metadata
-   * @returns {boolean} True if the file is empty
-   */
-  isEmptyImage(file) {
-    if (!file.path || !fs.existsSync(file.path)) {
-      return true;
-    }
-
-    // Check file size - less than 100 bytes is likely empty
-    const stats = fs.statSync(file.path);
-    return stats.size < 100;
   }
 
   /**

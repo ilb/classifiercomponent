@@ -17,7 +17,7 @@ export const splitPdf = async (req, res, next) => {
   next();
 };
 
-//https://github.com/jshttp/mime-db/pull/291 когда выложат , нужно будет обновить библиотеку и убрать данную функию
+//https://github.com/jshttp/mime-db/pull/291 когда выложат, нужно будет обновить библиотеку и убрать данную функию
 export const jfifToJpeg = async (req, res, next) => {
   req.files = req.files?.map((file) => {
     if (/\.jfif$/.test(file.originalname)) {
@@ -57,19 +57,5 @@ export const checkMimeType = async (req, res, next) => {
     }
     return true;
   });
-  next();
-};
-
-//проверка на пустой лист перенести в docier как подключу его новый
-export const checkEmptyList = async (req, res, next) => {
-  // Empty list check will be handled in AddPages
-  next();
-};
-
-/**
- * Middleware to store the UUID-to-path mapping in SQLite database
- */
-export const updateSqliteMapping = async (req, res, next) => {
-  // Storage mapping will be handled in AddPages
   next();
 };

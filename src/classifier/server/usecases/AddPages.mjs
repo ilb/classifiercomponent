@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 import { Poppler } from 'node-poppler';
+import sharp from 'sharp';
 
 /**
  * AddPages use case for adding pages to documents
@@ -34,9 +35,9 @@ export default class AddPages {
     try {
       // Step 1: Prepare the directories
       const pagesPath = this.prepareDirectories(uuid);
-
+      const nonEmptyFiles = await this.filterNonEmptyFiles(Object.values(files));
       // Step 2: Process all files in parallel
-      const processedFiles = await this.processAllFiles(files, pagesPath);
+      const processedFiles = await this.processAllFiles(nonEmptyFiles, pagesPath);
 
       // Step 3: Return early if no valid files after processing
       if (!processedFiles.length) {
@@ -89,10 +90,7 @@ export default class AddPages {
     );
 
     // Flatten the array (PDF processing returns arrays)
-    const processedFiles = processedFilesNested.flat();
-
-    // Filter out empty files
-    return this.filterEmptyFiles(processedFiles);
+    return processedFilesNested.flat();
   }
 
   /**
@@ -236,17 +234,6 @@ export default class AddPages {
   }
 
   /**
-   * Filters out empty image files
-   * @param {Array} files Array of file objects
-   * @returns {Promise<Array>} Filtered array of file objects
-   */
-  async filterEmptyFiles(files) {
-    // This is a simplified version of the empty check
-    // In a real implementation, you would check the image content
-    return files;
-  }
-
-  /**
    * Ensures that the document path exists for the given UUID
    * Using only the old structure
    *
@@ -262,5 +249,31 @@ export default class AddPages {
     }
 
     return oldPath;
+  }
+
+  async filterNonEmptyFiles(files) {
+    const filteredFiles = await Promise.all(
+      files.map(async (file) => {
+        if (!file.mimetype?.startsWith('image/')) {
+          return file;
+        }
+
+        try {
+          const image = sharp(file.buffer);
+          const stats = await image.stats();
+
+          // Анализ статистики цвета
+          const channels = stats.channels;
+          const isMostlyOneColor = channels.some((ch) => ch.max === ch.min && ch.max > 0);
+
+          return isMostlyOneColor ? null : file;
+        } catch (error) {
+          console.error(`Error processing ${file.originalname}:`, error);
+          return file;
+        }
+      })
+    );
+
+    return filteredFiles.filter(Boolean);
   }
 }

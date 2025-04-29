@@ -67,9 +67,9 @@ const schema = {
 
 export default function MyApp() {
   return (
-    <Classifier 
-      uuid="document-uuid" 
-      schema={schema} 
+    <Classifier
+      uuid="document-uuid"
+      schema={schema}
       onInit={docs => console.log('Documents initialized', docs)}
       onUpdate={(tab, docs) => console.log('Documents updated', tab, docs)}
       onRemove={(tab, docs) => console.log('Document removed', tab, docs)}
@@ -150,6 +150,7 @@ npm test
 # Build for production
 npm run build
 ```
+The application will be available at http://localhost:3010
 
 ## API Reference
 
