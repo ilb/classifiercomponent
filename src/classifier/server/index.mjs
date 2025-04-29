@@ -1,55 +1,67 @@
-import { defaultHandler, fileHandler } from '../../http/handlers.mjs';
+import { defaultHandler as handler, fileHandler } from '../../http/handlers.mjs';
 import AddPages from './usecases/AddPages.mjs';
 import GetPage from './usecases/GetPage.mjs';
 import DeletePage from './usecases/DeletePage.mjs';
 import CorrectionDocument from './usecases/CorrectPages.mjs';
 import nc from 'next-connect';
-import { uploadMiddleware } from '../../http/middlewares.mjs';
+import { checkMimeType, jfifToJpeg, uploadMiddleware } from '../../http/middlewares.mjs';
 import bodyParser from 'body-parser';
 import GetDocuments from './usecases/GetDocuments.mjs';
 import CheckClassifications from './usecases/CheckClassifications.mjs';
 import GetDocument from './usecases/GetDocument.mjs';
-import {
-  convertToJpeg,
-  splitPdf,
-  jfifToJpeg,
-  checkEmptyList,
-  checkMimeType
-} from '../../http/middlewares.mjs';
 import ClassifyPages from './usecases/ClassifyPages.mjs';
+import ErrorHandler from '../../http/ErrorHandler.mjs';
 
-const ClassifierApi = (createScope, onError, onNoMatch, rejectUnauthorized = (req, res, next) => next()) => {
-  const addPages = async (req, res) => defaultHandler(req, res, createScope, AddPages);
-  const deletePage = async (req, res) => defaultHandler(req, res, createScope, DeletePage);
-  const correctPages = async (req, res) =>
-    defaultHandler(req, res, createScope, CorrectionDocument);
-  const getDocuments = async (req, res) => defaultHandler(req, res, createScope, GetDocuments);
-  const classifyPages = async (req, res) => defaultHandler(req, res, createScope, ClassifyPages);
-  const checkClassifications = async (req, res) =>
-    defaultHandler(req, res, createScope, CheckClassifications);
+/**
+ * Creates handler functions for each API endpoint
+ * @param {Function} createScope Function to create DI scope
+ * @returns {Object} Object with handler functions
+ */
+const createHandlers = (createScope) => ({
+  addPages: async (req, res) => handler(req, res, createScope, AddPages),
+  deletePage: async (req, res) => handler(req, res, createScope, DeletePage),
+  correctPages: async (req, res) => handler(req, res, createScope, CorrectionDocument),
+  getDocuments: async (req, res) => handler(req, res, createScope, GetDocuments),
+  classifyPages: async (req, res) => handler(req, res, createScope, ClassifyPages),
+  checkClassifications: async (req, res) => handler(req, res, createScope, CheckClassifications),
+  getPage: async (req, res) => fileHandler(req, res, createScope, GetPage),
+  getDocument: async (req, res) => fileHandler(req, res, createScope, GetDocument)
+});
 
-  const getPage = async (req, res) => fileHandler(req, res, createScope, GetPage);
-  const getDocument = async (req, res) => fileHandler(req, res, createScope, GetDocument);
+/**
+ * Create API middleware for document classification functionality
+ * @param {Function} createScope Function to create dependency injection scope
+ * @param {Function} onError Custom error handler (optional)
+ * @param {Function} onNoMatch Handler for 404 routes (optional)
+ * @param {Function} rejectUnauthorized Authorization middleware (optional)
+ * @returns {Function} Next.js API middleware
+ */
+const ClassifierApi = (
+  createScope,
+  onError = ErrorHandler.ncErrorHandler,
+  onNoMatch = (req, res) => res.status(404).end(),
+  rejectUnauthorized = (req, res, next) => next()
+) => {
+  // Create handlers with the given scope factory
+  const handlers = createHandlers(createScope);
 
+  // Define API routes
   return nc().use(
     '/api/classifications',
     nc({ attachParams: true, onError, onNoMatch })
       .use(rejectUnauthorized)
       .use(uploadMiddleware.array('documents'))
-      .use(splitPdf)
-      .use(jfifToJpeg)
       .use(checkMimeType)
-      .use(convertToJpeg)
-      .use(checkEmptyList)
+      .use(jfifToJpeg)
       .use(bodyParser.json())
-      .get('/:uuid', checkClassifications)
-      .put('/:uuid', classifyPages)
-      .get('/:uuid/documents', getDocuments)
-      .post('/:uuid/documents/correction', correctPages)
-      .get('/:uuid/documents/:name', getDocument)
-      .put('/:uuid/documents/:name', addPages)
-      .get('/:uuid/documents/:name/:number', getPage)
-      .delete('/:uuid/documents/:name/:pageUuid', deletePage)
+      .get('/:uuid', handlers.checkClassifications)
+      .put('/:uuid', handlers.classifyPages)
+      .get('/:uuid/documents', handlers.getDocuments)
+      .post('/:uuid/documents/correction', handlers.correctPages)
+      .get('/:uuid/documents/:name', handlers.getDocument)
+      .put('/:uuid/documents/:name', handlers.addPages)
+      .get('/:uuid/documents/:name/:number', handlers.getPage)
+      .delete('/:uuid/documents/:name/:pageUuid', handlers.deletePage)
   );
 };
 
