@@ -1,4 +1,5 @@
 import mime from 'mime-types';
+import DocumentPathService from '../../../services/DocumentPathService.mjs';
 
 /**
  * GetDocuments use case for retrieving document information
@@ -7,8 +8,9 @@ export default class GetDocuments {
   /**
    * @param {DossierBuilder} dossierBuilder
    */
-  constructor({ dossierBuilder }) {
+  constructor({ dossierBuilder, sqliteDbPath }) {
     this.dossierBuilder = dossierBuilder;
+    this.documentPathService = new DocumentPathService(sqliteDbPath);
   }
 
   /**
@@ -18,7 +20,8 @@ export default class GetDocuments {
    * @returns {Promise<Object>} Document information
    */
   async process({ uuid }) {
-    const dossier = await this.dossierBuilder.build(uuid);
+    const uuidPath = await this.documentPathService.getPath(uuid);
+    const dossier = await this.dossierBuilder.build(uuidPath);
     const url = `${process.env.BASE_URL}/api/classifications/${uuid}/documents`;
 
     return dossier.getDocuments().reduce((accumulator, document) => {

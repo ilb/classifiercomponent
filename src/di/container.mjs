@@ -2,7 +2,6 @@ import awilix, { asClass, asValue } from 'awilix';
 import { DossierBuilder } from '@ilb/dossierjs';
 import { appConfig } from '../config/config.mjs';
 import FileService from '../services/FileService.mjs';
-import DocumentRepository from '../repository/DocumentRepository.mjs';
 import DocumentService from '../classifier/server/core/DocumentService.mjs';
 import mockRegistry from '../mocks/registry.mjs';
 
@@ -28,10 +27,9 @@ export default class Container {
 
       // Core services
       fileService: asClass(FileService).singleton(),
-      documentRepository: asClass(DocumentRepository).singleton(),
       documentService: asClass(DocumentService).singleton(),
       dossierBuilder: asClass(DossierBuilder).singleton(),
-
+      sqliteDbPath: asValue(process.env['apps.classifier.db']),
       // Environment values
       classifierQuantity: asValue(appConfig.get('classification.classifierQuantity', 8)),
 

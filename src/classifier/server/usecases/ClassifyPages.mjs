@@ -3,6 +3,7 @@ import { chunkArray, prepareClassifies } from '../utils.mjs';
 import queue from '../../../pqueue/pqueue.mjs';
 import DocumentService from '../core/DocumentService.mjs';
 import ClassifierGate from '../gates/ClassifierGate.mjs';
+import DocumentPathService from '../../../services/DocumentPathService.mjs';
 
 export default class ClassifyPages {
   /**
@@ -11,14 +12,22 @@ export default class ClassifyPages {
    * @param {any} verificationService
    * @param {VerificationRepository} verificationRepository
    * @param classifierQuantity
+   * @param {string} sqliteDbPath
    */
-  constructor({ dossierBuilder, verificationService, verificationRepository, classifierQuantity }) {
+  constructor({
+    dossierBuilder,
+    verificationService,
+    verificationRepository,
+    classifierQuantity,
+    sqliteDbPath
+  }) {
     this.dossierBuilder = dossierBuilder;
     this.verificationService = verificationService;
     this.classifierGate = new ClassifierGate();
     this.documentService = new DocumentService(dossierBuilder);
     this.verificationRepository = verificationRepository;
     this.classifierQuantity = classifierQuantity;
+    this.documentPathService = new DocumentPathService(sqliteDbPath);
     // concurrency = 1 чтобы страницы отправлялись на распознавание последовательно,
     // так как для распознавания требуется класс предыдущей распознанной страницы
     this.queue = queue;
@@ -33,7 +42,8 @@ export default class ClassifyPages {
    * @return {Promise<*>}
    */
   async process({ uuid, availableClasses = [], ...files }) {
-    const dossier = await this.dossierBuilder.build(uuid);
+    const uuidPath = await this.documentPathService.getPath(uuid);
+    const dossier = await this.dossierBuilder.build(uuidPath);
     const pages = Object.values(files).map((file) => new Page(file));
     let unknownDocument = dossier.getDocument('unknown');
     // сначала переместить все в нераспознанные
