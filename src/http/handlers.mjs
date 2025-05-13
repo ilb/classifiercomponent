@@ -21,7 +21,8 @@ export async function defaultHandler(req, res, createScope, usecase) {
     res.status(response.httpCode).send(response.data);
   } catch (err) {
     const errorResponse = ErrorHandler.handleError(err);
-    res.status(errorResponse.httpCode)
+    res
+      .status(errorResponse.httpCode)
       .setHeader('Content-Type', errorResponse.contentType)
       .send(errorResponse.data);
   }
@@ -49,7 +50,8 @@ export async function fileHandler(req, res, createScope, usecase) {
     res.send(file);
   } catch (err) {
     const errorResponse = ErrorHandler.handleError(err);
-    res.status(errorResponse.httpCode)
+    res
+      .status(errorResponse.httpCode)
       .setHeader('Content-Type', errorResponse.contentType)
       .send(errorResponse.data);
   }
@@ -67,4 +69,4 @@ const buildResponse = (result) => {
   } else {
     return Response.noContent();
   }
-}
+};

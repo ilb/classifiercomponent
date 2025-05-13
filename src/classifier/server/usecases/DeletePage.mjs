@@ -1,12 +1,16 @@
+import DocumentPathService from '../../../services/DocumentPathService.mjs';
+
 /**
  * DeletePage use case for removing pages from documents
  */
 export default class DeletePage {
   /**
    * @param {DossierBuilder} dossierBuilder
+   * @param sqliteDbPath
    */
-  constructor({ dossierBuilder }) {
+  constructor({ dossierBuilder, sqliteDbPath }) {
     this.dossierBuilder = dossierBuilder;
+    this.documentPathService = new DocumentPathService(sqliteDbPath);
   }
 
   /**
@@ -18,8 +22,8 @@ export default class DeletePage {
    * @return {Promise<void>}
    */
   async process({ uuid, name, pageUuid }) {
-    // Get document from dossier
-    const dossier = await this.dossierBuilder.build(uuid);
+    const uuidPath = await this.documentPathService.getPath(uuid);
+    const dossier = await this.dossierBuilder.build(uuidPath);
     const document = dossier.getDocument(name);
 
     // Delete the page

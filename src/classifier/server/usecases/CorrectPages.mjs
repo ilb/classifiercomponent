@@ -1,4 +1,5 @@
 import DocumentService from '../core/DocumentService.mjs';
+import DocumentPathService from '../../../services/DocumentPathService.mjs';
 
 /**
  * CorrectPages use case for reorganizing pages between documents
@@ -6,10 +7,12 @@ import DocumentService from '../core/DocumentService.mjs';
 export default class CorrectPages {
   /**
    * @param {DossierBuilder} dossierBuilder
+   * @param sqliteDbPath
    */
-  constructor({ dossierBuilder }) {
+  constructor({ dossierBuilder, sqliteDbPath }) {
     this.documentService = new DocumentService(dossierBuilder);
     this.dossierBuilder = dossierBuilder;
+    this.documentPathService = new DocumentPathService(sqliteDbPath);
   }
 
   /**
@@ -20,7 +23,8 @@ export default class CorrectPages {
    * @return {Promise<void>}
    */
   async process({ uuid, ...corrections }) {
-    const dossier = await this.dossierBuilder.build(uuid);
+    const uuidPath = await this.documentPathService.getPath(uuid);
+    const dossier = await this.dossierBuilder.build(uuidPath);
 
     await Promise.all(
       Object.values(corrections).map(async (correction) => {

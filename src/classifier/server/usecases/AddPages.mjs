@@ -1,9 +1,10 @@
 import { Page } from '@ilb/dossierjs';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
-import path from 'path';
+import * as node_path from 'path';
 import { Poppler } from 'node-poppler';
 import sharp from 'sharp';
+import DocumentPathService from '../../../services/DocumentPathService.mjs';
 
 /**
  * AddPages use case for adding pages to documents
@@ -12,10 +13,11 @@ import sharp from 'sharp';
 export default class AddPages {
   /**
    * @param {DossierBuilder} dossierBuilder
-   * @param {FileService} fileService
+   * @param sqliteDbPath
    */
-  constructor({ dossierBuilder }) {
+  constructor({ dossierBuilder, sqliteDbPath }) {
     this.dossierBuilder = dossierBuilder;
+    this.documentPathService = new DocumentPathService(sqliteDbPath);
   }
 
   /**
@@ -33,19 +35,16 @@ export default class AddPages {
     }
 
     try {
-      // Step 1: Prepare the directories
-      const pagesPath = this.prepareDirectories(uuid);
+      const uuidPath = await this.documentPathService.getPath(uuid);
+      const pagesPath = this.prepareDirectories(uuidPath);
       const nonEmptyFiles = await this.filterNonEmptyFiles(Object.values(files));
-      // Step 2: Process all files in parallel
       const processedFiles = await this.processAllFiles(nonEmptyFiles, pagesPath);
 
-      // Step 3: Return early if no valid files after processing
       if (!processedFiles.length) {
         return;
       }
 
-      // Step 4: Add the processed files to the document
-      await this.addFilesToDocument(uuid, name, processedFiles);
+      await this.addFilesToDocument(uuidPath, name, processedFiles);
     } catch (error) {
       console.error(`Error adding pages to document ${name} (${uuid}):`, error);
       throw error; // Re-throw to let the caller handle it
@@ -57,9 +56,9 @@ export default class AddPages {
    * @param {string} uuid Document UUID
    * @returns {string} Path to the pages directory
    */
-  prepareDirectories(uuid) {
-    const documentPath = this.ensureDocumentPath(uuid);
-    const pagesPath = path.join(documentPath, 'pages');
+  prepareDirectories(uuidPath) {
+    const documentPath = this.ensureDocumentPath(uuidPath);
+    const pagesPath = node_path.join(documentPath, 'pages');
 
     if (!fs.existsSync(pagesPath)) {
       fs.mkdirSync(pagesPath, { recursive: true });
@@ -95,14 +94,14 @@ export default class AddPages {
 
   /**
    * Add processed files to the document
-   * @param {string} uuid Document UUID
+   * @param {string} uuidPath Document path
    * @param {string} name Document name/type
    * @param {Array} processedFiles Array of processed file objects
    * @returns {Promise<void>}
    */
-  async addFilesToDocument(uuid, name, processedFiles) {
+  async addFilesToDocument(uuidPath, name, processedFiles) {
     // Build the dossier
-    const dossier = await this.dossierBuilder.build(uuid);
+    const dossier = await this.dossierBuilder.build(uuidPath);
     const document = dossier.getDocument(name);
 
     // Clear document if needed (when file type changes)
@@ -127,8 +126,8 @@ export default class AddPages {
   async processPdf(file, pagesPath) {
     const poppler = new Poppler(process.env.POPPLER_BIN_PATH);
     const fileUuid = uuidv4();
-    const tmpFilePath = path.join(pagesPath, `${fileUuid}.pdf`);
-    const splitOutputPath = path.join(pagesPath, fileUuid);
+    const tmpFilePath = node_path.join(pagesPath, `${fileUuid}.pdf`);
+    const splitOutputPath = node_path.join(pagesPath, fileUuid);
 
     // Ensure split output directory exists
     fs.mkdirSync(splitOutputPath, { recursive: true });
@@ -140,7 +139,7 @@ export default class AddPages {
       // Use poppler to convert PDF to images
       await poppler.pdfToCairo(
         tmpFilePath,
-        path.join(splitOutputPath, file.originalname.split('.')[0]),
+        node_path.join(splitOutputPath, file.originalname.split('.')[0]),
         {
           jpegFile: true
         }
@@ -153,10 +152,10 @@ export default class AddPages {
       const processedPages = pages.map((page) => {
         const pageUuid = uuidv4();
         const filename = `${pageUuid}.jpg`;
-        const pagePath = path.join(pagesPath, filename);
+        const pagePath = node_path.join(pagesPath, filename);
 
         // Rename the file to use the UUID
-        fs.renameSync(path.join(splitOutputPath, page), pagePath);
+        fs.renameSync(node_path.join(splitOutputPath, page), pagePath);
 
         return {
           originalname: page,
@@ -192,12 +191,13 @@ export default class AddPages {
     const fileUuid = uuidv4();
     const extension = file.originalname.split('.').pop().toLowerCase();
     const filename = `${fileUuid}.${extension}`;
-    const filePath = path.join(pagesPath, filename);
+    const filePath = node_path.join(pagesPath, filename);
 
     // Handle jfif extension
     const actualExtension = extension === 'jfif' ? 'jpg' : extension;
     const actualFilename = extension === 'jfif' ? `${fileUuid}.jpg` : filename;
-    const actualFilePath = extension === 'jfif' ? path.join(pagesPath, actualFilename) : filePath;
+    const actualFilePath =
+      extension === 'jfif' ? node_path.join(pagesPath, actualFilename) : filePath;
 
     // Save the file to disk
     fs.writeFileSync(filePath, file.buffer);
@@ -237,18 +237,19 @@ export default class AddPages {
    * Ensures that the document path exists for the given UUID
    * Using only the old structure
    *
-   * @param {string} uuid Document UUID
+   * @param {string} path file path
    * @returns {string} The full document path
    */
-  ensureDocumentPath(uuid) {
-    // Use only the old structure
-    const oldPath = `${process.env.DOSSIER_DOCUMENT_PATH}/dossier/${uuid}`;
+  ensureDocumentPath(path) {
+    const documentPath = `${process.env.DOSSIER_DOCUMENT_PATH}/dossier`;
 
-    if (!fs.existsSync(oldPath)) {
-      fs.mkdirSync(oldPath, { recursive: true });
+    path = node_path.join(documentPath, path);
+
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
     }
 
-    return oldPath;
+    return path;
   }
 
   async filterNonEmptyFiles(files) {
