@@ -7,7 +7,7 @@ import ClassifierSchemaBuilder from '../src/mocks/ClassifierSchemaBuilder.mjs';
 const builder = new ClassifierSchemaBuilder(matching);
 
 export default function App() {
-  const uuid = '7533b049-88ca-489b-878a-3ac1c8616fe7';
+  const uuid = '6533b049-88ca-489b-878a-3ac1c8616fe7';
   const [classifierSchema] = useState(builder.build(schema, { stateCode: 'CREATION' }));
 
   return (

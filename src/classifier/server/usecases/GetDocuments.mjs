@@ -1,5 +1,8 @@
 import mime from 'mime-types';
 
+/**
+ * GetDocuments use case for retrieving document information
+ */
 export default class GetDocuments {
   /**
    * @param {DossierBuilder} dossierBuilder
@@ -8,6 +11,12 @@ export default class GetDocuments {
     this.dossierBuilder = dossierBuilder;
   }
 
+  /**
+   * Process the request to get document information
+   *
+   * @param {string} uuid Document UUID
+   * @returns {Promise<Object>} Document information
+   */
   async process({ uuid }) {
     const dossier = await this.dossierBuilder.build(uuid);
     const url = `${process.env.BASE_URL}/api/classifications/${uuid}/documents`;
