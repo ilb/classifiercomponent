@@ -1,28 +1,33 @@
-import DocumentPathRepository from '../util/DocumentPathRepository.mjs';
 import node_path from 'path';
 import fs from 'fs';
 
 export default class DocumentPathService {
-  constructor(path) {
-    this.repository = new DocumentPathRepository(path);
+  /**
+   * @param {DocumentPathRepository} documentPathRepository
+   */
+  constructor({ documentPathRepository }) {
+    this.repository = documentPathRepository;
   }
 
   async getPath(uuid) {
+    let path = await this.repository.getPathByUuid(uuid);
+
     // Удалить этот кусок после выкладки на прод.
     // Он нужен для того, чтобы корректно загружались файлы в промежутке между
     // выкладкой и запуском скрипта, который спарсит текущую структуру папок в БД
-    let deprecatedPath = await this.getDeprecatedPath(uuid);
+    if (!path) {
+      let deprecatedPath = await this.getDeprecatedPath(uuid);
 
-    if (deprecatedPath) {
-      await this.repository.storeMapping(uuid, uuid);
+      if (deprecatedPath) {
+        path = uuid;
+        await this.repository.storePath(uuid, path);
+      }
     }
     //
 
-    let path = await this.repository.getPathByUuid(uuid);
-
-    if (!path && !deprecatedPath) {
+    if (!path) {
       path = this.generatePath(uuid);
-      await this.repository.storeMapping(uuid, path);
+      await this.repository.storePath(uuid, path);
     }
 
     return path;

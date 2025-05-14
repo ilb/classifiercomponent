@@ -7,12 +7,12 @@ import DocumentPathService from '../../../services/DocumentPathService.mjs';
 export default class CorrectPages {
   /**
    * @param {DossierBuilder} dossierBuilder
-   * @param sqliteDbPath
+   * @param {DocumentPathRepository} documentPathRepository
    */
-  constructor({ dossierBuilder, sqliteDbPath }) {
+  constructor({ dossierBuilder, documentPathRepository }) {
     this.documentService = new DocumentService(dossierBuilder);
     this.dossierBuilder = dossierBuilder;
-    this.documentPathService = new DocumentPathService(sqliteDbPath);
+    this.documentPathService = new DocumentPathService({ documentPathRepository });
   }
 
   /**

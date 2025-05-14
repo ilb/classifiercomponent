@@ -1,9 +1,9 @@
 export default class VerificationRepository {
-  findAllByPath() {
+  async findAllByPath() {
     return [];
   }
 
-  findLastFinishedByPath() {
+  async findLastFinishedByPath() {
     return [];
   }
 }

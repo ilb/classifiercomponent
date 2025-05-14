@@ -11,15 +11,15 @@ export default class ClassifyPages {
    * @param {DossierBuilder} dossierBuilder
    * @param {any} verificationService
    * @param {VerificationRepository} verificationRepository
+   * @param {DocumentPathRepository} documentPathRepository
    * @param classifierQuantity
-   * @param {string} sqliteDbPath
    */
   constructor({
     dossierBuilder,
     verificationService,
     verificationRepository,
     classifierQuantity,
-    sqliteDbPath
+    documentPathRepository
   }) {
     this.dossierBuilder = dossierBuilder;
     this.verificationService = verificationService;
@@ -27,7 +27,7 @@ export default class ClassifyPages {
     this.documentService = new DocumentService(dossierBuilder);
     this.verificationRepository = verificationRepository;
     this.classifierQuantity = classifierQuantity;
-    this.documentPathService = new DocumentPathService(sqliteDbPath);
+    this.documentPathService = new DocumentPathService({ documentPathRepository });
     // concurrency = 1 чтобы страницы отправлялись на распознавание последовательно,
     // так как для распознавания требуется класс предыдущей распознанной страницы
     this.queue = queue;

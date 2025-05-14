@@ -4,6 +4,7 @@ import { appConfig } from '../config/config.mjs';
 import FileService from '../services/FileService.mjs';
 import DocumentService from '../classifier/server/core/DocumentService.mjs';
 import mockRegistry from '../mocks/registry.mjs';
+import DocumentPathRepository from '../util/DocumentPathRepository.mjs';
 
 /**
  * Create a dependency injection container for the application
@@ -29,7 +30,7 @@ export default class Container {
       fileService: asClass(FileService).singleton(),
       documentService: asClass(DocumentService).singleton(),
       dossierBuilder: asClass(DossierBuilder).singleton(),
-      sqliteDbPath: asValue(process.env['apps.classifier.db']),
+      documentPathRepository: asClass(DocumentPathRepository).singleton(),
       // Environment values
       classifierQuantity: asValue(appConfig.get('classification.classifierQuantity', 8)),
 
