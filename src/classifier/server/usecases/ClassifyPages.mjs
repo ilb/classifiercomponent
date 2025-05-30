@@ -1,9 +1,8 @@
-import { Page } from '@ilb/dossierjs';
 import { chunkArray, prepareClassifies } from '../utils.mjs';
-import queue from '../../../pqueue/pqueue.mjs';
 import DocumentService from '../core/DocumentService.mjs';
 import ClassifierGate from '../gates/ClassifierGate.mjs';
 import DocumentPathService from '../../../services/DocumentPathService.mjs';
+import { Page } from '../dossierjs/index.js';
 
 export default class ClassifyPages {
   /**

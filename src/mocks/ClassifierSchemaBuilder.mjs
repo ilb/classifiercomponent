@@ -8,8 +8,9 @@ export default class ClassifierSchemaBuilder extends SchemaBuilder {
     const blocks = this.getBlocksProperties();
     const tabs = this.getTabsProperties(context.access);
     const meta = this.getMeta(tabs);
+    const dossier = schema.dossier;
 
-    return { classifier, tabs, blocks, meta };
+    return { classifier, tabs, blocks, meta, dossier };
   }
 
   /**

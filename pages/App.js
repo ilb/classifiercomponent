@@ -15,4 +15,4 @@ export default function App() {
       <Classifier uuid={uuid} name="classifier" schema={classifierSchema} onUpdate={console.log} />
     </div>
   );
-};
+}

@@ -39,10 +39,18 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
    * @param {Array} availableClasses Available classification types
    * @param {Function} onUpdate Callback after upload completes
    * @param {Object} selectedTab Current selected tab
+   * @param {Array} documentNames Optional document names array
    * @returns {Promise<void>}
    */
   const handleDocumentsDrop = useCallback(
-    async (acceptedFiles, targetTab, availableClasses = [], onUpdate, selectedTab) => {
+    async (
+      acceptedFiles,
+      targetTab,
+      availableClasses = [],
+      onUpdate,
+      selectedTab,
+      documentNames = []
+    ) => {
       if (!acceptedFiles || !acceptedFiles.length) {
         return showError?.('Файл выбранного типа не доступен для загрузки.');
       }
@@ -54,7 +62,7 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
         // Classify document using AI
         setLoading(true);
         try {
-          await classifyDocument(uuid, compressedFiles, availableClasses);
+          await classifyDocument(uuid, compressedFiles, availableClasses, documentNames);
           await revalidateDocuments();
         } catch (error) {
           console.error('Classification error:', error);
@@ -66,7 +74,7 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
         // Upload to specific document type
         setLoading(true);
         try {
-          const result = await uploadPages(uuid, targetTab, compressedFiles);
+          const result = await uploadPages(uuid, targetTab, compressedFiles, documentNames);
           const documents = await revalidateDocuments();
 
           if (onUpdate) {

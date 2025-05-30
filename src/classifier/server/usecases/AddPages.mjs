@@ -1,10 +1,10 @@
-import { Page } from '@ilb/dossierjs';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import * as node_path from 'path';
 import { Poppler } from 'node-poppler';
 import sharp from 'sharp';
 import DocumentPathService from '../../../services/DocumentPathService.mjs';
+import { Page } from '../dossierjs/index.js';
 
 /**
  * AddPages use case for adding pages to documents
@@ -25,10 +25,11 @@ export default class AddPages {
    *
    * @param {string} uuid Document UUID
    * @param {string} name Document name/type
+   * @param {string|undefined} documentName
    * @param {object} files Files to add
    * @return {Promise<*>}
    */
-  async process({ uuid, name, ...files }) {
+  async process({ uuid, name, documentName, ...files }) {
     // Return early if no files to process
     if (!Object.keys(files).length) {
       return;

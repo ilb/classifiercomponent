@@ -3,10 +3,13 @@ import { fetcher } from '../utils/fetcher';
 
 const basePath = process.env.API_PATH || '/api';
 
-export const classifyDocument = async (uuid, files, availableClasses) => {
+export const classifyDocument = async (uuid, files, availableClasses, documentNames = []) => {
   const formData = new FormData();
-  files.forEach((f) => {
+  files.forEach((f, index) => {
     formData.append(`documents`, f);
+    if (documentNames[index] && documentNames[index].trim()) {
+      formData.append(`documentNames`, documentNames[index].trim());
+    }
   });
 
   availableClasses.map((availableClass) => formData.append(`availableClasses`, availableClass));
@@ -26,11 +29,15 @@ export const classifyDocument = async (uuid, files, availableClasses) => {
   }
 };
 
-export const uploadPages = async (uuid, document, files) => {
+export const uploadPages = async (uuid, document, files, documentName) => {
   const formData = new FormData();
   files.forEach((f) => {
     formData.append(`documents`, f);
   });
+
+  if (documentName) {
+    formData.append(`documentName`, documentName);
+  }
 
   const result = await fetch(`${basePath}/classifications/${uuid}/documents/${document}`, {
     method: 'PUT',
@@ -94,9 +101,7 @@ export const usePages = (uuid, documentName) => {
     mutatePages: mutate,
     revalidatePages: () =>
       mutateGlobal(
-        documentName
-          ? `${basePath}/classifications/${uuid}/documents/${documentName}/index`
-          : null
+        documentName ? `${basePath}/classifications/${uuid}/documents/${documentName}/index` : null
       )
   };
 };

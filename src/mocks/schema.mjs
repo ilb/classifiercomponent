@@ -2,8 +2,13 @@ export default {
   classifier: {
     processor: 'ClassifierProcessor',
     access: {
-      show: '*',
-      editable: '*'
+      show: false,
+      editable: false
+    }
+  },
+  dossier: {
+    documentNaming: {
+      enabled: true
     }
   },
   blocks: [
@@ -13,7 +18,14 @@ export default {
     {
       name: 'Создание заявки',
       type: 'offerCreateBlock',
-      open: ['CREATION', 'CREATED', 'ON_CHECK', 'REJECT', 'CONTINUE_QUESTIONNAIRE', 'CLIENT_VERIFICATION'],
+      open: [
+        'CREATION',
+        'CREATED',
+        'ON_CHECK',
+        'REJECT',
+        'CONTINUE_QUESTIONNAIRE',
+        'CLIENT_VERIFICATION'
+      ],
       collapsed: true
     },
     {
@@ -21,16 +33,16 @@ export default {
     }
   ],
   documents: [
-    {
-      type: 'unknown',
-      block: 'unknownBlock',
-      name: 'Не распознано',
-      processor: 'ClassifierProcessor',
-      access: {
-        show: '*',
-        editable: '*'
-      }
-    },
+    // {
+    //   type: 'unknown',
+    //   block: 'unknownBlock',
+    //   name: 'Не распознано',
+    //   processor: 'ClassifierProcessor',
+    //   access: {
+    //     show: '*',
+    //     editable: '*'
+    //   }
+    // },
     {
       type: 'passport',
       block: 'offerCreateBlock',

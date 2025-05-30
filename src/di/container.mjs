@@ -1,10 +1,10 @@
 import awilix, { asClass, asValue } from 'awilix';
-import { DossierBuilder } from '@ilb/dossierjs';
 import { appConfig } from '../config/config.mjs';
 import FileService from '../services/FileService.mjs';
 import DocumentService from '../classifier/server/core/DocumentService.mjs';
 import mockRegistry from '../mocks/registry.mjs';
 import DocumentPathRepository from '../util/DocumentPathRepository.mjs';
+import { DossierBuilder } from '../classifier/server/dossierjs/index.js';
 
 /**
  * Create a dependency injection container for the application

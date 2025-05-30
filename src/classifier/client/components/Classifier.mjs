@@ -58,7 +58,7 @@ const Classifier = ({
       onInit && onInit(documents);
       setPrev(documents);
     }
-  }, [documents])
+  }, [documents]);
 
   useEffect(() => {
     setClassifier(schema.classifier);
@@ -112,7 +112,9 @@ const Classifier = ({
   }, [documents, form]);
 
   useEffect(() => {
-    const processTasks = tasks.filter(({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE');
+    const processTasks = tasks.filter(
+      ({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE'
+    );
     setCountStartedTasks(processTasks.length);
   }, [tasks]);
 
@@ -131,7 +133,7 @@ const Classifier = ({
 
       setPrev(documents);
     }
-  }, [finishedTasks.length])
+  }, [finishedTasks.length]);
 
   useEffect(() => {
     const interval = setInterval(() => setTwainHandler() && clearInterval(interval), 1000);
@@ -169,7 +171,7 @@ const Classifier = ({
     setDraggableOrigin(null);
   };
 
-  const handleDocumentsDrop = async (acceptedFiles) => {
+  const handleDocumentsDrop = async (acceptedFiles, documentName) => {
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
@@ -178,11 +180,13 @@ const Classifier = ({
       !countStartedTasks && setCountStartedTasks(-1);
       const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
       const compressedFiles = await compressFiles(acceptedFiles);
-      classifyDocument(uuid, compressedFiles, availableClasses).then(revalidateDocuments);
+      classifyDocument(uuid, compressedFiles, availableClasses, documentName).then(
+        revalidateDocuments
+      );
     } else {
       setLoading(true);
       const compressedFiles = await compressFiles(acceptedFiles);
-      uploadPages(uuid, selectedTab.type, compressedFiles)
+      uploadPages(uuid, selectedTab.type, compressedFiles, documentName)
         .then(async (result) => {
           const documents = await revalidateDocuments();
           onUpdate && onUpdate(selectedTab, documents);
@@ -194,16 +198,18 @@ const Classifier = ({
   };
 
   const compressFiles = async (files) => {
-    return Promise.all(files.map(async (file, index) => {
-      if (file.type.includes('image/')) {
-        return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
-          return new File([blob], file.name, { type: file.type });
-        });
-      } else {
-        return file;
-      }
-    }))
-  }
+    return Promise.all(
+      files.map(async (file, index) => {
+        if (file.type.includes('image/')) {
+          return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
+            return new File([blob], file.name, { type: file.type });
+          });
+        } else {
+          return file;
+        }
+      })
+    );
+  };
 
   const processError = (error, documents) => {
     if (error?.description?.type === 'signatureError') {
@@ -383,10 +389,7 @@ const Classifier = ({
         onDragEnd={onDragEnd}
         onDragOver={onDragOver}
         onDragCancel={onDragCancel}>
-        <Grid.Column
-          textAlign="center"
-          className="dossier__wrap"
-          width={4}>
+        <Grid.Column textAlign="center" className="dossier__wrap" width={4}>
           <Menu
             uuid={uuid}
             blocks={schema.blocks}
@@ -418,6 +421,7 @@ const Classifier = ({
               onDrop={handleDocumentsDrop}
               accept={selectedTab.accept}
               fileType={selectedTab.fileType}
+              showDocumentNameInput={schema.dossier?.documentNaming?.enabled || false}
             />
           )}
           <Dimmer.Dimmable>
