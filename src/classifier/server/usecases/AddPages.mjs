@@ -30,7 +30,6 @@ export default class AddPages {
    * @return {Promise<*>}
    */
   async process({ uuid, name, documentName, ...files }) {
-    // Return early if no files to process
     if (!Object.keys(files).length) {
       return;
     }
@@ -45,10 +44,10 @@ export default class AddPages {
         return;
       }
 
-      await this.addFilesToDocument(uuidPath, name, processedFiles);
+      await this.addFilesToDocument(uuidPath, name, processedFiles, documentName);
     } catch (error) {
       console.error(`Error adding pages to document ${name} (${uuid}):`, error);
-      throw error; // Re-throw to let the caller handle it
+      throw error;
     }
   }
 
@@ -75,10 +74,7 @@ export default class AddPages {
    * @returns {Promise<Array>} Array of processed file objects
    */
   async processAllFiles(files, pagesPath) {
-    // Get files array from the files object
     const filesList = Object.values(files);
-
-    // Process each file based on its type
     const processedFilesNested = await Promise.all(
       filesList.map(async (file) => {
         if (file.mimetype === 'application/pdf') {
@@ -89,7 +85,6 @@ export default class AddPages {
       })
     );
 
-    // Flatten the array (PDF processing returns arrays)
     return processedFilesNested.flat();
   }
 
@@ -98,14 +93,12 @@ export default class AddPages {
    * @param {string} uuidPath Document path
    * @param {string} name Document name/type
    * @param {Array} processedFiles Array of processed file objects
+   * @param {string|undefined} documentName Document name to save
    * @returns {Promise<void>}
    */
-  async addFilesToDocument(uuidPath, name, processedFiles) {
-    // Build the dossier
+  async addFilesToDocument(uuidPath, name, processedFiles, documentName) {
     const dossier = await this.dossierBuilder.build(uuidPath);
     const document = dossier.getDocument(name);
-
-    // Clear document if needed (when file type changes)
     const isImageType = processedFiles[0].mimetype.includes('image/');
     const documentNeedsClearing = !isImageType || !document.isImages();
 
@@ -113,9 +106,13 @@ export default class AddPages {
       await document.clear();
     }
 
-    // Convert file objects to Page objects and add them to the document
     const pages = processedFiles.map((file) => new Page(file));
     await document.addPages(pages);
+
+    if (documentName) {
+      document.structure.documentName = documentName;
+      document.structure.save();
+    }
   }
 
   /**
@@ -130,14 +127,10 @@ export default class AddPages {
     const tmpFilePath = node_path.join(pagesPath, `${fileUuid}.pdf`);
     const splitOutputPath = node_path.join(pagesPath, fileUuid);
 
-    // Ensure split output directory exists
     fs.mkdirSync(splitOutputPath, { recursive: true });
-
-    // Save PDF to disk temporarily
     fs.writeFileSync(tmpFilePath, file.buffer);
 
     try {
-      // Use poppler to convert PDF to images
       await poppler.pdfToCairo(
         tmpFilePath,
         node_path.join(splitOutputPath, file.originalname.split('.')[0]),
@@ -146,16 +139,12 @@ export default class AddPages {
         }
       );
 
-      // Read the generated image files
       const pages = fs.readdirSync(splitOutputPath);
-
-      // Process each page
       const processedPages = pages.map((page) => {
         const pageUuid = uuidv4();
         const filename = `${pageUuid}.jpg`;
         const pagePath = node_path.join(pagesPath, filename);
 
-        // Rename the file to use the UUID
         fs.renameSync(node_path.join(splitOutputPath, page), pagePath);
 
         return {
@@ -171,7 +160,6 @@ export default class AddPages {
 
       return processedPages;
     } finally {
-      // Clean up temporary files
       if (fs.existsSync(tmpFilePath)) {
         fs.unlinkSync(tmpFilePath);
       }
@@ -193,25 +181,18 @@ export default class AddPages {
     const extension = file.originalname.split('.').pop().toLowerCase();
     const filename = `${fileUuid}.${extension}`;
     const filePath = node_path.join(pagesPath, filename);
-
-    // Handle jfif extension
     const actualExtension = extension === 'jfif' ? 'jpg' : extension;
     const actualFilename = extension === 'jfif' ? `${fileUuid}.jpg` : filename;
     const actualFilePath =
       extension === 'jfif' ? node_path.join(pagesPath, actualFilename) : filePath;
 
-    // Save the file to disk
     fs.writeFileSync(filePath, file.buffer);
 
-    // Rename if it's a jfif file
     if (extension === 'jfif') {
       fs.renameSync(filePath, actualFilePath);
     }
 
-    // Handle image conversions (bmp, tiff, heic to jpg)
     if (['bmp', 'tiff', 'heic'].includes(extension)) {
-      // TODO: Implement image conversion logic if needed
-      // For now, we'll just pretend it was converted
       return {
         originalname: file.originalname,
         filename: `${fileUuid}.jpg`,

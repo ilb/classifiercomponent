@@ -20,6 +20,7 @@ export default class DocumentStructure {
       pages: this.pages,
       lastModified: (new Date()).toISOString(),
       ...(this.template && { template: this.template }),
+      ...(this.documentName && { documentName: this.documentName }),
     });
   }
 
@@ -36,6 +37,10 @@ export default class DocumentStructure {
   #setStructure(structure) {
     if (structure.template) {
       this.template = structure.template;
+    }
+
+    if (structure.documentName) {
+      this.documentName = structure.documentName;
     }
 
     this.pages = structure.pages || [];
