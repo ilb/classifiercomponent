@@ -7,7 +7,10 @@ export default {
     }
   },
   dossier: {
-    documentNaming: {
+    naming: {
+      enabled: true
+    },
+    download: {
       enabled: true
     }
   },

@@ -18,6 +18,7 @@ import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } fro
 import { toast } from 'react-semantic-toasts';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
+import { ClassifierProvider } from '../context/ClassifierContext.js';
 
 const Classifier = ({
   form,
@@ -382,67 +383,68 @@ const Classifier = ({
 
   return (
     <Grid columns={2} centered className="dossier classifier">
-      <DndContext
-        sensors={sensors}
-        modifiers={[snapCenterToCursor]}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-        onDragCancel={onDragCancel}>
-        <Grid.Column textAlign="center" className="dossier__wrap" width={4}>
-          <Menu
-            uuid={uuid}
-            blocks={schema.blocks}
-            classifier={classifier}
-            name={name}
-            documents={schema.tabs}
-            hiddenTabs={hiddenTabs}
-            selected={selectedTab.type}
-            onDocumentSelect={changeTab}
-          />
-        </Grid.Column>
-        <Grid.Column
-          className="dossier__wrap"
-          width={11}
-          textAlign="center"
-          style={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            minHeight: 700,
-            width: '73.75%!important'
-          }}>
-          <Dimmer active={loading} inverted>
-            <Loader style={{ display: 'block' }} size="big">
-              Загрузка...
-            </Loader>
-          </Dimmer>
-          {!selectedTab.readonly && (
-            <UploadDropzone
-              onDrop={handleDocumentsDrop}
-              accept={selectedTab.accept}
-              fileType={selectedTab.fileType}
-              showDocumentNameInput={schema.dossier?.documentNaming?.enabled || false}
+      <ClassifierProvider uuid={uuid} settings={schema.dossier}>
+        <DndContext
+          sensors={sensors}
+          modifiers={[snapCenterToCursor]}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+          onDragCancel={onDragCancel}>
+          <Grid.Column textAlign="center" className="dossier__wrap" width={4}>
+            <Menu
+              uuid={uuid}
+              blocks={schema.blocks}
+              classifier={classifier}
+              name={name}
+              documents={schema.tabs}
+              hiddenTabs={hiddenTabs}
+              selected={selectedTab.type}
+              onDocumentSelect={changeTab}
             />
-          )}
-          <Dimmer.Dimmable>
-            {!!countStartedTasks && selectedTab.type === 'classifier' && (
-              <Dimmer active inverted>
-                <Loader size="large" active>
-                  {!!countStartedTasks && 'Документы в обработке'}
-                </Loader>
-              </Dimmer>
+          </Grid.Column>
+          <Grid.Column
+            className="dossier__wrap"
+            width={11}
+            textAlign="center"
+            style={{
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              minHeight: 700,
+              width: '73.75%!important'
+            }}>
+            <Dimmer active={loading} inverted>
+              <Loader style={{ display: 'block' }} size="big">
+                Загрузка...
+              </Loader>
+            </Dimmer>
+            {!selectedTab.readonly && (
+              <UploadDropzone
+                onDrop={handleDocumentsDrop}
+                accept={selectedTab.accept}
+                fileType={selectedTab.fileType}
+              />
             )}
-            <SortableGallery
-              pageErrors={pageErrors}
-              tab={selectedTab}
-              srcSet={selectedDocument}
-              onRemove={handlePageDelete}
-              active={activeDraggable}
-              unoptimized={unoptimized}
-            />
-          </Dimmer.Dimmable>
-        </Grid.Column>
-      </DndContext>
+            <Dimmer.Dimmable>
+              {!!countStartedTasks && selectedTab.type === 'classifier' && (
+                <Dimmer active inverted>
+                  <Loader size="large" active>
+                    {!!countStartedTasks && 'Документы в обработке'}
+                  </Loader>
+                </Dimmer>
+              )}
+              <SortableGallery
+                pageErrors={pageErrors}
+                tab={selectedTab}
+                srcSet={selectedDocument}
+                onRemove={handlePageDelete}
+                active={activeDraggable}
+                unoptimized={unoptimized}
+              />
+            </Dimmer.Dimmable>
+          </Grid.Column>
+        </DndContext>
+      </ClassifierProvider>
     </Grid>
   );
 };

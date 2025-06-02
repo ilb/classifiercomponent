@@ -1,12 +1,12 @@
 import { useDropzone } from 'react-dropzone';
 import { Segment } from 'semantic-ui-react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import DocumentNameModal from './DocumentNameModal';
+import { ClassifierContext } from '../context/ClassifierContext';
 
 const UploadDropzone = ({
   onDrop,
   fileType,
-  showDocumentNameInput = false,
   accept = [
     'image/jpg',
     'image/bmp',
@@ -17,6 +17,9 @@ const UploadDropzone = ({
     'application/pdf'
   ]
 }) => {
+  const { settings } = useContext(ClassifierContext);
+  const showDocumentNameInput = settings?.naming?.enabled;
+
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const handleFileDrop = async (acceptedFiles) => {

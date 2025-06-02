@@ -1,8 +1,14 @@
 import { Icon, Menu, Popup } from 'semantic-ui-react';
 import { useDroppable } from '@dnd-kit/core';
 import { useDocuments } from '../../hooks';
+import { downloadFile } from '../../utils/fetcher';
+import { useContext } from 'react';
+import { ClassifierContext } from '../../context/ClassifierContext';
 
 const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, hidden }) => {
+  const { settings } = useContext(ClassifierContext);
+  const downloadEnabled = settings?.download?.enabled;
+
   let className = '';
   let isNotImage = false;
   let isRequired = !document.readonly && document.required;
@@ -21,6 +27,17 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
   if (error) className += ' error';
   if (document.readonly) className += 'readonly';
 
+  const handleDownloadAll = async (event) => {
+    event.stopPropagation();
+    try {
+      const downloadUrl = `/api/classifications/${uuid}/documents/${document.type}`;
+      const filename = `${document.type}.pdf`;
+      await downloadFile(downloadUrl, filename);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
+
   return (
     <>
       {!hidden && (
@@ -32,15 +49,54 @@ const MenuTab = ({ uuid, document, selected, disabled, onDocumentSelect, error, 
             name={document.type}
             active={selected}
             onClick={onDocumentSelect}>
-            <span>
-              {document.tooltip && (
-                <Popup
-                  content={document.tooltip}
-                  trigger={<Icon name="question circle outline" />}
-                />
-              )}
-              {document.name} {countPages ? '(' + countPages + ')' : ''}
-              {isRequired && <span style={{ color: 'red' }}>*</span>}
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%'
+              }}>
+              <span style={{ flex: 1 }}></span>
+              <span
+                style={{
+                  flex: 'none',
+                  textAlign: 'center'
+                }}>
+                {document.name} {countPages ? '(' + countPages + ')' : ''}
+                {isRequired && <span style={{ color: 'red' }}>*</span>}
+              </span>
+              <span
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center'
+                }}>
+                {document.tooltip && (
+                  <Popup
+                    content={document.tooltip}
+                    trigger={
+                      <Icon
+                        name="question circle outline"
+                        style={{ color: '#414141', opacity: 0.8 }}
+                      />
+                    }
+                  />
+                )}
+                {countPages > 0 && downloadEnabled && (
+                  <Icon
+                    name="download"
+                    link
+                    onClick={handleDownloadAll}
+                    style={{
+                      marginLeft: '8px',
+                      cursor: 'pointer',
+                      color: '#414141',
+                      opacity: 0.8
+                    }}
+                    title={`Скачать все страницы ${document.name}`}
+                  />
+                )}
+              </span>
             </span>
           </Menu.Item>
         </div>
