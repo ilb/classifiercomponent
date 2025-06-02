@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Button, Form, Input, Modal } from 'semantic-ui-react';
+import { useEffect, useState, useContext } from 'react';
+import { Button, Form, Input, Modal, Checkbox } from 'semantic-ui-react';
+import { ClassifierContext } from '../context/ClassifierContext';
 
 const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
   const [documentName, setDocumentName] = useState('');
+  const [createNewVersion, setCreateNewVersion] = useState(false);
+  const { settings } = useContext(ClassifierContext);
 
   useEffect(() => {
     if (files && files.length > 0) {
@@ -17,7 +20,7 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
 
   const handleConfirm = () => {
     const finalName = documentName.trim() || files[0]?.name;
-    onConfirm(finalName);
+    onConfirm(finalName, createNewVersion);
   };
 
   const handleCancel = () => {
@@ -34,7 +37,9 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
       <Modal.Content>
         <Form>
           <Form.Field>
-            <label>Название для {files?.length === 1 ? 'документа' : `${files?.length} документов`}:</label>
+            <label>
+              Название для {files?.length === 1 ? 'документа' : `${files?.length} документов`}:
+            </label>
             <Input
               fluid
               placeholder="Введите название документа"
@@ -42,9 +47,18 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
               onChange={(e) => handleNameChange(e.target.value)}
             />
           </Form.Field>
+          {settings?.versions?.enabled && (
+            <Form.Field>
+              <Checkbox
+                label="Создать новую версию документа"
+                checked={createNewVersion}
+                onChange={(e, { checked }) => setCreateNewVersion(checked)}
+              />
+            </Form.Field>
+          )}
           {files?.length > 1 && (
             <div style={{ marginTop: '10px', fontSize: '0.9em', color: '#666' }}>
-              Выбранные файлы: {files.map(f => f.name).join(', ')}
+              Выбранные файлы: {files.map((f) => f.name).join(', ')}
             </div>
           )}
         </Form>

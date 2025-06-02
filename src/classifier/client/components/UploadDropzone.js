@@ -2,11 +2,15 @@ import { useDropzone } from 'react-dropzone';
 import { Segment } from 'semantic-ui-react';
 import { useContext, useState } from 'react';
 import DocumentNameModal from './DocumentNameModal';
+import VersionSelector from './VersionSelector';
 import { ClassifierContext } from '../context/ClassifierContext';
 
 const UploadDropzone = ({
   onDrop,
   fileType,
+  versions = [],
+  selectedVersion,
+  onVersionChange,
   accept = [
     'image/jpg',
     'image/bmp',
@@ -31,9 +35,9 @@ const UploadDropzone = ({
     }
   };
 
-  const handleModalConfirm = (documentName) => {
+  const handleModalConfirm = (documentName, createNewVersion) => {
     setModalOpen(false);
-    onDrop(selectedFiles, documentName);
+    onDrop(selectedFiles, documentName, createNewVersion);
     setSelectedFiles([]);
   };
 
@@ -48,6 +52,11 @@ const UploadDropzone = ({
   });
   return (
     <div>
+      <VersionSelector
+        selectedVersion={selectedVersion}
+        onVersionChange={onVersionChange}
+        versions={versions}
+      />
       <Segment.Group className="dossier__uploads" horizontal style={{ cursor: 'pointer' }}>
         <Segment
           textAlign="center"

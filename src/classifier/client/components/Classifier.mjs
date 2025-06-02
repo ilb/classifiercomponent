@@ -49,6 +49,8 @@ const Classifier = ({
   const [prev, setPrev] = useState(null);
   const [pageErrors, setPageErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [documentVersions, setDocumentVersions] = useState({});
+  const [selectedVersions, setSelectedVersions] = useState({});
 
   useEffect(() => {
     selectTab(getSelectedTab());
@@ -172,7 +174,7 @@ const Classifier = ({
     setDraggableOrigin(null);
   };
 
-  const handleDocumentsDrop = async (acceptedFiles, documentName) => {
+  const handleDocumentsDrop = async (acceptedFiles, documentName, createNewVersion) => {
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
@@ -181,13 +183,17 @@ const Classifier = ({
       !countStartedTasks && setCountStartedTasks(-1);
       const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
       const compressedFiles = await compressFiles(acceptedFiles);
-      classifyDocument(uuid, compressedFiles, availableClasses, documentName).then(
-        revalidateDocuments
-      );
+      classifyDocument(
+        uuid,
+        compressedFiles,
+        availableClasses,
+        documentName,
+        createNewVersion
+      ).then(revalidateDocuments);
     } else {
       setLoading(true);
       const compressedFiles = await compressFiles(acceptedFiles);
-      uploadPages(uuid, selectedTab.type, compressedFiles, documentName)
+      uploadPages(uuid, selectedTab.type, compressedFiles, documentName, createNewVersion)
         .then(async (result) => {
           const documents = await revalidateDocuments();
           onUpdate && onUpdate(selectedTab, documents);
@@ -381,6 +387,21 @@ const Classifier = ({
     selectTab(tab);
   };
 
+  const handleVersionChange = (version) => {
+    setSelectedVersions({
+      ...selectedVersions,
+      [selectedTab.type]: version
+    });
+  };
+
+  const getVersionsForTab = (tabType) => {
+    return documentVersions[tabType] || [];
+  };
+
+  const getSelectedVersionForTab = (tabType) => {
+    return selectedVersions[tabType] || null;
+  };
+
   return (
     <Grid columns={2} centered className="dossier classifier">
       <ClassifierProvider uuid={uuid} settings={schema.dossier}>
@@ -423,6 +444,9 @@ const Classifier = ({
                 onDrop={handleDocumentsDrop}
                 accept={selectedTab.accept}
                 fileType={selectedTab.fileType}
+                versions={getVersionsForTab(selectedTab.type)}
+                selectedVersion={getSelectedVersionForTab(selectedTab.type)}
+                onVersionChange={handleVersionChange}
               />
             )}
             <Dimmer.Dimmable>

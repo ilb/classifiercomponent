@@ -12,6 +12,9 @@ export default {
     },
     download: {
       enabled: true
+    },
+    versions: {
+      enabled: true
     }
   },
   blocks: [
