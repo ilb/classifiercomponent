@@ -1,7 +1,7 @@
 import { useDropzone } from 'react-dropzone';
 import { Segment } from 'semantic-ui-react';
 import { useContext, useState } from 'react';
-import DocumentNameModal from './DocumentNameModal';
+import DocumentAddModal from './DocumentAddModal';
 import VersionSelector from './VersionSelector';
 import { ClassifierContext } from '../context/ClassifierContext';
 
@@ -21,6 +21,7 @@ const UploadDropzone = ({
     'application/pdf'
   ]
 }) => {
+  console.log(versions);
   const { settings } = useContext(ClassifierContext);
   const showDocumentNameInput = settings?.naming?.enabled;
 
@@ -35,9 +36,9 @@ const UploadDropzone = ({
     }
   };
 
-  const handleModalConfirm = (documentName, createNewVersion) => {
+  const handleModalConfirm = (documentParams) => {
     setModalOpen(false);
-    onDrop(selectedFiles, documentName, createNewVersion);
+    onDrop(selectedFiles, documentParams);
     setSelectedFiles([]);
   };
 
@@ -50,6 +51,7 @@ const UploadDropzone = ({
     accept,
     onDrop: handleFileDrop
   });
+
   return (
     <div>
       <VersionSelector
@@ -73,7 +75,7 @@ const UploadDropzone = ({
           <input {...dropzone.getInputProps()} id={'dropzone_input'} />
         </Segment>
       </Segment.Group>
-      <DocumentNameModal
+      <DocumentAddModal
         open={modalOpen}
         files={selectedFiles}
         onConfirm={handleModalConfirm}

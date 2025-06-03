@@ -2,25 +2,25 @@ import { useEffect, useState, useContext } from 'react';
 import { Button, Form, Input, Modal, Checkbox } from 'semantic-ui-react';
 import { ClassifierContext } from '../context/ClassifierContext';
 
-const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
-  const [documentName, setDocumentName] = useState('');
-  const [createNewVersion, setCreateNewVersion] = useState(false);
+const DocumentAddModal = ({ open, files, onConfirm, onCancel }) => {
+  const [rawName, setRawName] = useState('');
+  const [isNewVersion, setIsNewVersion] = useState(false);
   const { settings } = useContext(ClassifierContext);
 
   useEffect(() => {
     if (files && files.length > 0) {
       const firstFileName = files[0].name.replace(/\.[^/.]+$/, '');
-      setDocumentName(firstFileName);
+      setRawName(firstFileName);
     }
   }, [files]);
 
   const handleNameChange = (value) => {
-    setDocumentName(value);
+    setRawName(value);
   };
 
   const handleConfirm = () => {
-    const finalName = documentName.trim() || files[0]?.name;
-    onConfirm(finalName, createNewVersion);
+    const name = rawName.trim() || files[0]?.name;
+    onConfirm({ name, isNewVersion });
   };
 
   const handleCancel = () => {
@@ -43,7 +43,7 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
             <Input
               fluid
               placeholder="Введите название документа"
-              value={documentName}
+              value={rawName}
               onChange={(e) => handleNameChange(e.target.value)}
             />
           </Form.Field>
@@ -51,8 +51,8 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
             <Form.Field>
               <Checkbox
                 label="Создать новую версию документа"
-                checked={createNewVersion}
-                onChange={(e, { checked }) => setCreateNewVersion(checked)}
+                checked={isNewVersion}
+                onChange={(e, { checked }) => setIsNewVersion(checked)}
               />
             </Form.Field>
           )}
@@ -73,4 +73,4 @@ const DocumentNameModal = ({ open, files, onConfirm, onCancel }) => {
   );
 };
 
-export default DocumentNameModal;
+export default DocumentAddModal;

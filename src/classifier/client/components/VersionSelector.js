@@ -9,15 +9,15 @@ const VersionSelector = ({ selectedVersion, onVersionChange, versions = [] }) =>
   useEffect(() => {
     if (versions && versions.length > 0) {
       const options = versions.map((version, index) => ({
-        key: version.id,
+        key: version.uuid,
         text: version.name || `Версия ${index + 1}`,
-        value: version.id
+        value: version.uuid
       }));
       setVersionOptions(options);
     }
   }, [versions]);
 
-  if (!settings?.versions?.enabled || !versions || versions.length <= 1) {
+  if (!settings?.versions?.enabled || !versions) {
     return null;
   }
 
@@ -26,7 +26,7 @@ const VersionSelector = ({ selectedVersion, onVersionChange, versions = [] }) =>
       <label
         htmlFor="version-selector"
         style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-        Версия документа:
+        Актуальная версия документа:
       </label>
       <Dropdown
         selection

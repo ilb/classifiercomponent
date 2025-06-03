@@ -64,10 +64,10 @@ const ClassifierApi = (
       .put('/:uuid', handlers.classifyPages)
       .get('/:uuid/documents', handlers.getDocuments)
       .post('/:uuid/documents/correction', handlers.correctPages)
-      .get('/:uuid/documents/:name', handlers.getDocument)
-      .put('/:uuid/documents/:name', handlers.addPages)
-      .get('/:uuid/documents/:name/:number', handlers.getPage)
-      .delete('/:uuid/documents/:name/:pageUuid', handlers.deletePage)
+      .get('/:uuid/documents/:type', handlers.getDocument)
+      .put('/:uuid/documents/:type', handlers.addPages)
+      .get('/:uuid/documents/:type/:number', handlers.getPage)
+      .delete('/:uuid/documents/:type/:pageUuid', handlers.deletePage)
   );
 };
 

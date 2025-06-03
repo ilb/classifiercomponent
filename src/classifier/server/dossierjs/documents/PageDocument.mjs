@@ -79,8 +79,8 @@ export default class PageDocument extends Document {
    * @returns {string}
    */
   getDocumentName() {
-    if (this.structure.documentName) {
-      return this.structure.documentName;
+    if (this.structure.name) {
+      return this.structure.name;
     }
 
     return this.type + '-' + extractUuid(this.dossier.path);
@@ -238,6 +238,10 @@ export default class PageDocument extends Document {
    */
   getPages() {
     return this.structure.pages || [];
+  }
+
+  getVersions() {
+    return this.structure.versions || []
   }
 
   /**

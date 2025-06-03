@@ -29,14 +29,18 @@ export const classifyDocument = async (uuid, files, availableClasses, documentNa
   }
 };
 
-export const uploadPages = async (uuid, document, files, documentName) => {
+export const uploadPages = async (uuid, document, files, documentParams = {}) => {
   const formData = new FormData();
   files.forEach((f) => {
     formData.append(`documents`, f);
   });
 
-  if (documentName) {
-    formData.append(`documentName`, documentName);
+  if (documentParams.name) {
+    formData.append(`name`, documentParams.name);
+  }
+
+  if (documentParams.isNewVersion) {
+    formData.append(`isNewVersion`, documentParams.isNewVersion);
   }
 
   const result = await fetch(`${basePath}/classifications/${uuid}/documents/${document}`, {
@@ -87,35 +91,22 @@ export const correctDocuments = async (uuid, from, to) => {
   }
 };
 
-export const usePages = (uuid, documentName) => {
-  const { mutate: mutateGlobal } = useSWRConfig();
-  const { data: pages, mutate } = useSWR(
-    documentName ? `${basePath}/classifications/${uuid}/documents/${documentName}/index` : null,
-    fetcher,
-    {
-      fallbackData: []
-    }
-  );
-  return {
-    pages,
-    mutatePages: mutate,
-    revalidatePages: () =>
-      mutateGlobal(
-        documentName ? `${basePath}/classifications/${uuid}/documents/${documentName}/index` : null
-      )
-  };
-};
-
 export const useDocuments = (uuid) => {
   const { mutate: mutateGlobal } = useSWRConfig();
-  const { data: documents, mutate } = useSWR(
-    `${basePath}/classifications/${uuid}/documents`,
-    fetcher,
-    {
-      fallbackData: {}
-    }
-  );
+  const { data, mutate } = useSWR(`${basePath}/classifications/${uuid}/documents`, fetcher, {
+    fallbackData: {}
+  });
+
+  const documents = [];
+  const versions = [];
+
+  Object.entries(data).forEach(([key, value]) => {
+    documents[key] = value.pages;
+    versions[key] = value.versions;
+  });
+
   return {
+    versions,
     documents,
     mutateDocuments: mutate,
     correctDocuments: (from, to) => correctDocuments(uuid, from, to),

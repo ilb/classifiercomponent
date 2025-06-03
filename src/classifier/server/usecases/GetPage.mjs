@@ -11,10 +11,10 @@ export default class GetPage {
     this.documentPathService = new DocumentPathService({ documentPathRepository });
   }
 
-  async process({ uuid, name, number }) {
+  async process({ uuid, type, number }) {
     const uuidPath = await this.documentPathService.getPath(uuid);
     const dossier = await this.dossierBuilder.build(uuidPath);
-    const document = dossier.getDocument(name);
+    const document = dossier.getDocument(type);
     const page = document.getPage(number);
     const imageBuffer = document.getFile(number);
 

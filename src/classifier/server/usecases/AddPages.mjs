@@ -24,12 +24,12 @@ export default class AddPages {
    * Process the request to add pages to a document
    *
    * @param {string} uuid Document UUID
-   * @param {string} name Document name/type
-   * @param {string|undefined} documentName
+   * @param {string} type Document type
+   * @param {string|undefined} name
    * @param {object} files Files to add
    * @return {Promise<*>}
    */
-  async process({ uuid, name, documentName, ...files }) {
+  async process({ uuid, type, name, ...files }) {
     if (!Object.keys(files).length) {
       return;
     }
@@ -44,9 +44,9 @@ export default class AddPages {
         return;
       }
 
-      await this.addFilesToDocument(uuidPath, name, processedFiles, documentName);
+      await this.addFilesToDocument(uuidPath, type, processedFiles, name);
     } catch (error) {
-      console.error(`Error adding pages to document ${name} (${uuid}):`, error);
+      console.error(`Error adding pages to document ${type} (${uuid}):`, error);
       throw error;
     }
   }
@@ -91,14 +91,14 @@ export default class AddPages {
   /**
    * Add processed files to the document
    * @param {string} uuidPath Document path
-   * @param {string} name Document name/type
+   * @param {string} type Document type
    * @param {Array} processedFiles Array of processed file objects
-   * @param {string|undefined} documentName Document name to save
+   * @param {string|undefined} name Document name to save
    * @returns {Promise<void>}
    */
-  async addFilesToDocument(uuidPath, name, processedFiles, documentName) {
+  async addFilesToDocument(uuidPath, type, processedFiles, name) {
     const dossier = await this.dossierBuilder.build(uuidPath);
-    const document = dossier.getDocument(name);
+    const document = dossier.getDocument(type);
     const isImageType = processedFiles[0].mimetype.includes('image/');
     const documentNeedsClearing = !isImageType || !document.isImages();
 
@@ -109,8 +109,8 @@ export default class AddPages {
     const pages = processedFiles.map((file) => new Page(file));
     await document.addPages(pages);
 
-    if (documentName) {
-      document.structure.documentName = documentName;
+    if (name) {
+      document.structure.name = name;
       document.structure.save();
     }
   }

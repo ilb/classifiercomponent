@@ -38,7 +38,8 @@ const Classifier = ({
 }) => {
   const [classifier, setClassifier] = useState(schema.classifier);
   const { tasks } = useTasks(uuid);
-  const { documents, mutateDocuments, correctDocuments, revalidateDocuments } = useDocuments(uuid);
+  const { versions, documents, mutateDocuments, correctDocuments, revalidateDocuments } =
+    useDocuments(uuid);
   const [documentsTabs, setDocumentsTabs] = useState(schema.tabs);
   const [selectedTab, selectTab] = useState({});
   const [clonedItems, setClonedItems] = useState(null);
@@ -49,7 +50,6 @@ const Classifier = ({
   const [prev, setPrev] = useState(null);
   const [pageErrors, setPageErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [documentVersions, setDocumentVersions] = useState({});
   const [selectedVersions, setSelectedVersions] = useState({});
 
   useEffect(() => {
@@ -174,7 +174,7 @@ const Classifier = ({
     setDraggableOrigin(null);
   };
 
-  const handleDocumentsDrop = async (acceptedFiles, documentName, createNewVersion) => {
+  const handleDocumentsDrop = async (acceptedFiles, documentParams) => {
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
     }
@@ -183,17 +183,13 @@ const Classifier = ({
       !countStartedTasks && setCountStartedTasks(-1);
       const availableClasses = documentsTabs.filter((tab) => !tab.readonly).map((tab) => tab.type);
       const compressedFiles = await compressFiles(acceptedFiles);
-      classifyDocument(
-        uuid,
-        compressedFiles,
-        availableClasses,
-        documentName,
-        createNewVersion
-      ).then(revalidateDocuments);
+      classifyDocument(uuid, compressedFiles, availableClasses, documentParams?.name).then(
+        revalidateDocuments
+      );
     } else {
       setLoading(true);
       const compressedFiles = await compressFiles(acceptedFiles);
-      uploadPages(uuid, selectedTab.type, compressedFiles, documentName, createNewVersion)
+      uploadPages(uuid, selectedTab.type, compressedFiles, documentParams)
         .then(async (result) => {
           const documents = await revalidateDocuments();
           onUpdate && onUpdate(selectedTab, documents);
@@ -395,7 +391,7 @@ const Classifier = ({
   };
 
   const getVersionsForTab = (tabType) => {
-    return documentVersions[tabType] || [];
+    return versions[tabType] || [];
   };
 
   const getSelectedVersionForTab = (tabType) => {

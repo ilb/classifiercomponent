@@ -10,10 +10,10 @@ export default class GetDocument {
     this.documentPathService = new DocumentPathService({ documentPathRepository });
   }
 
-  async process({ uuid, name }) {
+  async process({ uuid, type }) {
     const uuidPath = await this.documentPathService.getPath(uuid);
     const dossier = await this.dossierBuilder.build(uuidPath);
-    const document = dossier.getDocument(name);
+    const document = dossier.getDocument(type);
 
     return {
       file: await document.getDocument(),

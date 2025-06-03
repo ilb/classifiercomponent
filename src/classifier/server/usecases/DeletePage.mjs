@@ -17,14 +17,14 @@ export default class DeletePage {
    * Process the request to delete a page from a document
    *
    * @param {string} uuid Document UUID
-   * @param {string} name Document name/type
+   * @param {string} type Document type
    * @param {string} pageUuid UUID of the page to delete
    * @return {Promise<void>}
    */
-  async process({ uuid, name, pageUuid }) {
+  async process({ uuid, type, pageUuid }) {
     const uuidPath = await this.documentPathService.getPath(uuid);
     const dossier = await this.dossierBuilder.build(uuidPath);
-    const document = dossier.getDocument(name);
+    const document = dossier.getDocument(type);
 
     // Delete the page
     await document.deletePage(pageUuid);

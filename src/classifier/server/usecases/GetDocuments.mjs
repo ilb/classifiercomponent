@@ -24,7 +24,6 @@ export default class GetDocuments {
     const uuidPath = await this.documentPathService.getPath(uuid);
     const dossier = await this.dossierBuilder.build(uuidPath);
     const url = `${process.env.BASE_URL}/api/classifications/${uuid}/documents`;
-
     return dossier.getDocuments().reduce((accumulator, document) => {
       const links = document.getPages().map((page, i) => {
         return {
@@ -35,9 +34,18 @@ export default class GetDocuments {
         };
       });
 
+      const versions = document.getVersions();
+
       return {
         ...accumulator,
-        [document.type]: links
+        [document.type]: {
+          pages: links,
+          versions: versions.map(({ name, lastModified, uuid }) => ({
+            name,
+            lastModified,
+            uuid
+          }))
+        }
       };
     }, {});
   }
