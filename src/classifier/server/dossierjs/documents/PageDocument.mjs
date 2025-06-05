@@ -345,7 +345,7 @@ export default class PageDocument extends Document {
     const newVersion = {
       uuid: newVersionUuid,
       name: name || '',
-      pages: pages
+      pages
     };
 
     this.structure.versions.push(newVersion);
@@ -362,7 +362,7 @@ export default class PageDocument extends Document {
     if (this.structure.versions && this.structure.currentVersion) {
       const currentVersion = this.structure.versions.find(v => v.uuid === this.structure.currentVersion);
       if (currentVersion) {
-        currentVersion.pages.push(...pages.map((page) => page.structure));
+        currentVersion.pages.push(...pages);
         if (name) {
           currentVersion.name = name;
         }
