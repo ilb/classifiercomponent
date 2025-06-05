@@ -156,8 +156,12 @@ export default class PageDocument extends Document {
    * @param {boolean|undefined} params.isNewVersion
    * @returns {Promise<void>}
    */
-  async addPages(pages, params= {}) {
+  async addPages(pages, params = {}) {
     await MessageBus.emit(new UploadingEvent({ document: this, pages }));
+    // Если это первая загружаемая версия документа, то принудительно указываем что это новая версия
+    if (!this.structure?.versions?.length && params.hasOwnProperty("isNewVersion")) {
+      params.isNewVersion = true;
+    }
 
     if (params.isNewVersion === true) {
       this.#createNewVersion(pages, params.name);
@@ -355,12 +359,10 @@ export default class PageDocument extends Document {
    * @param {string|undefined} name
    */
   #addToCurrentVersion(pages, name) {
-    pages.map(async (page) => await this.#processAddPage(page));
-
     if (this.structure.versions && this.structure.currentVersion) {
       const currentVersion = this.structure.versions.find(v => v.uuid === this.structure.currentVersion);
       if (currentVersion) {
-        currentVersion.pages.push(...pages.map(page => page.structure));
+        currentVersion.pages.push(...pages.map((page) => page.structure));
         if (name) {
           currentVersion.name = name;
         }

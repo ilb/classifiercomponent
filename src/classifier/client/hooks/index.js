@@ -39,7 +39,7 @@ export const uploadPages = async (uuid, document, files, documentParams = {}) =>
     formData.append(`name`, documentParams.name);
   }
 
-  if (documentParams.isNewVersion) {
+  if (documentParams.hasOwnProperty('isNewVersion')) {
     formData.append(`isNewVersion`, documentParams.isNewVersion);
   }
 
