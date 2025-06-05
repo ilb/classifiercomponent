@@ -5,6 +5,7 @@ import { Poppler } from 'node-poppler';
 import sharp from 'sharp';
 import DocumentPathService from '../../../services/DocumentPathService.mjs';
 import { Page } from '../dossierjs/index.js';
+import { parseBool } from '../utils.mjs';
 
 /**
  * AddPages use case for adding pages to documents
@@ -26,14 +27,14 @@ export default class AddPages {
    * @param {string} uuid Document UUID
    * @param {string} type Document type
    * @param {string|undefined} name
+   * @param {"true"|"false"} isNewVersion
    * @param {object} files Files to add
    * @return {Promise<*>}
    */
-  async process({ uuid, type, name, ...files }) {
+  async process({ uuid, type, name, isNewVersion, ...files }) {
     if (!Object.keys(files).length) {
       return;
     }
-
     try {
       const uuidPath = await this.documentPathService.getPath(uuid);
       const pagesPath = this.prepareDirectories(uuidPath);
@@ -44,7 +45,7 @@ export default class AddPages {
         return;
       }
 
-      await this.addFilesToDocument(uuidPath, type, processedFiles, name);
+      await this.addFilesToDocument(uuidPath, type, processedFiles, name, parseBool(isNewVersion));
     } catch (error) {
       console.error(`Error adding pages to document ${type} (${uuid}):`, error);
       throw error;
@@ -94,9 +95,10 @@ export default class AddPages {
    * @param {string} type Document type
    * @param {Array} processedFiles Array of processed file objects
    * @param {string|undefined} name Document name to save
+   * @param {boolean|null} isNewVersion Version flag
    * @returns {Promise<void>}
    */
-  async addFilesToDocument(uuidPath, type, processedFiles, name) {
+  async addFilesToDocument(uuidPath, type, processedFiles, name, isNewVersion) {
     const dossier = await this.dossierBuilder.build(uuidPath);
     const document = dossier.getDocument(type);
     const isImageType = processedFiles[0].mimetype.includes('image/');
@@ -107,12 +109,7 @@ export default class AddPages {
     }
 
     const pages = processedFiles.map((file) => new Page(file));
-    await document.addPages(pages);
-
-    if (name) {
-      document.structure.name = name;
-      document.structure.save();
-    }
+    await document.addPages(pages, { name, isNewVersion });
   }
 
   /**

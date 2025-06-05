@@ -14,7 +14,11 @@ export default class DocumentStructure {
     }
   }
 
-  save() {
+  save(params = {}) {
+    if (params.name) {
+      this.name = params.name;
+    }
+
     debug('тип документа который приходит в сохранение:', this.type);
     this.dossierStructure.save(this.type, {
       pages: this.pages,

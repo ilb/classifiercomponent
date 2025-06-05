@@ -1,21 +1,22 @@
 import fs from 'fs';
-import path from 'path'
+import path from 'path';
 import mime from 'mime-types';
 import {
+  Document,
+  DocumentMerger,
   InsideMovedEvent,
   InsideMovingEvent,
+  MessageBus,
+  Page,
   RemovedEvent,
   RemovingEvent,
   UploadedEvent,
-  UploadingEvent,
-  Page,
-  Document,
-  MessageBus,
-  DocumentMerger
+  UploadingEvent
 } from '../index.js';
 
 import createDebug from 'debug';
-import { extractUuid } from "../utils.mjs";
+import { extractUuid } from '../utils.mjs';
+import { v4 as uuidv4 } from 'uuid';
 
 const debug = createDebug('dossierjs');
 
@@ -67,7 +68,7 @@ export default class PageDocument extends Document {
    */
   async getDocument() {
     if (this.isImages()) {
-      return this.documentMerger.merge(this.getPages().map(page => page.uri));
+      return this.documentMerger.merge(this.getPages().map((page) => page.uri));
     } else {
       return fs.readFileSync(this.getPage(1).uri);
     }
@@ -137,7 +138,7 @@ export default class PageDocument extends Document {
    * @param {Page} page
    * @param {int|null} numberTo
    */
-  async addPage(page, numberTo= null) {
+  async addPage(page, numberTo = null) {
     await MessageBus.emit(new UploadingEvent({ document: this, pages: [page] }));
     await this.#processAddPage(page, numberTo);
     debug('Запуск создания структуры');
@@ -150,14 +151,24 @@ export default class PageDocument extends Document {
    * Нескольких страниц в конец документа
    *
    * @param {Page[]} pages
+   * @param {object} params
+   * @param {string|undefined} params.name
+   * @param {boolean|undefined} params.isNewVersion
    * @returns {Promise<void>}
    */
-  async addPages(pages) {
+  async addPages(pages, params= {}) {
     await MessageBus.emit(new UploadingEvent({ document: this, pages }));
-    pages.map(async page => await this.#processAddPage(page))
-    debug('Запуск создания структуры');
-    this.structure.save();
-    debug('Конец создания структуры');
+
+    if (params.isNewVersion === true) {
+      this.#createNewVersion(pages, params.name);
+    } else if (params.isNewVersion === false) {
+      this.#addToCurrentVersion(pages, params.name);
+    } else {
+      pages.map(async (page) => await this.#processAddPage(page));
+    }
+
+    this.structure.save(params);
+
     await MessageBus.emit(new UploadedEvent({ document: this, pages }));
   }
 
@@ -182,7 +193,7 @@ export default class PageDocument extends Document {
    * @returns {Page|null}
    */
   extractPage(number) {
-    return this.getPages().splice(number - 1, 1)[0]
+    return this.getPages().splice(number - 1, 1)[0];
   }
 
   /**
@@ -190,7 +201,7 @@ export default class PageDocument extends Document {
    */
   async clear() {
     for (let i = this.getPages().length - 1; i >= 0; i--) {
-      await this.deletePage(this.getPages()[i].uuid)
+      await this.deletePage(this.getPages()[i].uuid);
     }
   }
 
@@ -201,7 +212,7 @@ export default class PageDocument extends Document {
    */
   async deletePage(pageUuid) {
     await MessageBus.emit(new RemovingEvent({ document: this, pageUuid }));
-    await this.#processDeletePage(pageUuid)
+    await this.#processDeletePage(pageUuid);
     this.structure.save();
     await MessageBus.emit(new RemovedEvent({ document: this, pageUuid }));
   }
@@ -230,7 +241,6 @@ export default class PageDocument extends Document {
     });
   }
 
-
   /**
    * Получение страниц документа
    *
@@ -241,7 +251,7 @@ export default class PageDocument extends Document {
   }
 
   getVersions() {
-    return this.structure.versions || []
+    return this.structure.versions || [];
   }
 
   /**
@@ -250,7 +260,7 @@ export default class PageDocument extends Document {
    * @param {string} uuid
    */
   getPageByUuid(uuid) {
-    return this.getPages().find(page => page.uuid === uuid);
+    return this.getPages().find((page) => page.uuid === uuid);
   }
 
   /**
@@ -260,7 +270,7 @@ export default class PageDocument extends Document {
    * @return {*[]}
    */
   getPagesByUuids(uuids) {
-    return this.getPages().filter(page => uuids.includes(page.uuid));
+    return this.getPages().filter((page) => uuids.includes(page.uuid));
   }
 
   /**
@@ -281,7 +291,7 @@ export default class PageDocument extends Document {
    */
   async #processAddPage(page, numberTo = null) {
     if (numberTo) {
-      this.getPages().splice(numberTo - 1, 0, page)
+      this.getPages().splice(numberTo - 1, 0, page);
     } else {
       this.getPages().push(page);
     }
@@ -301,7 +311,7 @@ export default class PageDocument extends Document {
 
     const movingPage = this.getPages().splice(numberFrom - 1, 1)[0];
 
-    this.getPages().splice(numberTo - 1, 0, movingPage)
+    this.getPages().splice(numberTo - 1, 0, movingPage);
   }
 
   /**
@@ -313,6 +323,48 @@ export default class PageDocument extends Document {
   async #processDeletePage(pageUuid) {
     const page = this.getPageByUuid(pageUuid);
     fs.unlinkSync(page.uri);
-    this.structure.pages = this.getPages().filter(page => page.uuid !== pageUuid);
+    this.structure.pages = this.getPages().filter((page) => page.uuid !== pageUuid);
+  }
+
+  /**
+   * Create new version with pages
+   *
+   * @param {Page[]} pages
+   * @param {string|undefined} name
+   */
+  #createNewVersion(pages, name) {
+    if (!this.structure.versions) {
+      this.structure.versions = [];
+    }
+
+    const newVersionUuid = uuidv4();
+    const newVersion = {
+      uuid: newVersionUuid,
+      name: name || '',
+      pages: pages
+    };
+
+    this.structure.versions.push(newVersion);
+    this.structure.currentVersion = newVersionUuid;
+  }
+
+  /**
+   * Add pages to current version
+   *
+   * @param {Page[]} pages
+   * @param {string|undefined} name
+   */
+  #addToCurrentVersion(pages, name) {
+    pages.map(async (page) => await this.#processAddPage(page));
+
+    if (this.structure.versions && this.structure.currentVersion) {
+      const currentVersion = this.structure.versions.find(v => v.uuid === this.structure.currentVersion);
+      if (currentVersion) {
+        currentVersion.pages.push(...pages.map(page => page.structure));
+        if (name) {
+          currentVersion.name = name;
+        }
+      }
+    }
   }
 }
