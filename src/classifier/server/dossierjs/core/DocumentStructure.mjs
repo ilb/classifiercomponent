@@ -20,14 +20,20 @@ export default class DocumentStructure {
     }
 
     debug('тип документа который приходит в сохранение:', this.type);
-    this.dossierStructure.save(this.type, {
-      pages: this.pages,
+    const saveData = {
       lastModified: new Date().toISOString(),
       ...(this.template && { template: this.template }),
       ...(this.name && { name: this.name }),
       ...(this.versions && { versions: this.versions }),
       ...(this.currentVersion && { currentVersion: this.currentVersion })
-    });
+    };
+
+    // Если есть версии, не сохраняем страницы в основном массиве pages
+    if (!this.versions || this.versions.length === 0) {
+      saveData.pages = this.pages;
+    }
+
+    this.dossierStructure.save(this.type, saveData);
   }
 
   exists() {
