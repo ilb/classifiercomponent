@@ -106,7 +106,7 @@ const Classifier = ({
     const uniformDocuments = {};
 
     for (const type in documents) {
-      if (documents[type].length) {
+      if (documents[type]?.length) {
         uniformDocuments[type] = documents[type];
       }
     }

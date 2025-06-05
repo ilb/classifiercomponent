@@ -313,9 +313,18 @@ export default class PageDocument extends Document {
       return;
     }
 
-    const movingPage = this.getPages().splice(numberFrom - 1, 1)[0];
-
-    this.getPages().splice(numberTo - 1, 0, movingPage);
+    // Если используется система версий
+    if (this.structure.versions && this.structure.currentVersion) {
+      const currentVersion = this.structure.versions.find(v => v.uuid === this.structure.currentVersion);
+      if (currentVersion) {
+        const movingPage = currentVersion.pages.splice(numberFrom - 1, 1)[0];
+        currentVersion.pages.splice(numberTo - 1, 0, movingPage);
+      }
+    } else {
+      // Обратная совместимость - работа с обычным массивом pages
+      const movingPage = this.structure.pages.splice(numberFrom - 1, 1)[0];
+      this.structure.pages.splice(numberTo - 1, 0, movingPage);
+    }
   }
 
   /**
@@ -326,8 +335,22 @@ export default class PageDocument extends Document {
    */
   async #processDeletePage(pageUuid) {
     const page = this.getPageByUuid(pageUuid);
+    if (!page) {
+      return;
+    }
+    
     fs.unlinkSync(page.uri);
-    this.structure.pages = this.getPages().filter((page) => page.uuid !== pageUuid);
+
+    // Если используется система версий
+    if (this.structure.versions && this.structure.currentVersion) {
+      const currentVersion = this.structure.versions.find(v => v.uuid === this.structure.currentVersion);
+      if (currentVersion) {
+        currentVersion.pages = currentVersion.pages.filter((page) => page.uuid !== pageUuid);
+      }
+    } else {
+      // Обратная совместимость - удаление из обычного массива pages
+      this.structure.pages = this.getPages().filter((page) => page.uuid !== pageUuid);
+    }
   }
 
   /**
