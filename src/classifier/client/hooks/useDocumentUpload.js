@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'react-semantic-toasts';
 import { classifyDocument, uploadPages } from './index';
 import { compress } from '../utils/compressor';
+import { revalidateDocumentsWithRetry } from '../utils/retryUtils';
 
 /**
  * Hook for handling document upload functionality
@@ -32,6 +33,7 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
     );
   }, []);
 
+
   /**
    * Handle files dropped for classification
    * @param {Array} acceptedFiles Accepted files
@@ -42,7 +44,14 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
    * @returns {Promise<void>}
    */
   const handleDocumentsDrop = useCallback(
-    async (acceptedFiles, targetTab, availableClasses = [], onUpdate, selectedTab) => {
+    async (
+      acceptedFiles,
+      targetTab,
+      availableClasses = [],
+      onUpdate,
+      selectedTab,
+      currentDocuments = {}
+    ) => {
       if (!acceptedFiles || !acceptedFiles.length) {
         return showError?.('Файл выбранного типа не доступен для загрузки.');
       }
@@ -67,7 +76,8 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
         setLoading(true);
         try {
           const result = await uploadPages(uuid, targetTab, compressedFiles);
-          const documents = await revalidateDocuments();
+          // Use retry mechanism for direct uploads to handle race conditions
+          const documents = await revalidateDocumentsWithRetry(revalidateDocuments, 3, 1000, currentDocuments);
 
           if (onUpdate) {
             onUpdate(selectedTab, documents);
@@ -100,7 +110,7 @@ export const useDocumentUpload = (uuid, revalidateDocuments, showError) => {
         }
       }
     },
-    [uuid, compressFiles, revalidateDocuments, showError]
+    [uuid, compressFiles, revalidateDocumentsWithRetry, showError]
   );
 
   return {

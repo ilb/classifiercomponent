@@ -120,4 +120,3 @@ export const compress = async (file, acceptFileSize, maxWidth, maxHeight, qualit
     processCompress(file, acceptFileSize, maxWidth, maxHeight, quality, resolve)
   );
 };
-

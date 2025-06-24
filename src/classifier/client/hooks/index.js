@@ -94,9 +94,7 @@ export const usePages = (uuid, documentName) => {
     mutatePages: mutate,
     revalidatePages: () =>
       mutateGlobal(
-        documentName
-          ? `${basePath}/classifications/${uuid}/documents/${documentName}/index`
-          : null
+        documentName ? `${basePath}/classifications/${uuid}/documents/${documentName}/index` : null
       )
   };
 };

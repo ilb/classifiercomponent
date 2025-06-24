@@ -18,6 +18,7 @@ import { classifyDocument, deletePage, uploadPages, useDocuments, useTasks } fro
 import { toast } from 'react-semantic-toasts';
 import { registerTwain } from '../utils/twain';
 import { compress } from '../utils/compressor.js';
+import { revalidateDocumentsWithRetry } from '../utils/retryUtils';
 
 const Classifier = ({
   form,
@@ -58,7 +59,7 @@ const Classifier = ({
       onInit && onInit(documents);
       setPrev(documents);
     }
-  }, [documents])
+  }, [documents]);
 
   useEffect(() => {
     setClassifier(schema.classifier);
@@ -112,7 +113,9 @@ const Classifier = ({
   }, [documents, form]);
 
   useEffect(() => {
-    const processTasks = tasks.filter(({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE');
+    const processTasks = tasks.filter(
+      ({ status }) => status.code === 'STARTED' || status.code === 'IN_QUEUE'
+    );
     setCountStartedTasks(processTasks.length);
   }, [tasks]);
 
@@ -131,7 +134,7 @@ const Classifier = ({
 
       setPrev(documents);
     }
-  }, [finishedTasks.length])
+  }, [finishedTasks.length]);
 
   useEffect(() => {
     const interval = setInterval(() => setTwainHandler() && clearInterval(interval), 1000);
@@ -169,6 +172,7 @@ const Classifier = ({
     setDraggableOrigin(null);
   };
 
+
   const handleDocumentsDrop = async (acceptedFiles) => {
     if (!acceptedFiles.length) {
       return showError('Файл выбранного типа не доступен для загрузки.');
@@ -184,26 +188,29 @@ const Classifier = ({
       const compressedFiles = await compressFiles(acceptedFiles);
       uploadPages(uuid, selectedTab.type, compressedFiles)
         .then(async (result) => {
-          const documents = await revalidateDocuments();
-          onUpdate && onUpdate(selectedTab, documents);
-          setPrev(documents);
-          result.error && processError(result.error, documents);
+          // Use retry mechanism for direct uploads to handle race conditions
+          const updatedDocuments = await revalidateDocumentsWithRetry(revalidateDocuments, 3, 1000, documents);
+          onUpdate && onUpdate(selectedTab, updatedDocuments);
+          setPrev(updatedDocuments);
+          result.error && processError(result.error, updatedDocuments);
         })
         .finally(() => setLoading(false));
     }
   };
 
   const compressFiles = async (files) => {
-    return Promise.all(files.map(async (file, index) => {
-      if (file.type.includes('image/')) {
-        return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
-          return new File([blob], file.name, { type: file.type });
-        });
-      } else {
-        return file;
-      }
-    }))
-  }
+    return Promise.all(
+      files.map(async (file, index) => {
+        if (file.type.includes('image/')) {
+          return compress(file, 500, Infinity, 1000, 0.9).then((blob) => {
+            return new File([blob], file.name, { type: file.type });
+          });
+        } else {
+          return file;
+        }
+      })
+    );
+  };
 
   const processError = (error, documents) => {
     if (error?.description?.type === 'signatureError') {
@@ -383,10 +390,7 @@ const Classifier = ({
         onDragEnd={onDragEnd}
         onDragOver={onDragOver}
         onDragCancel={onDragCancel}>
-        <Grid.Column
-          textAlign="center"
-          className="dossier__wrap"
-          width={4}>
+        <Grid.Column textAlign="center" className="dossier__wrap" width={4}>
           <Menu
             uuid={uuid}
             blocks={schema.blocks}
